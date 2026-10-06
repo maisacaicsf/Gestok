@@ -35,6 +35,12 @@ service cloud.firestore {
         allow delete: if false;
       }
 
+      // Operadores do PDV: somente o proprietário da loja pode criar, consultar, alterar ou desativar.
+      match /operadores/{operadorId} {
+        allow read, write: if request.auth != null
+          && get(/databases/$(database)/documents/lojas/$(lojaId)).data.donoUid == request.auth.uid;
+      }
+
       match /produtos/{produtoId} {
         allow read, write: if request.auth != null
           && get(/databases/$(database)/documents/lojas/$(lojaId)).data.donoUid == request.auth.uid;

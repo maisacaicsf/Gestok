@@ -12,6 +12,10 @@ function referenciaUsuarios(lojaId) {
     return referenciaLoja(lojaId).collection('usuarios');
 }
 
+function referenciaOperadores(lojaId) {
+    return referenciaLoja(lojaId).collection('operadores');
+}
+
 function referenciaProdutos(lojaId) {
     return referenciaLoja(lojaId).collection('produtos');
 }

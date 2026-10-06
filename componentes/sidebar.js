@@ -76,6 +76,7 @@
             "perfil",
             "suporte",
             "redes_sociais",
+            "operadores",
             "login",
             "cadastro",
             "planos"
@@ -396,6 +397,30 @@
 
                         <span>
                             Solicitações
+                        </span>
+
+                    </a>
+
+
+                    <!-- EQUIPE -->
+
+                    <div class="sidebar-section-title">
+                        EQUIPE
+                    </div>
+
+
+                    <a
+                        href="${urlGestok("operadores/index.html")}"
+                        class="sidebar-nav-item"
+                        data-page="operadores"
+                    >
+
+                        <span class="sidebar-nav-icon">
+                            ♙
+                        </span>
+
+                        <span>
+                            Operadores
                         </span>
 
                     </a>
@@ -777,6 +802,18 @@
             if (
                 pagina === "solicitacoes" &&
                 caminho.includes("/solicitacoes/")
+            ) {
+
+                item.classList.add(
+                    "active"
+                );
+
+            }
+
+
+            if (
+                pagina === "operadores" &&
+                caminho.includes("/operadores/")
             ) {
 
                 item.classList.add(
