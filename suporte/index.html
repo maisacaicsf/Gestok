@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Gestok | Suporte</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../componentes/sidebar.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================
+         SIDEBAR UNIVERSAL
+    ========================================== -->
+
+    <div
+        id="gestok-sidebar-container"
+    ></div>
+
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <header class="header">
+
+        <div class="header-left">
+
+            <button
+                class="menu-button"
+                id="menuButton"
+                type="button"
+                aria-label="Abrir menu"
+            >
+
+                <span></span>
+                <span></span>
+                <span></span>
+
+            </button>
+
+
+            <span class="page-name">
+                Suporte
+            </span>
+
+        </div>
+
+
+        <div class="header-right">
+
+            <button
+                class="notification-button"
+                type="button"
+                aria-label="Notificações"
+            >
+                ♧
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================
+         CONTEÚDO
+    ========================================== -->
+
+    <main class="main-content">
+
+
+        <!-- =====================================
+             HERO
+        ====================================== -->
+
+        <section class="hero">
+
+            <div>
+
+                <span class="eyebrow">
+                    CENTRAL DE AJUDA
+                </span>
+
+                <h1>
+                    Como podemos ajudar?
+                </h1>
+
+                <p>
+                    Encontre respostas, consulte dúvidas frequentes
+                    ou fale com nossa equipe de suporte.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             BUSCA
+        ====================================== -->
+
+        <section class="support-search">
+
+            <div class="search-icon">
+                ⌕
+            </div>
+
+            <input
+                type="search"
+                id="buscaSuporte"
+                placeholder="Digite sua dúvida..."
+                autocomplete="off"
+            >
+
+        </section>
+
+
+        <!-- =====================================
+             CARDS PRINCIPAIS
+        ====================================== -->
+
+        <section class="support-options">
+
+
+            <!-- PERGUNTAS FREQUENTES -->
+
+            <button
+                class="support-card"
+                type="button"
+                data-open="faq"
+            >
+
+                <div class="support-card-icon blue">
+                    ?
+                </div>
+
+                <div>
+
+                    <strong>
+                        Perguntas frequentes
+                    </strong>
+
+                    <span>
+                        Encontre respostas rápidas
+                        para as principais dúvidas.
+                    </span>
+
+                </div>
+
+                <b>
+                    →
+                </b>
+
+            </button>
+
+
+            <!-- ABRIR CHAMADO -->
+
+            <button
+                class="support-card"
+                type="button"
+                data-open="chamado"
+            >
+
+                <div class="support-card-icon purple">
+                    +
+                </div>
+
+                <div>
+
+                    <strong>
+                        Abrir chamado
+                    </strong>
+
+                    <span>
+                        Precisa de ajuda?
+                        Fale com nossa equipe.
+                    </span>
+
+                </div>
+
+                <b>
+                    →
+                </b>
+
+            </button>
+
+
+            <!-- MEUS CHAMADOS -->
+
+            <a
+                class="support-card support-card-link-card"
+                id="meusChamados"
+                href="chamados/index.html"
+            >
+
+                <div class="support-card-icon green">
+                    ?
+                </div>
+
+                <div>
+
+                    <strong>
+                        Meus chamados
+                    </strong>
+
+                    <span>
+                        Acompanhe suas solicitações
+                        de suporte.
+                    </span>
+
+                </div>
+
+                <b>
+                    →
+                </b>
+
+            </a>
+
+        </section>
+
+
+        <!-- =====================================
+             FAQ
+        ====================================== -->
+
+        <section
+            class="panel faq-panel"
+            id="faq"
+        >
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>
+                        Perguntas frequentes
+                    </h2>
+
+                    <p>
+                        Respostas para as dúvidas mais comuns.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="faq-list">
+
+
+                <!-- FAQ 1 -->
+
+                <button
+                    class="faq-item"
+                    type="button"
+                >
+
+                    <span>
+                        Como cadastrar um produto?
+                    </span>
+
+                    <b>
+                        +
+                    </b>
+
+                </button>
+
+
+                <div class="faq-answer">
+
+                    <p>
+
+                        Acesse o menu
+                        <strong>Criar produto</strong>,
+                        preencha as informações do produto
+                        e salve o cadastro.
+
+                    </p>
+
+                </div>
+
+
+                <!-- FAQ 2 -->
+
+                <button
+                    class="faq-item"
+                    type="button"
+                >
+
+                    <span>
+                        Como registrar uma entrada?
+                    </span>
+
+                    <b>
+                        +
+                    </b>
+
+                </button>
+
+
+                <div class="faq-answer">
+
+                    <p>
+
+                        Acesse
+                        <strong>Entrada</strong>,
+                        selecione o produto,
+                        informe a quantidade e confirme
+                        a movimentação.
+
+                    </p>
+
+                </div>
+
+
+                <!-- FAQ 3 -->
+
+                <button
+                    class="faq-item"
+                    type="button"
+                >
+
+                    <span>
+                        Como registrar uma saída?
+                    </span>
+
+                    <b>
+                        +
+                    </b>
+
+                </button>
+
+
+                <div class="faq-answer">
+
+                    <p>
+
+                        Acesse
+                        <strong>Saída</strong>,
+                        selecione o produto,
+                        informe a quantidade retirada
+                        e confirme a operação.
+
+                    </p>
+
+                </div>
+
+
+                <!-- FAQ 4 -->
+
+                <button
+                    class="faq-item"
+                    type="button"
+                >
+
+                    <span>
+                        Onde vejo o histórico do estoque?
+                    </span>
+
+                    <b>
+                        +
+                    </b>
+
+                </button>
+
+
+                <div class="faq-answer">
+
+                    <p>
+
+                        Acesse
+                        <strong>Movimentações</strong>
+                        para consultar todas as entradas
+                        e saídas registradas.
+
+                    </p>
+
+                </div>
+
+
+                <!-- FAQ 5 -->
+
+                <button
+                    class="faq-item"
+                    type="button"
+                >
+
+                    <span>
+                        Como gerar um relatório?
+                    </span>
+
+                    <b>
+                        +
+                    </b>
+
+                </button>
+
+
+                <div class="faq-answer">
+
+                    <p>
+
+                        Acesse
+                        <strong>Relatórios</strong>,
+                        escolha o tipo de relatório,
+                        aplique os filtros desejados
+                        e clique em
+                        <strong>Gerar PDF</strong>.
+
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             CONTATO
+        ====================================== -->
+
+        <section class="contact-panel">
+
+
+            <div class="contact-icon">
+                ?
+            </div>
+
+
+            <div class="contact-content">
+
+                <span class="eyebrow">
+                    PRECISA DE MAIS AJUDA?
+                </span>
+
+                <h2>
+                    Nossa equipe está pronta para ajudar.
+                </h2>
+
+                <p>
+                    Abra um chamado e descreva o que
+                    está acontecendo. Nossa equipe poderá
+                    acompanhar sua solicitação.
+                </p>
+
+            </div>
+
+
+            <button
+                class="primary-button"
+                id="btnAbrirChamado"
+                type="button"
+            >
+
+                Abrir chamado
+
+                <span>
+                    →
+                </span>
+
+            </button>
+
+
+        </section>
+
+
+        <!-- =====================================
+             MODAL CHAMADO
+        ====================================== -->
+
+        <div
+            class="modal-overlay"
+            id="modalChamado"
+        >
+
+            <div class="modal">
+
+
+                <div class="modal-header">
+
+                    <div>
+
+                        <span class="eyebrow">
+                            SUPORTE
+                        </span>
+
+                        <h2>
+                            Abrir chamado
+                        </h2>
+
+                    </div>
+
+
+                    <button
+                        class="modal-close"
+                        id="fecharChamado"
+                        type="button"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <form id="formChamado">
+
+
+                    <!-- ASSUNTO -->
+
+                    <div class="form-group">
+
+                        <label for="assunto">
+                            Assunto
+                        </label>
+
+                        <input
+                            id="assunto"
+                            name="assunto"
+                            type="text"
+                            placeholder="Ex.: Problema ao cadastrar produto"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- CATEGORIA -->
+
+                    <div class="form-group">
+
+                        <label for="categoria">
+                            Categoria
+                        </label>
+
+                        <select
+                            id="categoria"
+                            name="categoria"
+                            required
+                        >
+
+                            <option value="">
+                                Selecione uma categoria
+                            </option>
+
+                            <option value="Conta">
+                                Conta e acesso
+                            </option>
+
+                            <option value="Produtos">
+                                Produtos
+                            </option>
+
+                            <option value="Estoque">
+                                Estoque
+                            </option>
+
+                            <option value="Relatórios">
+                                Relatórios
+                            </option>
+
+                            <option value="Sistema">
+                                Problema no sistema
+                            </option>
+
+                            <option value="Outro">
+                                Outro
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- MENSAGEM -->
+
+                    <div class="form-group">
+
+                        <label for="mensagem">
+                            Descreva o problema
+                        </label>
+
+                        <textarea
+                            id="mensagem"
+                            name="mensagem"
+                            rows="5"
+                            placeholder="Explique o que aconteceu..."
+                            required
+                        ></textarea>
+
+                    </div>
+
+
+                    <!-- AÇÕES -->
+
+                    <div class="modal-actions">
+
+                        <button
+                            class="secondary-button"
+                            id="cancelarChamado"
+                            type="button"
+                        >
+                            Cancelar
+                        </button>
+
+
+                        <button
+                            class="primary-button"
+                            type="submit"
+                        >
+                            Enviar chamado
+                            →
+                        </button>
+
+                    </div>
+
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+    </main>
+
+
+    <!-- =========================================
+         SCRIPTS
+    ========================================= -->
+
+
+    <!-- FIREBASE -->
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+
+    <!-- CONFIGURAÇÃO FIREBASE -->
+
+    <script src="../firebase/config.js"></script>
+
+
+    <!-- INICIALIZAÇÃO FIREBASE -->
+
+    <script>
+
+        if (
+            typeof firebase !== "undefined" &&
+            typeof firebaseConfig !== "undefined"
+        ) {
+
+            if (!firebase.apps.length) {
+
+                firebase.initializeApp(
+                    firebaseConfig
+                );
+
+            }
+
+        }
+
+    </script>
+
+
+    <!-- BIBLIOTECAS FIREBASE DO GESTOK -->
+
+    <script src="../firebase/auth.js"></script>
+
+    <script src="../firebase/firestore.js"></script>
+
+
+    <!-- CONTEXTO CENTRAL DO GESTOK -->
+
+    <script src="../auth.js"></script>
+
+
+    <!-- SIDEBAR -->
+
+    <script src="../componentes/sidebar.js"></script>
+
+
+    <!-- SCRIPT DO SUPORTE -->
+
+    <script src="script.js"></script>
+
+
+</body>
+
+</html>

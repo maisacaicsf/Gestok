@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Gestok | Solicitar compra</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="../componentes/sidebar.css"
+    >
+</head>
+
+<body>
+    <div id="gestok-sidebar-container"></div>
+    <!-- HEADER -->
+    <header class="header">
+
+        <div class="header-left">
+
+            <button
+                class="menu-button"
+                id="menuButton"
+                type="button"
+                aria-label="Abrir menu"
+            >
+
+                <span></span>
+                <span></span>
+                <span></span>
+
+            </button>
+
+            <span class="page-name">
+                Solicitar compra
+            </span>
+
+        </div>
+        </div>
+
+    </header>
+
+
+    <!-- CONTEÚDO -->
+    <main class="main-content">
+
+
+        <a
+            href="../sistema/index.html"
+            class="back-dashboard"
+        >
+            ← Voltar ao Dashboard
+        </a>
+
+
+        <!-- TÍTULO -->
+        <section class="hero">
+
+            <div>
+
+                <span class="eyebrow">
+                    COMPRAS
+                </span>
+
+                <h1>
+                    Solicitar compra
+                </h1>
+
+                <p>
+                    Solicite produtos para reposição do estoque.
+                </p>
+
+            </div>
+
+
+            <button
+                class="primary-button"
+                id="btnNovaSolicitacao"
+                type="button"
+            >
+                ＋ Nova solicitação
+            </button>
+
+        </section>
+
+
+        <!-- RESUMO -->
+        <section class="summary-grid">
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon pending">
+                    !
+                </div>
+
+                <div>
+
+                    <span>
+                        Pendentes
+                    </span>
+
+                    <strong id="totalPendentes">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon approved">
+                    ✓
+                </div>
+
+                <div>
+
+                    <span>
+                        Aprovadas
+                    </span>
+
+                    <strong id="totalAprovadas">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon attention">
+                    ↓
+                </div>
+
+                <div>
+
+                    <span>
+                        Produtos abaixo do mínimo
+                    </span>
+
+                    <strong id="totalAbaixoMinimo">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon total">
+                    #
+                </div>
+
+                <div>
+
+                    <span>
+                        Total de solicitações
+                    </span>
+
+                    <strong id="totalSolicitacoes">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- PAINEL -->
+        <section class="panel">
+
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>
+                        Solicitações de compra
+                    </h2>
+
+                    <p>
+                        Acompanhe as solicitações realizadas.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- FILTROS -->
+            <div class="filters">
+
+
+                <div class="search-box">
+
+                    <span>
+                        ⌕
+                    </span>
+
+                    <input
+                        type="search"
+                        id="busca"
+                        placeholder="Buscar produto ou motivo..."
+                    >
+
+                </div>
+
+
+                <select id="filtroStatus">
+
+                    <option value="">
+                        Todos os status
+                    </option>
+
+                    <option value="Pendente">
+                        Pendentes
+                    </option>
+
+                    <option value="Em análise">
+                        Em análise
+                    </option>
+
+                    <option value="Aprovada">
+                        Aprovadas
+                    </option>
+
+                    <option value="Recusada">
+                        Recusadas
+                    </option>
+
+                    <option value="Cancelada">
+                        Canceladas
+                    </option>
+
+                </select>
+
+
+                <button
+                    id="limparFiltros"
+                    type="button"
+                >
+                    Limpar filtros
+                </button>
+
+            </div>
+
+
+            <!-- TABELA -->
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Produto
+                            </th>
+
+                            <th>
+                                Estoque
+                            </th>
+
+                            <th>
+                                Quantidade
+                            </th>
+
+                            <th>
+                                Motivo
+                            </th>
+
+                            <th>
+                                Data
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Ações
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="listaSolicitacoes">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- ESTADO VAZIO -->
+            <div
+                class="empty-state"
+                id="emptyState"
+                style="display: none;"
+            >
+
+                <div class="empty-icon">
+                    □
+                </div>
+
+                <strong>
+                    Nenhuma solicitação encontrada
+                </strong>
+
+                <span>
+                    As solicitações de compra aparecerão aqui.
+                </span>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- MODAL NOVA SOLICITAÇÃO -->
+    <div
+        class="modal-overlay"
+        id="modalOverlay"
+    >
+
+        <div
+            class="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modalTitulo"
+        >
+
+
+            <div class="modal-header">
+
+                <div>
+
+                    <span class="modal-eyebrow">
+                        COMPRAS
+                    </span>
+
+                    <h2 id="modalTitulo">
+                        Nova solicitação
+                    </h2>
+
+                    <p>
+                        Informe o produto e a quantidade necessária.
+                    </p>
+
+                </div>
+
+
+                <button
+                    class="modal-close"
+                    id="fecharModal"
+                    type="button"
+                    aria-label="Fechar"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <form id="solicitacaoForm">
+
+
+                <!-- PRODUTO -->
+                <div class="form-group">
+
+                    <label for="produto">
+                        Produto
+                    </label>
+
+                    <select
+                        id="produto"
+                        required
+                    >
+
+                        <option value="">
+                            Selecione um produto
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- INFORMAÇÕES DO ESTOQUE -->
+                <div
+                    class="stock-info"
+                    id="stockInfo"
+                    style="display: none;"
+                >
+
+
+                    <div>
+
+                        <span>
+                            Estoque atual
+                        </span>
+
+                        <strong id="estoqueAtual">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Estoque mínimo
+                        </span>
+
+                        <strong id="estoqueMinimo">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Unidade
+                        </span>
+
+                        <strong id="unidadeProduto">
+                            UN
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- QUANTIDADE -->
+                <div class="form-group">
+
+                    <label for="quantidade">
+                        Quantidade para compra
+                    </label>
+
+                    <input
+                        type="number"
+                        id="quantidade"
+                        min="1"
+                        step="1"
+                        placeholder="Ex.: 10"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- MOTIVO -->
+                <div class="form-group">
+
+                    <label for="motivo">
+                        Motivo
+                    </label>
+
+                    <select id="motivo">
+
+                        <option value="Estoque abaixo do mínimo">
+                            Estoque abaixo do mínimo
+                        </option>
+
+                        <option value="Reposição de estoque">
+                            Reposição de estoque
+                        </option>
+
+                        <option value="Aumento da demanda">
+                            Aumento da demanda
+                        </option>
+
+                        <option value="Compra preventiva">
+                            Compra preventiva
+                        </option>
+
+                        <option value="Outro">
+                            Outro
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- OBSERVAÇÃO -->
+                <div class="form-group">
+
+                    <label for="observacao">
+                        Observação
+                        <span>
+                            opcional
+                        </span>
+                    </label>
+
+                    <textarea
+                        id="observacao"
+                        rows="3"
+                        placeholder="Adicione alguma informação sobre a compra..."
+                    ></textarea>
+
+                </div>
+
+
+                <!-- BOTÕES -->
+                <div class="modal-actions">
+
+                    <button
+                        type="button"
+                        class="secondary-button"
+                        id="cancelarModal"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="primary-button"
+                    >
+                        Solicitar compra
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <script src="../componentes/sidebar.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+    <script src="../firebase/config.js"></script>
+
+    <script>
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+    </script>
+
+    <script src="../firebase/auth.js"></script>
+    <script src="../firebase/firestore.js"></script>
+    <script src="../auth.js"></script>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

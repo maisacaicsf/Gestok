@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Gestok | Produtos</title>
+
+    <link rel="stylesheet" href="style.css">
+        <link
+        rel="stylesheet"
+        href="../componentes/sidebar.css"
+    >
+</head>
+
+<body>
+<body>
+<div id="gestok-sidebar-container"></div>
+<header class="header">
+
+    <div class="header-left">
+
+        <button
+            class="menu-button"
+            id="menuButton"
+            aria-label="Abrir menu">
+
+            <span></span>
+            <span></span>
+            <span></span>
+
+        </button>
+
+        <div class="page-name">
+            Entrada de estoque
+        </div>
+
+    </div>
+</header>
+    <main class="page">
+
+        <div class="page-header">
+            <div>
+                <span class="eyebrow">ESTOQUE</span>
+                <h1>Produtos</h1>
+                <p>Cadastre e organize os produtos do seu estoque.</p>
+            </div>
+        </div>
+
+        <section class="product-container">
+
+            <div class="form-header">
+                <div>
+                    <h2>Cadastrar produto</h2>
+                    <p>Preencha as informações abaixo para adicionar um novo produto.</p>
+                </div>
+            </div>
+
+            <form id="produtoForm">
+
+                <div class="form-grid">
+
+                    <div class="form-group full">
+                        <label for="nome">Nome do produto *</label>
+                        <input
+                            type="text"
+                            id="nome"
+                            name="nome"
+                            placeholder="Ex.: Notebook Dell Inspiron"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="codigo">Código / SKU</label>
+                        <input
+                            type="text"
+                            id="codigo"
+                            name="codigo"
+                            placeholder="Ex.: PROD-001"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="categoria">Categoria</label>
+                        <select id="categoria" name="categoria">
+                            <option value="">Selecione uma categoria</option>
+                            <option>Eletrônicos</option>
+                            <option>Informática</option>
+                            <option>Escritório</option>
+                            <option>Ferramentas</option>
+                            <option>Materiais</option>
+                            <option>Outros</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quantidade">Quantidade inicial *</label>
+                        <input
+                            type="number"
+                            id="quantidade"
+                            name="quantidade"
+                            min="0"
+                            value="0"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="unidade">Unidade</label>
+                        <select id="unidade" name="unidade">
+                            <option value="UN">Unidade</option>
+                            <option value="CX">Caixa</option>
+                            <option value="KG">Quilograma</option>
+                            <option value="L">Litro</option>
+                            <option value="M">Metro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="estoqueMinimo">Estoque mínimo</label>
+                        <input
+                            type="number"
+                            id="estoqueMinimo"
+                            name="estoqueMinimo"
+                            min="0"
+                            value="0"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="estoqueMaximo">Estoque máximo</label>
+                        <input
+                            type="number"
+                            id="estoqueMaximo"
+                            name="estoqueMaximo"
+                            min="0"
+                            value="0"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="preco">Preço unitário</label>
+
+                        <div class="input-money">
+                            <span>R$</span>
+
+                            <input
+                                type="number"
+                                id="preco"
+                                name="preco"
+                                min="0"
+                                step="0.01"
+                                placeholder="0,00"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="descricao">Descrição</label>
+
+                        <textarea
+                            id="descricao"
+                            name="descricao"
+                            rows="4"
+                            placeholder="Digite uma descrição do produto..."
+                        ></textarea>
+                    </div>
+
+                </div>
+
+                <div class="form-footer">
+                    <a href="../index.html" class="secondary-button">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="primary-button">
+                        ✓ Cadastrar produto
+                    </button>
+                </div>
+
+            </form>
+    <!-- =========================================
+        LISTA DE PRODUTOS
+    ========================================= -->
+
+    <section class="product-container products-list-container">
+
+        <div class="form-header">
+
+            <div>
+                <h2>Produtos cadastrados</h2>
+                <p>Consulte os produtos atualmente cadastrados no estoque.</p>
+            </div>
+
+            <span class="products-count" id="produtosCount">
+                0 produtos
+            </span>
+
+        </div>
+
+
+        <div class="products-list" id="produtosLista">
+
+            <!--
+                Os produtos serão inseridos
+                automaticamente pelo JavaScript.
+            -->
+
+        </div>
+
+
+        <div class="products-empty" id="produtosVazio">
+
+            <div class="products-empty-icon">
+                📦
+            </div>
+
+            <strong>
+                Nenhum produto cadastrado
+            </strong>
+
+            <span>
+                Os produtos cadastrados aparecerão aqui.
+            </span>
+
+        </div>
+
+        </section>
+
+    </main>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script src="../firebase/config.js"></script>
+    <script>firebase.initializeApp(firebaseConfig);</script>
+    <script src="../firebase/auth.js"></script>
+    <script src="../firebase/firestore.js"></script>
+    <script src="../auth.js"></script>
+    <script src="../componentes/sidebar.js"></script>
+    <script src="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,929 @@
+/* =========================================
+   GESTOK
+   Consulta de produtos
+========================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f7fb;
+    color: #172033;
+}
+/* =========================================
+   PÁGINA
+========================================= */
+
+.page {
+    width: min(1100px, calc(100% - 60px));
+    margin: 0 auto;
+    padding: 38px 0 60px;
+}
+
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    margin-bottom: 28px;
+}
+
+
+.eyebrow {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: #1d4ed8;
+}
+
+
+.page-header h1 {
+    margin: 0;
+    font-size: 32px;
+    letter-spacing: -0.5px;
+}
+
+
+.page-header p {
+    margin: 8px 0 0;
+    color: #7a8496;
+    font-size: 14px;
+}
+
+
+.primary-button {
+    border: 0;
+    border-radius: 10px;
+    padding: 12px 18px;
+    background: #1d4ed8;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+
+/* =========================================
+   PAINEL
+========================================= */
+
+.products-panel {
+    background: #ffffff;
+    border: 1px solid #e7eaf0;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(20, 30, 50, 0.05);
+    overflow: hidden;
+}
+
+
+.products-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 24px 26px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+
+.products-panel-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+
+.products-panel-header p {
+    margin: 6px 0 0;
+    color: #7a8496;
+    font-size: 13px;
+}
+
+
+.products-total {
+    white-space: nowrap;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #f1f5ff;
+    color: #1d4ed8;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* =========================================
+   PESQUISA
+========================================= */
+
+.search-box {
+    position: relative;
+    margin: 22px 26px 18px;
+}
+
+
+.search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+}
+
+
+.search-box input {
+    width: 100%;
+    height: 48px;
+    padding: 0 16px 0 44px;
+    border: 1px solid #dfe4eb;
+    border-radius: 10px;
+    outline: none;
+    font-size: 14px;
+    color: #172033;
+    background: #ffffff;
+}
+
+
+.search-box input:focus {
+    border-color: #1d4ed8;
+    box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.08);
+}
+
+
+/* =========================================
+   FILTROS
+========================================= */
+
+.filters {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr) auto;
+    gap: 14px;
+    padding: 0 26px 22px;
+}
+
+
+.filter-group label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #536071;
+}
+
+
+.filter-group select {
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid #dfe4eb;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #303b4d;
+    outline: none;
+    cursor: pointer;
+}
+
+
+.clear-filters {
+    align-self: end;
+    height: 42px;
+    padding: 0 15px;
+    border: 1px solid #dfe4eb;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #536071;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+
+/* =========================================
+   TABELA
+========================================= */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    border-top: 1px solid #edf0f4;
+}
+
+
+.products-table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+}
+
+
+.products-table th {
+    padding: 14px 18px;
+    text-align: left;
+    background: #f8fafc;
+    color: #687386;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+
+.products-table td {
+    padding: 16px 18px;
+    border-top: 1px solid #edf0f4;
+    color: #465164;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+
+.products-table tbody tr:hover {
+    background: #fafcff;
+}
+
+
+/* =========================================
+   PRODUTO
+========================================= */
+
+.product-name strong {
+    display: block;
+    color: #172033;
+    font-size: 14px;
+}
+
+
+.product-name small {
+    display: block;
+    max-width: 240px;
+    margin-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #8993a3;
+    font-size: 11px;
+}
+
+
+.unit {
+    margin-left: 3px;
+    color: #8993a3;
+    font-size: 11px;
+}
+
+
+/* =========================================
+   STATUS
+========================================= */
+
+.stock-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 9px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+.stock-status .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+}
+
+
+.stock-status.success {
+    background: #ecfdf3;
+    color: #15803d;
+}
+
+
+.stock-status.success .status-dot {
+    background: #22c55e;
+}
+
+
+.stock-status.warning {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+
+.stock-status.warning .status-dot {
+    background: #f97316;
+}
+
+
+.stock-status.danger {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+
+.stock-status.danger .status-dot {
+    background: #ef4444;
+}
+
+
+.stock-status.inactive {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+
+.stock-status.inactive .status-dot {
+    background: #9ca3af;
+}
+
+
+/* =========================================
+   EDITAR
+========================================= */
+
+.edit-button {
+    border: 1px solid #dbe2ec;
+    border-radius: 8px;
+    padding: 7px 11px;
+    background: #ffffff;
+    color: #3155a5;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+
+.edit-button:hover {
+    background: #f1f5ff;
+    border-color: #b9c8ec;
+}
+
+
+/* =========================================
+   SEM RESULTADOS
+========================================= */
+
+.no-results {
+    min-height: 260px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 30px;
+}
+
+
+.no-results-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    font-size: 23px;
+    margin-bottom: 12px;
+}
+
+
+.no-results strong {
+    font-size: 15px;
+}
+
+
+.no-results span {
+    margin-top: 6px;
+    color: #8993a3;
+    font-size: 13px;
+}
+
+
+/* =========================================
+   RESPONSIVO
+========================================= */
+
+@media (max-width: 900px) {
+
+    .filters {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .clear-filters {
+        align-self: end;
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .topbar {
+        padding: 0 4%;
+    }
+
+    .page {
+        width: 94%;
+        padding-top: 25px;
+    }
+
+    .page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .page-header h1 {
+        font-size: 27px;
+    }
+
+    .products-panel-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .filters {
+        grid-template-columns: 1fr;
+    }
+
+    .clear-filters {
+        width: 100%;
+    }
+
+}
+/* =========================================
+   GESTOK - MENU LATERAL
+========================================= */
+
+.sidebar {
+    position: fixed !important;
+    top: 0;
+    left: -290px;
+    width: 290px;
+    height: 100vh;
+
+    background: #ffffff;
+
+    z-index: 9999;
+
+    border-right: 1px solid #e7ebf0;
+
+    box-shadow: 8px 0 30px rgba(20, 30, 50, 0.08);
+
+    transition: left 0.25s ease;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 22px 17px;
+
+    box-sizing: border-box;
+}
+
+.sidebar.active {
+    left: 0 !important;
+}
+
+
+/* =========================================
+   TOPO DA BARRA
+========================================= */
+
+.sidebar-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 30px;
+
+    padding: 0 5px;
+}
+
+
+/* =========================================
+   LOGO
+========================================= */
+
+.brand {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    text-decoration: none;
+
+    color: #171a1f;
+}
+
+.brand-icon {
+    width: 37px;
+    height: 37px;
+
+    border-radius: 10px;
+
+    background: linear-gradient(
+        135deg,
+        #428ce9,
+        #2868ce
+    );
+
+    color: #ffffff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: 800;
+    font-size: 16px;
+}
+
+.brand div:last-child {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand strong {
+    font-size: 16px;
+}
+
+.brand span {
+    color: #a4acb8;
+    font-size: 9px;
+    margin-top: 2px;
+}
+
+
+/* =========================================
+   BOTÃO X
+========================================= */
+
+.close-sidebar {
+    width: 30px;
+    height: 30px;
+
+    border: 0;
+
+    background: #f4f6f8;
+
+    border-radius: 8px;
+
+    color: #777f89;
+
+    font-size: 21px;
+
+    cursor: pointer;
+}
+
+
+/* =========================================
+   NAVEGAÇÃO
+========================================= */
+
+.navigation {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nav-title {
+    color: #a4acb6;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.8px;
+
+    margin: 8px 10px 5px;
+}
+
+.nav-item {
+    width: 100%;
+
+    padding: 11px 12px;
+
+    border: 0;
+
+    border-radius: 9px;
+
+    background: transparent;
+
+    color: #66717e;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    text-align: left;
+
+    font-family: inherit;
+
+    font-size: 12px;
+
+    text-decoration: none;
+
+    box-sizing: border-box;
+
+    transition: 0.15s;
+}
+
+.nav-item:hover {
+    background: #ffffff;
+    color: #2563eb;
+}
+
+.navigation .nav-item.active {
+    background: #edf4ff !important;
+    color: #2563eb !important;
+    font-weight: 600;
+}
+
+.nav-icon {
+    width: 20px;
+
+    flex-shrink: 0;
+
+    text-align: center;
+
+    font-size: 17px;
+}
+
+
+/* =========================================
+   CRIAR PRODUTO
+========================================= */
+
+/* =========================================
+   CRIAR PRODUTO - DESTAQUE
+========================================= */
+
+.nav-create-product {
+    margin-top: 8px;
+
+    min-height: 48px;
+
+    padding: 10px 12px;
+
+    border-radius: 11px;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    box-shadow: 0 5px 14px rgba(37, 99, 235, .20);
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    text-decoration: none;
+
+    transition: .18s ease;
+}
+
+.nav-create-product:hover {
+    background: #1d4ed8;
+
+    color: #ffffff;
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 7px 18px rgba(37, 99, 235, .25);
+}
+
+.nav-create-product .nav-icon {
+    width: 28px;
+    height: 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+
+    background: rgba(255, 255, 255, .16);
+
+    color: #ffffff;
+
+    font-size: 18px;
+
+    flex-shrink: 0;
+}
+
+.nav-create-product strong {
+    display: block;
+
+    color: #ffffff;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+.nav-create-product small {
+    display: block;
+
+    color: rgba(255, 255, 255, .75);
+
+    font-size: 9px;
+
+    margin-top: 2px;
+}
+
+
+/* =========================================
+   PARTE INFERIOR
+========================================= */
+
+.sidebar-bottom {
+    margin-top: auto;
+
+    padding: 12px 4px 4px;
+}
+
+.system-status {
+    padding: 12px;
+
+    border-radius: 11px;
+
+    background: #f6f8fa;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+}
+
+.system-status .status-dot {
+    width: 8px;
+    height: 8px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #21ad4b;
+
+    box-shadow:
+        0 0 0 3px #ddf7e8;
+}
+
+.system-status div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.system-status strong {
+    font-size: 10px;
+}
+
+.system-status small {
+    color: #a4acb8;
+    font-size: 8px;
+}
+
+
+/* =========================================
+   FUNDO ESCURO
+========================================= */
+
+.overlay {
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(
+        15,
+        23,
+        35,
+        0.32
+    );
+
+    z-index: 9998;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition:
+        opacity 0.25s ease;
+}
+
+.overlay.active {
+    opacity: 1;
+
+    pointer-events: auto;
+}
+
+
+/* =========================================
+   CABEÇALHO
+========================================= */
+
+.header {
+    width: 100%;
+    height: 72px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #e7ebf0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 0 28px;
+
+    box-sizing: border-box;
+
+    position: relative;
+
+    z-index: 100;
+}
+
+.header-left {
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+}
+
+.menu-button {
+    width: 38px;
+    height: 38px;
+
+    border: 0;
+
+    background: transparent;
+
+    cursor: pointer;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    gap: 5px;
+
+    padding: 4px;
+}
+
+.menu-button span {
+    display: block;
+
+    width: 27px;
+    height: 3px;
+
+    background: #747d88;
+
+    border-radius: 10px;
+}
+
+.page-name {
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #374151;
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 650px) {
+
+    .header {
+        padding: 0 15px;
+    }
+
+    .page-name {
+        display: none;
+    }
+
+    .user-info,
+    .user-arrow {
+        display: none;
+    }
+
+    .sidebar {
+        width: 280px;
+        left: -280px;
+    }
+
+}

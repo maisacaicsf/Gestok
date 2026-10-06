@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestok | Redes sociais</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../componentes/sidebar.css">
+</head>
+<body>
+
+    <div id="gestok-sidebar-container"></div>
+
+    <header class="page-header-bar">
+        <div class="page-header-left">
+            <button class="menu-button" id="menuButton" type="button" aria-label="Abrir menu">
+                <span></span><span></span><span></span>
+            </button>
+            <span>Redes sociais</span>
+        </div>
+    </header>
+
+    <main class="main-content">
+
+        <a class="back-dashboard" href="../sistema/index.html">← Voltar ao Dashboard</a>
+
+        <section class="hero">
+            <div>
+                <span class="eyebrow">GESTOK</span>
+                <h1>Redes sociais</h1>
+                <p>Acompanhe os canais oficiais do Gestok em um só lugar.</p>
+            </div>
+            <div class="hero-badge">Canais oficiais</div>
+        </section>
+
+        <section class="panel intro-panel">
+            <div class="intro-icon">◎</div>
+            <div>
+                <strong>Redes sociais do Gestok</strong>
+                <p>Os links serão adicionados posteriormente nesta página.</p>
+            </div>
+        </section>
+
+        <section class="social-grid" id="socialGrid">
+
+            <article class="social-card instagram" data-social="instagram">
+                <div class="social-top">
+                    <div class="social-icon">◎</div>
+                    <div>
+                        <strong>Instagram</strong>
+                        <span>Perfil oficial do Gestok</span>
+                    </div>
+                </div>
+                <div class="social-link-status" id="status-instagram">Link em breve</div>
+                <button class="open-button" type="button" data-open="instagram" disabled>Acessar Instagram</button>
+            </article>
+
+            <article class="social-card facebook" data-social="facebook">
+                <div class="social-top">
+                    <div class="social-icon">f</div>
+                    <div>
+                        <strong>Facebook</strong>
+                        <span>Página oficial do Gestok</span>
+                    </div>
+                </div>
+                <div class="social-link-status" id="status-facebook">Link em breve</div>
+                <button class="open-button" type="button" data-open="facebook" disabled>Acessar Facebook</button>
+            </article>
+
+            <article class="social-card tiktok" data-social="tiktok">
+                <div class="social-top">
+                    <div class="social-icon">♪</div>
+                    <div>
+                        <strong>TikTok</strong>
+                        <span>Perfil oficial do Gestok</span>
+                    </div>
+                </div>
+                <div class="social-link-status" id="status-tiktok">Link em breve</div>
+                <button class="open-button" type="button" data-open="tiktok" disabled>Acessar TikTok</button>
+            </article>
+
+            <article class="social-card youtube" data-social="youtube">
+                <div class="social-top">
+                    <div class="social-icon">▶</div>
+                    <div>
+                        <strong>YouTube</strong>
+                        <span>Canal oficial do Gestok</span>
+                    </div>
+                </div>
+                <div class="social-link-status" id="status-youtube">Link em breve</div>
+                <button class="open-button" type="button" data-open="youtube" disabled>Acessar YouTube</button>
+            </article>
+
+        </section>
+
+        <section class="panel info-panel">
+            <strong>Links oficiais</strong>
+        </section>
+
+    </main>
+
+    <script src="../componentes/sidebar.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

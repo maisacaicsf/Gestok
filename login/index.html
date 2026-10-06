@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Gestok | Login</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <!-- =========================================
+         ESTILO DA RECUPERAÇÃO DE SENHA
+    ========================================== -->
+
+    <style>
+
+        .forgot-password {
+            display: inline-block;
+            margin-top: 4px;
+            margin-bottom: 8px;
+            color: #2563eb;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+        .password-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 9999;
+        }
+
+        .password-modal-overlay.active {
+            display: flex;
+        }
+
+        .password-modal {
+            width: min(430px, 100%);
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 26px;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2);
+        }
+
+        .password-modal-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .password-modal-header h2 {
+            margin: 0 0 6px;
+        }
+
+        .password-modal-header p {
+            margin: 0;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .password-modal-close {
+            border: 0;
+            background: transparent;
+            font-size: 28px;
+            line-height: 1;
+            cursor: pointer;
+            color: #64748b;
+            padding: 0;
+        }
+
+        .password-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .password-modal-actions button {
+            flex: 1;
+        }
+
+        .password-help {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .password-status {
+            margin-top: 14px;
+            padding: 11px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.4;
+            display: none;
+        }
+
+        .password-status.show {
+            display: block;
+        }
+
+        .password-status.success {
+            background: #ecfdf5;
+            color: #047857;
+        }
+
+        .password-status.error {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        @media (max-width: 520px) {
+
+            .password-modal {
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .password-modal-actions {
+                flex-direction: column;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <main>
+
+        <!-- =========================================
+             CARD DE LOGIN
+        ========================================== -->
+
+        <section class="card">
+
+
+            <!-- LOGO -->
+
+            <div class="logo">
+                G
+            </div>
+
+
+            <!-- TÍTULO -->
+
+            <span class="eyebrow">
+                ACESSAR O SISTEMA
+            </span>
+
+
+            <h1>
+                Bem-vindo ao Gestok
+            </h1>
+
+
+            <p>
+                Entre com o Código da Loja,
+                usuário e senha.
+            </p>
+
+
+            <!-- =================================
+                 FORMULÁRIO DE LOGIN
+            ================================== -->
+
+            <form id="loginForm">
+
+
+                <!-- CÓDIGO DA LOJA -->
+
+                <label>
+
+                    Código da Loja
+
+                    <input
+                        id="codigoLoja"
+                        type="text"
+                        inputmode="numeric"
+                        maxlength="4"
+                        placeholder="Ex.: 0001"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <small class="field-help">
+                        Código de 4 dígitos da sua empresa.
+                    </small>
+
+                </label>
+
+
+                <!-- USUÁRIO -->
+
+                <label>
+
+                    Usuário
+
+                    <input
+                        id="usuario"
+                        type="text"
+                        placeholder="Seu usuário"
+                        autocomplete="username"
+                        required
+                    >
+
+                </label>
+
+
+                <!-- SENHA -->
+
+                <label>
+
+                    Senha
+
+                    <input
+                        id="senha"
+                        type="password"
+                        placeholder="Sua senha"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </label>
+
+
+                <!-- ESQUECI SENHA -->
+
+                <div>
+
+                    <a
+                        href="#"
+                        class="forgot-password"
+                        id="abrirRecuperacao"
+                    >
+                        Esqueci minha senha
+                    </a>
+
+                </div>
+
+
+                <!-- MENSAGEM -->
+
+                <div
+                    id="mensagemLogin"
+                    class="form-message"
+                    hidden
+                ></div>
+
+
+                <!-- BOTÃO -->
+
+                <button
+                    type="submit"
+                    id="btnEntrar"
+                >
+
+                    Entrar no Gestok →
+
+                </button>
+
+
+            </form>
+
+
+            <!-- LINKS -->
+
+            <div class="links">
+
+                <a href="../cadastro/index.html">
+                    Criar uma conta
+                </a>
+
+                <a href="../apresentacao.html">
+                    Voltar à apresentação
+                </a>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================================
+         MODAL RECUPERAÇÃO DE SENHA
+    ========================================== -->
+
+    <div
+        class="password-modal-overlay"
+        id="passwordModalOverlay"
+    >
+
+        <div
+            class="password-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="passwordModalTitle"
+        >
+
+            <div class="password-modal-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        RECUPERAÇÃO
+                    </span>
+
+                    <h2 id="passwordModalTitle">
+                        Esqueci minha senha
+                    </h2>
+
+                    <p>
+                        Informe o Código da Loja e seu usuário.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="password-modal-close"
+                    id="fecharRecuperacao"
+                    aria-label="Fechar"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <!-- FORMULÁRIO -->
+
+            <form id="recuperacaoForm">
+
+
+                <label>
+
+                    Código da Loja
+
+                    <input
+                        id="codigoLojaRecuperacao"
+                        type="text"
+                        inputmode="numeric"
+                        maxlength="4"
+                        placeholder="Ex.: 0001"
+                        autocomplete="off"
+                        required
+                    >
+
+                </label>
+
+
+                <label>
+
+                    Usuário
+
+                    <input
+                        id="usuarioRecuperacao"
+                        type="text"
+                        placeholder="Seu usuário"
+                        autocomplete="username"
+                        required
+                    >
+
+                </label>
+
+
+                <div
+                    id="passwordStatus"
+                    class="password-status"
+                ></div>
+
+
+                <div class="password-modal-actions">
+
+                    <button
+                        type="button"
+                        class="secondary-button"
+                        id="cancelarRecuperacao"
+                    >
+                        Cancelar
+                    </button>
+
+
+                    <button
+                        type="submit"
+                        class="primary-button"
+                        id="enviarRecuperacao"
+                    >
+                        Enviar link
+                    </button>
+
+                </div>
+
+
+                <div class="password-help">
+
+                    O link será enviado para o e-mail
+                    cadastrado nesta conta.
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         FIREBASE
+    ========================================== -->
+
+    <script
+        src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"
+    ></script>
+
+    <script
+        src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"
+    ></script>
+
+    <script
+        src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"
+    ></script>
+
+
+    <script src="../firebase/config.js"></script>
+
+
+    <script>
+
+        if (
+            typeof firebase !== "undefined" &&
+            typeof firebaseConfig !== "undefined"
+        ) {
+
+            if (!firebase.apps.length) {
+
+                firebase.initializeApp(
+                    firebaseConfig
+                );
+
+            }
+
+        }
+
+    </script>
+
+
+    <script src="../firebase/auth.js"></script>
+
+    <script src="../firebase/firestore.js"></script>
+
+    <script src="../auth.js"></script>
+
+
+    <!-- =========================================
+         SCRIPT
+    ========================================== -->
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

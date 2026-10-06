@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Gestok | Teste Firebase</title>
+
+</head>
+
+<body>
+
+    <h1>Gestok Firebase</h1>
+
+    <p id="status">
+        Testando conexão...
+    </p>
+
+
+    <!-- FIREBASE -->
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+
+    <!-- CONFIGURAÇÃO -->
+
+    <script src="config.js"></script>
+
+
+    <!-- INICIALIZAÇÃO -->
+
+    <script>
+
+        firebase.initializeApp(firebaseConfig);
+
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        document.getElementById("status").textContent =
+            "Firebase conectado com sucesso!";
+
+        console.log(
+            "Gestok Firebase:",
+            firebase.app().options.projectId
+        );
+
+    </script>
+
+</body>
+
+</html>

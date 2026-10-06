@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Resolver mínimo para o login Código da Loja + Usuário.
+    // Contém apenas identificadores de acesso e o e-mail técnico do Firebase Auth.
+    match /acessos/{chave} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid;
+      allow update: if request.auth != null
+        && resource.data.uid == request.auth.uid;
+      allow delete: if false;
+    }
+
+    match /lojas/{lojaId} {
+      allow create: if request.auth != null
+        && request.resource.data.donoUid == request.auth.uid;
+
+      allow read, update: if request.auth != null
+        && resource.data.donoUid == request.auth.uid;
+
+      allow delete: if false;
+
+      match /usuarios/{uid} {
+        allow create: if request.auth != null
+          && uid == request.auth.uid
+          && get(/databases/$(database)/documents/lojas/$(lojaId)).data.donoUid == request.auth.uid;
+
+        allow read, update: if request.auth != null
+          && uid == request.auth.uid
+          && get(/databases/$(database)/documents/lojas/$(lojaId)).data.donoUid == request.auth.uid;
+
+        allow delete: if false;
+      }
+
+      match /produtos/{produtoId} {
+        allow read, write: if request.auth != null
+          && get(/databases/$(database)/documents/lojas/$(lojaId)).data.donoUid == request.auth.uid;
+      }
+
+      match /movimentacoes/{movimentoId} {
+        allow read, write: if request.auth != null
+          && get(/databases/$(database)/documents/lojas/$(lojaId)).data.donoUid == request.auth.uid;
+      }
+
+      match /chamados/{chamadoId} {
+        allow read, write: if request.auth != null
+          && get(/databases/$(database)/documents/lojas/$(lojaId)).data.donoUid == request.auth.uid;
+      }
+
+      match /solicitacoes/{solicitacaoId} {
+        allow read, write: if request.auth != null
+          && get(/databases/$(database)/documents/lojas/$(lojaId)).data.donoUid == request.auth.uid;
+      }
+    }
+  }
+}

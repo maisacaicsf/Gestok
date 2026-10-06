@@ -1,0 +1,318 @@
+/* =========================================
+   RESET / BASE
+========================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Inter, Arial, sans-serif;
+    background: #f5f7fb;
+    color: #172033;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.header {
+    width: 100%;
+    height: 72px;
+    background: #fff;
+    border-bottom: 1px solid #e7ebf0;
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* =========================================
+   BOTÃO MENU
+========================================= */
+
+.menu-button {
+    width: 38px;
+    height: 38px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+}
+
+.menu-button span {
+    display: block;
+    width: 27px;
+    height: 3px;
+    background: #747d88;
+    border-radius: 10px;
+}
+
+/* =========================================
+   NOME DA PÁGINA
+========================================= */
+
+.page-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+/* =========================================
+   CONTEÚDO PRINCIPAL
+========================================= */
+
+.main-content {
+    width: min(1400px, 92%);
+    margin: 0 auto;
+    padding: 30px 0;
+}
+
+/* =========================================
+   VOLTAR AO DASHBOARD
+========================================= */
+
+.back-dashboard {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 20px;
+    color: #66717e;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* =========================================
+   HERO
+========================================= */
+
+.hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.eyebrow {
+    font-size: 9px;
+    letter-spacing: 1px;
+    font-weight: 700;
+    color: #8e98a5;
+}
+
+.hero h1 {
+    font-size: 25px;
+    margin: 7px 0;
+}
+
+.hero p {
+    margin: 0;
+    color: #8a94a1;
+    font-size: 11px;
+}
+
+/* =========================================
+   PAINEL
+========================================= */
+
+.panel {
+    background: #fff;
+    border: 1px solid #e8ebf0;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 25px rgba(20, 30, 50, .04);
+}
+
+/* =========================================
+   FILTROS
+========================================= */
+
+.filters {
+    display: grid;
+    grid-template-columns: 1fr 190px 190px auto;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.filters input,
+.filters select {
+    height: 40px;
+    border: 1px solid #e1e5eb;
+    border-radius: 9px;
+    padding: 0 12px;
+    font: inherit;
+    font-size: 11px;
+    color: #4b5563;
+    background: #fff;
+    outline: none;
+}
+
+.filters input:focus,
+.filters select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .07);
+}
+
+.filters button {
+    height: 40px;
+    border: 0;
+    border-radius: 9px;
+    padding: 0 14px;
+    background: #f4f6f8;
+    color: #66717e;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.filters button:hover {
+    background: #ebeff3;
+}
+
+.filters button:disabled {
+    opacity: .55;
+    cursor: wait;
+}
+
+/* =========================================
+   TABELA
+========================================= */
+
+.table-wrap {
+    overflow: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 850px;
+    border-collapse: collapse;
+}
+
+th {
+    padding: 11px;
+    border-bottom: 1px solid #edf0f3;
+    color: #9aa2ad;
+    text-align: left;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+td {
+    padding: 13px 11px;
+    border-bottom: 1px solid #f0f2f5;
+    color: #4b5563;
+    font-size: 11px;
+}
+
+td strong {
+    display: block;
+    color: #202938;
+    font-size: 11px;
+}
+
+td small {
+    color: #9aa2ad;
+    font-size: 9px;
+}
+
+/* =========================================
+   BADGES
+========================================= */
+
+.badge {
+    display: inline-flex;
+    padding: 5px 8px;
+    border-radius: 7px;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.badge.entrada {
+    background: #edf9f1;
+    color: #20a45a;
+}
+
+.badge.saida {
+    background: #fff0f0;
+    color: #df4b4b;
+}
+
+/* =========================================
+   ESTADO VAZIO
+========================================= */
+
+.empty-state {
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    color: #8d97a3;
+}
+
+.empty-state div {
+    font-size: 25px;
+}
+
+.empty-state strong {
+    font-size: 12px;
+    color: #4b5563;
+}
+
+.empty-state span {
+    font-size: 10px;
+}
+
+/* =========================================
+   RESPONSIVIDADE
+========================================= */
+
+@media (max-width: 800px) {
+
+    .filters {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .filters input {
+        grid-column: 1 / -1;
+    }
+
+}
+
+@media (max-width: 500px) {
+
+    .header {
+        padding: 0 15px;
+    }
+
+    .main-content {
+        width: calc(100% - 24px);
+        padding: 20px 0;
+    }
+
+    .panel {
+        padding: 14px;
+        border-radius: 13px;
+    }
+
+    .filters {
+        grid-template-columns: 1fr;
+    }
+
+    .filters input {
+        grid-column: auto;
+    }
+
+}

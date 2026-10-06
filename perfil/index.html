@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Meu Perfil - Gestok</title>
+
+    <link rel="stylesheet" href="style.css">
+        <link
+        rel="stylesheet"
+        href="../componentes/sidebar.css"
+    >
+</head>
+
+<body>
+    <div id="gestok-sidebar-container"></div>
+    <!-- HEADER -->
+    <header class="header">
+
+        <div class="header-left">
+
+            <button class="menu-button" id="menuButton">
+
+                <span></span>
+                <span></span>
+                <span></span>
+
+            </button>
+
+            <span class="page-name">
+                Meu Perfil
+            </span>
+
+        </div>
+
+
+        <div class="header-right">
+
+            <button class="user-profile" id="userProfile">
+
+            <div class="avatar" id="headerAvatar">
+                U
+            </div>
+
+            <div class="user-info">
+
+                <strong id="nomeUsuarioMenu">
+                    Usuário
+                </strong>
+
+                <span>
+                    Administrador
+                </span>
+
+            </div>
+                <span class="user-arrow">
+                    ⌄
+                </span>
+
+            </button>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- CONTEÚDO -->
+    <main class="page">
+
+
+        <!-- VOLTAR -->
+        <a href="../sistema/index.html" class="back-dashboard">
+            ← Voltar ao Dashboard
+        </a>
+
+
+        <!-- TÍTULO -->
+        <div class="hero">
+
+            <div>
+
+                <div class="eyebrow">
+                    CONTA
+                </div>
+
+                <h1>
+                    Meu Perfil
+                </h1>
+
+                <p>
+                    Gerencie suas informações e sua assinatura.
+                </p>
+
+            </div>
+
+            <div class="plan-badge">
+                Plano Mensal
+            </div>
+
+        </div>
+
+
+        <!-- ABAS -->
+        <div class="profile-tabs">
+
+            <button class="tab active" data-tab="perfil">
+                 Perfil
+            </button>
+
+            <button class="tab" data-tab="assinatura">
+                 Assinatura
+            </button>
+
+        </div>
+
+
+
+        <!-- PERFIL -->
+        <section class="tab-content active" id="perfil">
+
+
+           <div class="card profile-card">
+
+            <div class="card-title">
+
+                <div>
+
+                    <h2>Informações pessoais</h2>
+
+                    <p>Atualize seus dados.</p>
+
+                </div>
+
+            </div>
+
+
+            <!-- CÓDIGO DA LOJA -->
+
+            <div class="store-code">
+
+                <span>
+                    Código da Loja
+                </span>
+
+                <strong id="codigoLoja">
+                    ----
+                </strong>
+
+                <small>
+                    Identificação exclusiva da sua empresa
+                </small>
+
+            </div>
+
+
+            <label>
+
+                Nome
+
+                <input
+                    type="text"
+                    id="nameInput"
+                    value=""
+                >
+
+            </label>
+
+
+            <label>
+
+                E-mail
+
+                <input
+                    type="email"
+                    id="emailInput"
+                    placeholder="Digite seu e-mail"
+                >
+
+            </label>
+
+
+            <button
+                class="primary"
+                id="saveProfile"
+            >
+                Salvar alterações
+            </button>
+            <button
+            type="button"
+            id="btnLogout"
+            class="logout-profile-button"
+            >
+            Sair da conta
+            </button>
+
+
+            <span
+                class="saved"
+                id="savedMessage"
+            ></span>
+
+        </div>
+
+
+            <div class="card">
+
+                <div class="card-title">
+
+                    <div>
+
+                        <h2>
+                            Segurança
+                        </h2>
+
+                        <p>
+                            Altere sua senha.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <label>
+
+                    Nova senha
+
+                    <input
+                        type="password"
+                        id="passwordInput"
+                        placeholder="Digite uma nova senha"
+                    >
+
+                </label>
+
+
+                <button class="primary" id="changePassword">
+                    Alterar senha
+                </button>
+
+            </div>
+        </section>
+
+
+
+        <!-- ASSINATURA -->
+        <section class="tab-content" id="assinatura">
+
+
+            <div class="card subscription-card">
+
+
+                <div class="card-title">
+
+                    <div>
+
+                        <h2>
+                            Minha assinatura
+                        </h2>
+
+                        <p>
+                            Plano mensal do Gestok.
+                        </p>
+
+                    </div>
+
+                    <span
+                        class="status"
+                        id="subscriptionStatus">
+                        Inativo
+                    </span>
+
+                </div>
+
+
+                <div class="price">
+
+                    <strong>
+                        R$ 30,00
+                    </strong>
+
+                    <span>
+                        / 30 dias
+                    </span>
+
+                </div>
+
+
+                <div class="subscription-info">
+
+
+                    <div>
+
+                        <span>
+                            Início
+                        </span>
+
+                        <strong id="startDate">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Vencimento
+                        </span>
+
+                        <strong id="endDate">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Dias restantes
+                        </span>
+
+                        <strong id="daysRemaining">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Plano
+                        </span>
+
+                        <strong>
+                            Mensal
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+                <button
+                    class="primary pay"
+                    id="subscribeButton">
+
+                    Assinar por R$ 30,00
+
+                </button>
+
+
+                <p class="payment-note">
+
+                    O pagamento libera 30 dias de acesso ao Gestok.
+
+                </p>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+<!-- =========================================
+     FIREBASE
+========================================= -->
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+
+<!-- =========================================
+     CONFIGURAÇÃO FIREBASE
+========================================= -->
+
+<script src="../firebase/config.js"></script>
+
+
+<!-- =========================================
+     INICIALIZAÇÃO FIREBASE
+========================================= -->
+
+<script>
+
+    if (
+        typeof firebase !== "undefined" &&
+        typeof firebaseConfig !== "undefined"
+    ) {
+
+        if (!firebase.apps.length) {
+
+            firebase.initializeApp(
+                firebaseConfig
+            );
+
+        }
+
+    }
+
+</script>
+
+
+<!-- =========================================
+     FIREBASE AUTH / FIRESTORE
+========================================= -->
+
+<script src="../firebase/auth.js"></script>
+
+<script src="../firebase/firestore.js"></script>
+
+
+<!-- =========================================
+     AUTH CENTRAL DO GESTOK
+========================================= -->
+
+<script src="../auth.js"></script>
+
+
+<!-- =========================================
+     SIDEBAR
+========================================= -->
+
+<script src="../componentes/sidebar.js"></script>
+
+
+<!-- =========================================
+     SCRIPT DO PERFIL
+========================================= -->
+
+<script src="script.js"></script>
+</body>
+
+</html>

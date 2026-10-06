@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Gestok | Movimentações</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../componentes/sidebar.css"
+    >
+
+</head>
+
+<body>
+
+    <div id="gestok-sidebar-container"></div>
+
+    <header class="header">
+
+        <div class="header-left">
+
+            <button
+                class="menu-button"
+                id="menuButton"
+                type="button"
+                aria-label="Abrir menu"
+            >
+
+                <span></span>
+                <span></span>
+                <span></span>
+
+            </button>
+
+            <span class="page-name">
+                Movimentações
+            </span>
+
+        </div>
+
+    </header>
+
+    <main class="main-content">
+
+        <a
+            href="../sistema/index.html"
+            class="back-dashboard"
+        >
+            ← Voltar ao Dashboard
+        </a>
+
+        <section class="hero">
+
+            <div>
+
+                <span class="eyebrow">
+                    ESTOQUE
+                </span>
+
+                <h1>
+                    Movimentações
+                </h1>
+
+                <p>
+                    Histórico de entradas e saídas do estoque.
+                </p>
+
+            </div>
+
+        </section>
+
+        <section class="panel">
+
+            <div class="filters">
+
+                <input
+                    id="busca"
+                    type="search"
+                    placeholder="Buscar produto, código ou motivo..."
+                    autocomplete="off"
+                >
+
+                <select id="filtroTipo">
+
+                    <option value="">
+                        Todos os tipos
+                    </option>
+
+                    <option value="Entrada">
+                        Entradas
+                    </option>
+
+                    <option value="Saída">
+                        Saídas
+                    </option>
+
+                </select>
+
+                <select id="filtroPeriodo">
+
+                    <option value="">
+                        Todos os períodos
+                    </option>
+
+                    <option value="hoje">
+                        Hoje
+                    </option>
+
+                    <option value="7">
+                        Últimos 7 dias
+                    </option>
+
+                    <option value="30">
+                        Últimos 30 dias
+                    </option>
+
+                </select>
+
+                <button
+                    id="limparHistorico"
+                    type="button"
+                    disabled
+                >
+                    Limpar histórico
+                </button>
+
+            </div>
+
+            <div
+                id="statusMovimentacoes"
+                style="padding: 0 0 12px; color: #98a2b3; font-size: 10px;"
+            >
+                Carregando movimentações...
+            </div>
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Tipo</th>
+                            <th>Produto</th>
+                            <th>Quantidade</th>
+                            <th>Estoque</th>
+                            <th>Motivo</th>
+                            <th>Data</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="listaMovimentacoes"></tbody>
+
+                </table>
+
+            </div>
+
+            <div
+                class="empty-state"
+                id="emptyState"
+                style="display: none;"
+            >
+
+                <div>↔</div>
+
+                <strong>
+                    Nenhuma movimentação encontrada
+                </strong>
+
+                <span>
+                    As entradas e saídas aparecerão aqui.
+                </span>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="../componentes/sidebar.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+    <script src="../firebase/config.js"></script>
+
+    <script>
+        if (
+            typeof firebase !== "undefined" &&
+            typeof firebaseConfig !== "undefined" &&
+            !firebase.apps.length
+        ) {
+            firebase.initializeApp(firebaseConfig);
+        }
+    </script>
+
+    <script src="../firebase/auth.js"></script>
+    <script src="../firebase/firestore.js"></script>
+    <script src="../auth.js"></script>
+    <script src="script.js"></script>
+
+</body>
+
+</html>

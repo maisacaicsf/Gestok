@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestok | Pagamento</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="payment-page">
+<section class="payment-card">
+    <div class="logo">G</div>
+    <span class="eyebrow">ASSINATURA</span>
+    <h1>Ative seu Gestok</h1>
+    <p class="description">Sua conta foi criada com sucesso. Finalize o pagamento para liberar o acesso ao sistema.</p>
+
+    <div class="plan-box">
+        <div>
+            <span>PLANO GESTOK</span>
+            <strong>Gestok</strong>
+            <small>Acesso por 30 dias</small>
+        </div>
+        <div class="price"><small>R$</small><strong>30,00</strong></div>
+    </div>
+
+    <div class="benefits">
+        <div>✓ Cadastro de produtos</div>
+        <div>✓ Entradas e saídas</div>
+        <div>✓ Histórico de movimentações</div>
+        <div>✓ Alertas de estoque</div>
+        <div>✓ Dashboard completo</div>
+    </div>
+
+    <div class="payment-method">
+        <span class="method-label">FORMA DE PAGAMENTO</span>
+        <div id="paymentBrick_container"></div>
+    </div>
+
+    <div id="mensagemPagamento" class="payment-message" hidden></div>
+
+    <div id="statusPagamento" class="payment-status" hidden>
+        <strong>Estamos confirmando seu pagamento...</strong>
+        <span>Não feche esta página. O acesso será liberado automaticamente quando o Mercado Pago confirmar a aprovação.</span>
+    </div>
+
+    <small class="security-note">🔒 Os dados do cartão são tratados pelo Mercado Pago. O Gestok não armazena número do cartão ou CVV.</small>
+
+    <a href="../login/index.html" class="back-link">← Voltar para o login</a>
+</section>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+<script src="../firebase/config.js"></script>
+<script>firebase.initializeApp(firebaseConfig);</script>
+<script src="../firebase/auth.js"></script>
+<script src="../firebase/firestore.js"></script>
+<script src="../auth.js"></script>
+<script src="config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Gestok | Meus chamados</title>
+
+
+    <!-- CSS DA PÁGINA -->
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+
+    <!-- CSS DA SIDEBAR UNIVERSAL -->
+
+    <link
+        rel="stylesheet"
+        href="../../componentes/sidebar.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================
+         SIDEBAR UNIVERSAL
+    ========================================== -->
+
+    <div
+        id="gestok-sidebar-container"
+    ></div>
+
+
+
+    <!-- =========================================
+         CONTEÚDO
+    ========================================== -->
+
+    <main class="main-content">
+
+
+        <!-- =====================================
+             HERO
+        ====================================== -->
+
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <span class="eyebrow">
+                    SUPORTE
+                </span>
+
+                <h1>
+                    Meus chamados
+                </h1>
+
+                <p>
+                    Acompanhe suas solicitações de suporte
+                    e consulte o andamento de cada atendimento.
+                </p>
+
+            </div>
+
+
+            <button
+                class="primary-button"
+                id="novoChamado"
+                type="button"
+            >
+
+                ＋ Novo chamado
+
+            </button>
+
+        </section>
+
+
+
+        <!-- =====================================
+             RESUMO
+        ====================================== -->
+
+        <section class="summary-grid">
+
+
+            <!-- TOTAL -->
+
+            <div class="summary-card">
+
+                <div class="summary-icon blue">
+                    ▤
+                </div>
+
+                <div>
+
+                    <span>
+                        Total
+                    </span>
+
+                    <strong id="totalChamados">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ABERTOS -->
+
+            <div class="summary-card">
+
+                <div class="summary-icon orange">
+                    ◷
+                </div>
+
+                <div>
+
+                    <span>
+                        Abertos
+                    </span>
+
+                    <strong id="chamadosAbertos">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- RESOLVIDOS -->
+
+            <div class="summary-card">
+
+                <div class="summary-icon green">
+                    ✓
+                </div>
+
+                <div>
+
+                    <span>
+                        Resolvidos
+                    </span>
+
+                    <strong id="chamadosResolvidos">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =====================================
+             FILTROS
+        ====================================== -->
+
+        <section class="panel">
+
+            <div class="filters">
+
+
+                <!-- BUSCA -->
+
+                <div class="search-field">
+
+                    <span>
+                        ⌕
+                    </span>
+
+                    <input
+                        type="search"
+                        id="buscaChamado"
+                        placeholder="Buscar chamado..."
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+
+                <!-- STATUS -->
+
+                <select id="filtroStatus">
+
+                    <option value="">
+                        Todos os status
+                    </option>
+
+                    <option value="Aberto">
+                        Aberto
+                    </option>
+
+                    <option value="Em atendimento">
+                        Em atendimento
+                    </option>
+
+                    <option value="Resolvido">
+                        Resolvido
+                    </option>
+
+                    <option value="Fechado">
+                        Fechado
+                    </option>
+
+                </select>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================
+             LISTA
+        ====================================== -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>
+                        Solicitações
+                    </h2>
+
+                    <p>
+                        Histórico dos seus chamados de suporte.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- LISTA DOS CHAMADOS -->
+
+            <div
+                class="tickets-list"
+                id="ticketsList"
+            ></div>
+
+
+
+            <!-- ESTADO VAZIO -->
+
+            <div
+                class="empty-state"
+                id="emptyState"
+            >
+
+                <div class="empty-icon">
+                    ?
+                </div>
+
+                <strong>
+                    Nenhum chamado encontrado
+                </strong>
+
+                <span>
+                    Quando você abrir um chamado,
+                    ele aparecerá aqui.
+                </span>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =====================================
+             BOTÃO VOLTAR
+        ====================================== -->
+
+        <div class="bottom-back">
+
+            <a
+                href="../index.html"
+                class="back-button"
+            >
+
+                ← Voltar para Suporte
+
+            </a>
+
+        </div>
+
+
+
+        <!-- =====================================
+             MODAL DETALHES
+        ====================================== -->
+
+        <div
+            class="modal-overlay"
+            id="modalDetalhes"
+        >
+
+            <div class="modal">
+
+
+                <!-- CABEÇALHO -->
+
+                <div class="modal-header">
+
+                    <div>
+
+                        <span class="eyebrow">
+                            CHAMADO
+                        </span>
+
+                        <h2 id="detalheAssunto">
+                            -
+                        </h2>
+
+                    </div>
+
+
+                    <button
+                        class="modal-close"
+                        id="fecharDetalhes"
+                        type="button"
+                    >
+
+                        ×
+
+                    </button>
+
+                </div>
+
+
+
+                <!-- DETALHES -->
+
+                <div class="ticket-details">
+
+
+                    <!-- GRID -->
+
+                    <div class="detail-grid">
+
+
+                        <!-- NÚMERO -->
+
+                        <div class="detail-box">
+
+                            <span>
+                                Número
+                            </span>
+
+                            <strong id="detalheNumero">
+                                -
+                            </strong>
+
+                        </div>
+
+
+
+                        <!-- STATUS -->
+
+                        <div class="detail-box">
+
+                            <span>
+                                Status
+                            </span>
+
+                            <strong id="detalheStatus">
+                                -
+                            </strong>
+
+                        </div>
+
+
+
+                        <!-- CATEGORIA -->
+
+                        <div class="detail-box">
+
+                            <span>
+                                Categoria
+                            </span>
+
+                            <strong id="detalheCategoria">
+                                -
+                            </strong>
+
+                        </div>
+
+
+
+                        <!-- DATA -->
+
+                        <div class="detail-box">
+
+                            <span>
+                                Data
+                            </span>
+
+                            <strong id="detalheData">
+                                -
+                            </strong>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- DESCRIÇÃO -->
+
+                    <div class="detail-section">
+
+                        <h4>
+                            Descrição
+                        </h4>
+
+                        <div class="detail-message">
+
+                            <p id="detalheMensagem">
+                                -
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- CONVERSA -->
+
+                    <div class="detail-section">
+
+                        <h4>
+                            Conversa
+                        </h4>
+
+                        <div
+                            class="ticket-conversation"
+                            id="mensagensChamado"
+                        >
+
+                            <div class="conversation-empty">
+                                Carregando conversa...
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- RESPONDER -->
+
+                    <div class="detail-section">
+
+                        <h4>
+                            Responder
+                        </h4>
+
+                        <form
+                            class="ticket-reply-form"
+                            id="formResponderChamado"
+                        >
+
+                            <textarea
+                                id="mensagemRespostaCliente"
+                                rows="4"
+                                maxlength="2000"
+                                placeholder="Digite sua resposta..."
+                                required
+                            ></textarea>
+
+                            <button
+                                type="submit"
+                                class="primary-button"
+                                id="btnEnviarRespostaCliente"
+                            >
+                                Enviar resposta
+                                →
+                            </button>
+
+                            <div
+                                class="reply-status"
+                                id="statusRespostaCliente"
+                            ></div>
+
+                        </form>
+
+                    </div>
+
+
+                    <!-- COMPATIBILIDADE -->
+
+                    <div
+                        class="support-response"
+                        id="respostaSuporte"
+                        hidden
+                    ></div>
+
+
+                </div>
+
+
+
+                <!-- RODAPÉ -->
+
+                <div class="modal-footer">
+
+                    <button
+                        class="secondary-button"
+                        id="fecharDetalhesBtn"
+                        type="button"
+                    >
+
+                        Fechar
+
+                    </button>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+    </main>
+
+
+
+    <!-- =========================================
+         FIREBASE
+    ========================================== -->
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+
+
+    <!-- =========================================
+         CONFIGURAÇÃO FIREBASE
+    ========================================== -->
+
+    <script src="../../firebase/config.js"></script>
+
+
+
+    <!-- =========================================
+         INICIALIZAÇÃO SEGURA
+    ========================================== -->
+
+    <script>
+
+        if (
+            typeof firebase !== "undefined" &&
+            typeof firebaseConfig !== "undefined"
+        ) {
+
+            if (!firebase.apps.length) {
+
+                firebase.initializeApp(
+                    firebaseConfig
+                );
+
+            }
+
+        }
+
+    </script>
+
+
+
+    <!-- =========================================
+         FIREBASE AUTH / FIRESTORE
+    ========================================== -->
+
+    <script src="../../firebase/auth.js"></script>
+
+    <script src="../../firebase/firestore.js"></script>
+
+
+
+    <!-- =========================================
+         AUTH CENTRAL DO GESTOK
+    ========================================== -->
+
+    <script src="../../auth.js"></script>
+
+
+
+    <!-- =========================================
+         SIDEBAR UNIVERSAL
+    ========================================== -->
+
+    <script src="../../componentes/sidebar.js"></script>
+
+
+
+    <!-- =========================================
+         SCRIPT DOS CHAMADOS
+    ========================================== -->
+
+    <script src="script.js"></script>
+
+
+</body>
+
+</html>

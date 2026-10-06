@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Gestok | Criar conta</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+    <main>
+
+        <!-- =========================================
+             VOLTAR
+        ========================================== -->
+
+        <a
+            href="../planos/index.html"
+            class="back"
+        >
+            ← Voltar aos planos
+        </a>
+
+
+        <!-- =========================================
+             CARD
+        ========================================== -->
+
+        <section class="card">
+
+
+            <!-- LOGO -->
+
+            <div class="logo">
+                G
+            </div>
+
+
+            <!-- TÍTULO -->
+
+            <span class="eyebrow">
+                CRIAR CONTA
+            </span>
+
+
+            <h1>
+                Comece seu Gestok
+            </h1>
+
+
+            <p>
+                Crie sua conta e configure o acesso
+                da sua empresa ao Gestok.
+            </p>
+
+
+            <!-- =====================================
+                 FORMULÁRIO
+            ====================================== -->
+
+            <form id="cadastroForm">
+
+
+                <!-- NOME DA EMPRESA -->
+
+                <label>
+
+                    Nome da empresa
+
+                    <input
+                        id="nome"
+                        type="text"
+                        placeholder="Nome da sua empresa"
+                        autocomplete="organization"
+                        required
+                    >
+
+                </label>
+
+
+                <!-- E-MAIL -->
+
+                <label>
+
+                    E-mail
+
+                    <input
+                        id="email"
+                        type="email"
+                        placeholder="seu@email.com"
+                        autocomplete="email"
+                        required
+                    >
+
+                </label>
+
+
+                <!-- USUÁRIO -->
+
+                <label>
+
+                    Nome de usuário
+
+                    <input
+                        id="usuario"
+                        type="text"
+                        placeholder="Ex.: joao"
+                        autocomplete="username"
+                        minlength="3"
+                        required
+                    >
+
+                    <small class="field-help">
+                        Você usará esse nome junto com o
+                        Código da Loja para entrar.
+                    </small>
+
+                </label>
+
+
+                <!-- SENHA -->
+
+                <label>
+
+                    Senha
+
+                    <input
+                        id="senha"
+                        type="password"
+                        placeholder="Mínimo de 6 caracteres"
+                        autocomplete="new-password"
+                        minlength="6"
+                        required
+                    >
+
+                </label>
+
+
+                <!-- CONFIRMAR SENHA -->
+
+                <label>
+
+                    Confirmar senha
+
+                    <input
+                        id="confirmarSenha"
+                        type="password"
+                        placeholder="Repita sua senha"
+                        autocomplete="new-password"
+                        minlength="6"
+                        required
+                    >
+
+                </label>
+
+
+                <!-- MENSAGEM -->
+
+                <div
+                    id="mensagemCadastro"
+                    class="form-message"
+                    hidden
+                ></div>
+
+
+                <!-- BOTÃO -->
+
+                <button
+                    type="submit"
+                    id="btnCriarConta"
+                >
+                    Criar minha conta →
+                </button>
+
+
+            </form>
+
+
+            <!-- =====================================
+                 LOGIN
+            ====================================== -->
+
+            <div class="login">
+
+                Já possui uma conta?
+
+                <a href="../login/index.html">
+                    Entrar
+                </a>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================================
+         FIREBASE
+    ========================================== -->
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+
+    <script src="../firebase/config.js"></script>
+
+
+    <script>
+
+        if (
+            typeof firebase !== "undefined" &&
+            !firebase.apps.length
+        ) {
+
+            firebase.initializeApp(
+                firebaseConfig
+            );
+
+        }
+
+    </script>
+
+
+    <script src="../firebase/auth.js"></script>
+
+    <script src="../firebase/firestore.js"></script>
+
+    <script src="../auth.js"></script>
+
+
+    <!-- =========================================
+         SCRIPT DO CADASTRO
+    ========================================== -->
+
+    <script src="script.js"></script>
+
+
+</body>
+
+</html>

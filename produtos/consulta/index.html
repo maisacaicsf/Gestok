@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+<title>Gestok | Produtos</title>
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+    <link
+        rel="stylesheet"
+        href="../../componentes/sidebar.css"
+    >
+</head>
+
+<body>
+<div id="gestok-sidebar-container"></div>
+<header class="header">
+
+    <div class="header-left">
+
+        <button
+            class="menu-button"
+            id="menuButton"
+            aria-label="Abrir menu">
+
+            <span></span>
+            <span></span>
+            <span></span>
+
+        </button>
+
+        <div class="page-name">
+            Entrada de estoque
+        </div>
+
+    </div>
+</header>
+<!-- =========================================
+     CONTEÚDO
+========================================== -->
+
+<main class="page">
+
+    <!-- CABEÇALHO -->
+
+    <div class="page-header">
+
+        <div>
+
+            <span class="eyebrow">
+                ESTOQUE
+            </span>
+
+            <h1>
+                Produtos
+            </h1>
+
+            <p>
+                Consulte e acompanhe os produtos cadastrados no estoque.
+            </p>
+
+        </div>
+
+
+        <a
+            href="../index.html#novo"
+            class="primary-button"
+        >
+            ＋ Novo produto
+        </a>
+
+    </div>
+
+
+    <!-- =====================================
+         PAINEL DE CONSULTA
+    ====================================== -->
+
+    <section class="products-panel">
+
+
+        <!-- CABEÇALHO DO PAINEL -->
+
+        <div class="products-panel-header">
+
+            <div>
+
+                <h2>
+                    Produtos cadastrados
+                </h2>
+
+                <p>
+                    Pesquise e filtre os produtos do estoque.
+                </p>
+
+            </div>
+
+
+            <div
+                class="products-total"
+                id="produtosCount"
+            >
+                0 produtos
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             PESQUISA
+        ====================================== -->
+
+        <div class="search-box">
+
+            <span class="search-icon">
+                🔎
+            </span>
+
+            <input
+                type="text"
+                id="pesquisaProduto"
+                placeholder="Pesquisar por nome ou código..."
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <!-- =====================================
+             FILTROS
+        ====================================== -->
+
+        <div class="filters">
+
+            <div class="filter-group">
+
+                <label for="filtroCategoria">
+                    Categoria
+                </label>
+
+                <select id="filtroCategoria">
+
+                    <option value="">
+                        Todas
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label for="filtroStatus">
+                    Status
+                </label>
+
+                <select id="filtroStatus">
+
+                    <option value="">
+                        Todos
+                    </option>
+
+                    <option value="ativo">
+                        Ativos
+                    </option>
+
+                    <option value="inativo">
+                        Inativos
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label for="filtroEstoque">
+                    Estoque
+                </label>
+
+                <select id="filtroEstoque">
+
+                    <option value="">
+                        Todos
+                    </option>
+
+                    <option value="normal">
+                        Normal
+                    </option>
+
+                    <option value="baixo">
+                        Abaixo do mínimo
+                    </option>
+
+                    <option value="zerado">
+                        Zerado
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label for="ordenacao">
+                    Ordenar
+                </label>
+
+                <select id="ordenacao">
+
+                    <option value="nome">
+                        Nome A-Z
+                    </option>
+
+                    <option value="nome-desc">
+                        Nome Z-A
+                    </option>
+
+                    <option value="estoque-menor">
+                        Menor estoque
+                    </option>
+
+                    <option value="estoque-maior">
+                        Maior estoque
+                    </option>
+
+                    <option value="codigo">
+                        Código A-Z
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="clear-filters"
+                id="limparFiltros"
+            >
+                Limpar filtros
+            </button>
+
+        </div>
+
+
+        <!-- =====================================
+             TABELA
+        ====================================== -->
+
+        <div class="table-container">
+
+            <table class="products-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Produto
+                        </th>
+
+                        <th>
+                            Código
+                        </th>
+
+                        <th>
+                            Categoria
+                        </th>
+
+                        <th>
+                            Estoque
+                        </th>
+
+                        <th>
+                            Mínimo
+                        </th>
+
+                        <th>
+                            Máximo
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Ação
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="produtosTabela">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- =====================================
+             SEM RESULTADOS
+        ====================================== -->
+
+        <div
+            class="no-results"
+            id="semResultados"
+        >
+
+            <div class="no-results-icon">
+                📦
+            </div>
+
+            <strong>
+                Nenhum produto encontrado
+            </strong>
+
+            <span>
+                Tente alterar a pesquisa ou os filtros.
+            </span>
+
+        </div>
+
+
+    </section>
+
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="../../firebase/config.js"></script>
+<script>firebase.initializeApp(firebaseConfig);</script>
+<script src="../../firebase/auth.js"></script>
+<script src="../../firebase/firestore.js"></script>
+<script src="../../auth.js"></script>
+<script src="../../componentes/sidebar.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

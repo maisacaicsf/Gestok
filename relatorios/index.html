@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Gestok | Relatórios</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../componentes/sidebar.css"
+    >
+
+</head>
+
+
+<body>
+
+    <div id="gestok-sidebar-container"></div>
+
+
+    <!-- =========================================
+         CABEÇALHO
+    ========================================== -->
+
+    <header class="header">
+
+        <div class="header-left">
+
+            <button
+                class="menu-button"
+                id="menuButton"
+                type="button"
+                aria-label="Abrir menu"
+            >
+
+                <span></span>
+                <span></span>
+                <span></span>
+
+            </button>
+
+            <div class="page-name">
+                Relatórios
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================
+         CONTEÚDO
+    ========================================== -->
+
+    <main class="page">
+
+
+        <!-- =====================================
+             CABEÇALHO
+        ====================================== -->
+
+        <div class="page-header">
+
+            <div>
+
+                <span class="eyebrow">
+                    GESTÃO
+                </span>
+
+                <h1>
+                    Relatórios
+                </h1>
+
+                <p>
+                    Consulte e gere relatórios
+                    do seu estoque.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             PAINEL DE RELATÓRIOS
+        ====================================== -->
+
+        <section class="product-container">
+
+
+            <div class="form-header">
+
+                <div>
+
+                    <h2>
+                        Gerar relatório
+                    </h2>
+
+                    <p>
+                        Escolha os dados que deseja
+                        incluir no PDF.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="report-form">
+
+
+                <!-- TIPO -->
+
+                <div class="form-group full">
+
+                    <label for="tipoRelatorio">
+                        Tipo de relatório
+                    </label>
+
+
+                    <select id="tipoRelatorio">
+
+                        <option value="estoque">
+                            Relatório de estoque
+                        </option>
+
+                        <option value="entradas">
+                            Relatório de entradas
+                        </option>
+
+                        <option value="saidas">
+                            Relatório de saídas
+                        </option>
+
+                        <option value="movimentacoes">
+                            Relatório de movimentações
+                        </option>
+
+                        <option value="estoque-baixo">
+                            Relatório de estoque baixo
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- DATAS -->
+
+                <div
+                    class="date-grid"
+                    id="periodo"
+                >
+
+                    <div class="form-group">
+
+                        <label for="dataInicial">
+                            Data inicial
+                        </label>
+
+                        <input
+                            type="date"
+                            id="dataInicial"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="dataFinal">
+                            Data final
+                        </label>
+
+                        <input
+                            type="date"
+                            id="dataFinal"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- PRODUTO -->
+
+                <div class="form-group full">
+
+                    <label for="produtoFiltro">
+                        Produto
+                    </label>
+
+
+                    <select id="produtoFiltro">
+
+                        <option value="">
+                            Todos os produtos
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- TIPO DE MOVIMENTAÇÃO -->
+
+                <div
+                    class="form-group full"
+                    id="tipoMovimentacaoGrupo"
+                >
+
+                    <label for="tipoMovimentacao">
+                        Tipo de movimentação
+                    </label>
+
+
+                    <select id="tipoMovimentacao">
+
+                        <option value="">
+                            Todas
+                        </option>
+
+                        <option value="entrada">
+                            Entradas
+                        </option>
+
+                        <option value="saida">
+                            Saídas
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================
+                 RODAPÉ
+            ================================== -->
+
+            <div class="form-footer">
+
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    id="limparFiltros"
+                >
+
+                    Limpar filtros
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    id="gerarPdf"
+                >
+
+                    ▣ Gerar PDF
+
+                </button>
+
+
+            </div>
+
+
+        </section>
+
+
+        <!-- =====================================
+             PRÉVIA
+        ====================================== -->
+
+        <section
+            class="product-container preview-container"
+            id="previewPanel"
+        >
+
+
+            <div
+                class="form-header preview-header"
+            >
+
+
+                <div>
+
+                    <h2>
+                        Prévia dos dados
+                    </h2>
+
+                    <p id="previewDescription">
+                        Os dados do relatório aparecerão
+                        aqui.
+                    </p>
+
+                </div>
+
+
+                <span
+                    class="result-count"
+                    id="resultCount"
+                >
+                    0 registros
+                </span>
+
+
+            </div>
+
+
+            <div
+                class="preview-content"
+                id="previewContent"
+            >
+
+                <div class="empty-preview">
+
+
+                    <div class="empty-icon">
+                        ▤
+                    </div>
+
+
+                    <strong>
+                        Nenhum dado para exibir
+                    </strong>
+
+
+                    <span>
+                        Os dados aparecerão aqui
+                        antes da geração do PDF.
+                    </span>
+
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =========================================
+         BIBLIOTECAS PDF
+    ========================================== -->
+
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+    ></script>
+
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"
+    ></script>
+
+
+    <!-- =========================================
+         FIREBASE
+    ========================================== -->
+
+    <script
+        src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"
+    ></script>
+
+    <script
+        src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"
+    ></script>
+
+    <script
+        src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"
+    ></script>
+
+
+    <!-- =========================================
+         CONFIGURAÇÃO FIREBASE
+    ========================================== -->
+
+    <script src="../firebase/config.js"></script>
+
+
+    <!-- =========================================
+         INICIALIZAÇÃO SEGURA DO FIREBASE
+    ========================================== -->
+
+    <script>
+
+        if (
+            typeof firebase !== "undefined" &&
+            typeof firebaseConfig !== "undefined"
+        ) {
+
+            if (!firebase.apps.length) {
+
+                firebase.initializeApp(
+                    firebaseConfig
+                );
+
+            }
+
+        }
+
+    </script>
+
+
+    <!-- =========================================
+         FIREBASE AUTH
+    ========================================== -->
+
+    <script src="../firebase/auth.js"></script>
+
+
+    <!-- =========================================
+         FIREBASE FIRESTORE
+    ========================================== -->
+
+    <script src="../firebase/firestore.js"></script>
+
+
+    <!-- =========================================
+         AUTH CENTRAL DO GESTOK
+    ========================================== -->
+
+    <script src="../auth.js"></script>
+
+
+    <!-- =========================================
+         SIDEBAR UNIVERSAL
+    ========================================== -->
+
+    <script src="../componentes/sidebar.js"></script>
+
+
+    <!-- =========================================
+         SCRIPT DOS RELATÓRIOS
+    ========================================== -->
+
+    <script src="script.js"></script>
+
+
+</body>
+
+</html>

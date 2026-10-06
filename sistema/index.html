@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Gestok | Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+        <link
+        rel="stylesheet"
+        href="../componentes/sidebar.css"
+    >
+
+</head>
+
+<body>
+    <div id="gestok-sidebar-container"></div>
+<!-- =========================================
+     APLICAÇÃO
+========================================= -->
+
+<div class="app">
+
+
+    <!-- =====================================
+         HEADER
+    ====================================== -->
+
+    <header class="header">
+
+
+        <div class="header-left">
+
+
+            <button
+                class="menu-button"
+                id="menuButton"
+                type="button"
+                aria-label="Abrir menu"
+            >
+
+                <span></span>
+                <span></span>
+                <span></span>
+
+            </button>
+
+
+            <div class="page-name">
+                Dashboard
+            </div>
+
+
+        </div>
+
+
+
+        <div class="header-right">
+
+
+            <!-- NOTIFICAÇÕES -->
+
+            <button
+                class="notification-button"
+                id="notificationButton"
+                type="button"
+                aria-label="Notificações"
+            >
+
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                >
+
+                    <path
+                        d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"
+                    />
+
+                    <path
+                        d="M10 21h4"
+                    />
+
+                </svg>
+
+
+                <span class="notification-dot"></span>
+
+            </button>
+
+
+
+            <!-- PAINEL DE NOTIFICAÇÕES -->
+
+            <div
+                class="notifications-panel"
+                id="notificationsPanel"
+                aria-hidden="true"
+            >
+
+                <div class="notifications-header">
+
+                    <div>
+
+                        <span>
+                            NOTIFICAÇÕES
+                        </span>
+
+                        <strong>
+                            Avisos do sistema
+                        </strong>
+
+                    </div>
+
+
+                    <button
+                        id="marcarAvisosLidos"
+                        type="button"
+                    >
+                        Marcar como lidos
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="notifications-list"
+                    id="notificationsList"
+                >
+                </div>
+
+
+                <div
+                    class="notifications-empty"
+                    id="notificationsEmpty"
+                    hidden
+                >
+
+                    <div class="notifications-empty-icon">
+                        ✓
+                    </div>
+
+                    <strong>
+                        ✓ Tudo em dia
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- USUÁRIO -->
+
+            <button
+                class="user-profile"
+                type="button"
+                onclick="window.location.href='../perfil/index.html'"
+            >
+
+
+                <div
+                    class="avatar"
+                    id="avatarUsuario"
+                >
+                    U
+                </div>
+
+
+                <div class="user-info">
+
+                    <strong id="nomeUsuarioMenu">
+                        Usuário
+                    </strong>
+
+                    <span>
+                        Administrador
+                    </span>
+
+                </div>
+
+
+                <span class="user-arrow">
+                    ⌄
+                </span>
+
+
+            </button>
+
+
+        </div>
+
+
+    </header>
+
+
+
+    <!-- =====================================
+         MAIN
+    ====================================== -->
+
+    <main class="main-content">
+
+
+        <!-- =================================
+             WELCOME
+        ================================== -->
+
+        <section class="welcome">
+
+
+            <div>
+
+                <h1>
+                    Olá,
+                    <strong id="nomeUsuario">
+                        Usuário
+                    </strong>
+                </h1>
+
+                <p>
+                    Aqui está o resumo do seu estoque hoje.
+                </p>
+
+            </div>
+
+
+
+            <!-- DATA -->
+
+            <div class="date-box">
+
+
+                <span class="calendar-icon">
+                    ▣
+                </span>
+
+
+                <div>
+
+                    <small>
+                        Hoje
+                    </small>
+
+                    <strong id="currentDate">
+                        26 Ago 2026
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================
+             ESTATÍSTICAS
+        ================================== -->
+
+        <section class="stats-grid">
+
+
+            <!-- PRODUTOS -->
+
+            <article class="stat-card">
+
+
+                <div class="stat-top">
+
+
+                    <div class="stat-icon blue">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+
+                            <path
+                                d="M21 8l-9-5-9 5 9 5 9-5z"
+                            />
+
+                            <path
+                                d="M3 8v8l9 5 9-5V8"
+                            />
+
+                            <path
+                                d="M12 13v8"
+                            />
+
+                        </svg>
+
+                    </div>
+
+
+                    <span class="stat-badge positive">
+                        Ativos
+                    </span>
+
+
+                </div>
+
+
+                <div class="stat-content">
+
+                    <strong id="produtosAtivos">
+                        0
+                    </strong>
+
+                    <span>
+                        Produtos ativos
+                    </span>
+
+                </div>
+
+
+            </article>
+
+
+
+            <!-- MOVIMENTAÇÕES -->
+
+            <article class="stat-card">
+
+
+                <div class="stat-top">
+
+
+                    <div class="stat-icon indigo">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+
+                            <path d="M7 7h13" />
+
+                            <path d="M17 3l4 4-4 4" />
+
+                            <path d="M17 17H4" />
+
+                            <path d="M7 13l-4 4 4 4" />
+
+                        </svg>
+
+                    </div>
+
+
+                    <span class="stat-badge neutral">
+                        Hoje
+                    </span>
+
+
+                </div>
+
+
+                <div class="stat-content">
+
+                    <strong id="totalMovimentacoes">
+                        0
+                    </strong>
+
+                    <span>
+                        Movimentações
+                    </span>
+
+                </div>
+
+
+            </article>
+
+
+
+            <!-- ESTOQUE BAIXO -->
+
+            <article class="stat-card">
+
+
+                <div class="stat-top">
+
+
+                    <div class="stat-icon orange">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+
+                            <path
+                                d="M10.3 3.2L2.7 17a2 2 0 0 0 1.8 3h15a2 2 0 0 0 1.8-3L13.7 3.2a2 2 0 0 0-3.4 0z"
+                            />
+
+                            <path d="M12 8v5" />
+
+                            <path d="M12 16h.01" />
+
+                        </svg>
+
+                    </div>
+
+
+                    <span class="stat-badge warning">
+                        Atenção
+                    </span>
+
+
+                </div>
+
+
+                <div class="stat-content">
+
+                    <strong id="estoqueMinimo">
+                        0
+                    </strong>
+
+                    <span>
+                        Estoque abaixo do mínimo
+                    </span>
+
+                </div>
+
+
+            </article>
+
+
+
+            <!-- QUANTIDADE -->
+
+            <article class="stat-card">
+
+
+                <div class="stat-top">
+
+
+                    <div class="stat-icon green">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+
+                            <path d="M12 3v18" />
+
+                            <path
+                                d="M17 7.5c0-2-2.2-3.5-5-3.5S7 5.5 7 7.5s2.2 3.5 5 3.5 5 1.5 5 3.5-2.2 3.5-5 3.5-5-1.5-5-3.5"
+                            />
+
+                        </svg>
+
+                    </div>
+
+
+                    <span class="stat-badge positive">
+                        Estoque
+                    </span>
+
+
+                </div>
+
+
+                <div class="stat-content">
+
+                    <strong id="estoqueMaximo">
+                        0
+                    </strong>
+
+                    <span>
+                        Quantidade em estoque
+                    </span>
+
+                </div>
+
+
+            </article>
+
+
+        </section>
+
+
+
+        <!-- =================================
+             AÇÕES RÁPIDAS
+        ================================== -->
+
+        <section class="panel quick-panel">
+
+
+            <div class="panel-header">
+
+
+                <div>
+
+                    <h2>
+                        Ações rápidas
+                    </h2>
+
+                    <p>
+                        Execute as operações mais utilizadas.
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="quick-actions">
+
+
+                <!-- ENTRADA -->
+
+                <button
+                    class="quick-action entrada"
+                    data-page="Entrada"
+                    type="button"
+                >
+
+                    <span class="quick-icon">
+                        ↓
+                    </span>
+
+
+                    <span class="quick-text">
+
+                        <strong>
+                            Entrada
+                        </strong>
+
+                        <small>
+                            Adicionar estoque
+                        </small>
+
+                    </span>
+
+
+                    <span class="quick-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+
+                <!-- SAÍDA -->
+
+                <button
+                    class="quick-action saida"
+                    data-page="Saída"
+                    type="button"
+                >
+
+                    <span class="quick-icon">
+                        ↑
+                    </span>
+
+
+                    <span class="quick-text">
+
+                        <strong>
+                            Saída
+                        </strong>
+
+                        <small>
+                            Retirar estoque
+                        </small>
+
+                    </span>
+
+
+                    <span class="quick-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+
+                <!-- MOVIMENTAÇÕES -->
+
+                <button
+                    class="quick-action movimentacao"
+                    data-page="Movimentações"
+                    type="button"
+                >
+
+                    <span class="quick-icon">
+                        ↔
+                    </span>
+
+
+                    <span class="quick-text">
+
+                        <strong>
+                            Movimentações
+                        </strong>
+
+                        <small>
+                            Ver histórico
+                        </small>
+
+                    </span>
+
+
+                    <span class="quick-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+
+                <!-- SOLICITAÇÃO -->
+
+                <button
+                    class="quick-action compra"
+                    data-page="Solicitações"
+                    type="button"
+                >
+
+                    <span class="quick-icon">
+                        +
+                    </span>
+
+
+                    <span class="quick-text">
+
+                        <strong>
+                            Solicitação
+                        </strong>
+
+                        <small>
+                            Solicitar compra
+                        </small>
+
+                    </span>
+
+
+                    <span class="quick-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================
+             PARTE INFERIOR
+        ================================== -->
+
+        <section class="bottom-grid">
+
+
+            <!-- MOVIMENTAÇÕES -->
+
+            <div class="panel movements-panel">
+
+
+                <div class="panel-header">
+
+
+                    <div>
+
+                        <h2>
+                            Últimas movimentações
+                        </h2>
+
+                        <p>
+                            Atividade recente do estoque.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        class="see-all"
+                        id="verTodasMovimentacoes"
+                        type="button"
+                    >
+                        Ver todas
+                    </button>
+
+
+                </div>
+
+
+
+                <div class="empty-state">
+
+
+                    <div class="empty-icon">
+                        ↔
+                    </div>
+
+
+                    <strong>
+                        Nenhuma movimentação
+                    </strong>
+
+
+                    <span>
+                        As entradas e saídas aparecerão aqui.
+                    </span>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- ALERTAS -->
+
+            <div class="panel alerts-panel">
+
+
+                <div class="panel-header">
+
+
+                    <div>
+
+                        <h2>
+                            Alertas
+                        </h2>
+
+                        <p>
+                            Acompanhe situações importantes.
+                        </p>
+
+                    </div>
+
+
+                    <span class="alert-count">
+                        0
+                    </span>
+
+
+                </div>
+
+
+
+                <div
+                    class="empty-state"
+                    id="alertEmptyState"
+                >
+
+                    <div class="empty-icon success">
+                        ✓
+                    </div>
+
+
+                    <strong>
+                        Tudo certo!
+                    </strong>
+
+
+                    <span>
+                        Nenhum produto está abaixo
+                        do estoque mínimo.
+                    </span>
+
+                </div>
+
+
+
+                <div
+                    class="alert-products-list"
+                    id="alertProductsList"
+                >
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+</div>
+
+
+
+<!-- =========================================
+     JAVASCRIPT
+========================================= -->
+<script src="../componentes/sidebar.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script src="../firebase/config.js"></script>
+    <script>if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);</script>
+    <script src="../firebase/auth.js"></script>
+    <script src="../firebase/firestore.js"></script>
+
+    <script src="../auth.js"></script>
+<script src="script.js"></script>
+
+
+</body>
+
+</html>
