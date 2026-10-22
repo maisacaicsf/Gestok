@@ -7,19 +7,42 @@ service cloud.firestore {
     match /acessos/{chave} {
       allow get: if true;
       allow list: if false;
+
+      // Só cria o índice de acesso quem é dono da loja informada, e a chave
+      // precisa ser exatamente "codigoLoja_usuario" (impede ocupar chaves alheias).
       allow create: if request.auth != null
-        && request.resource.data.uid == request.auth.uid;
+        && request.resource.data.uid == request.auth.uid
+        && chave == request.resource.data.codigoLoja + '_' + request.resource.data.usuario
+        && get(/databases/$(database)/documents/lojas/$(request.resource.data.lojaId)).data.donoUid == request.auth.uid;
+
+      // O dono pode atualizar, mas não pode trocar a loja nem o uid vinculados.
       allow update: if request.auth != null
-        && resource.data.uid == request.auth.uid;
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.lojaId == resource.data.lojaId;
+
       allow delete: if false;
     }
 
     match /lojas/{lojaId} {
-      allow create: if request.auth != null
-        && request.resource.data.donoUid == request.auth.uid;
 
-      allow read, update: if request.auth != null
+      // Na criação, a loja só pode nascer com TESTE GRÁTIS (no máximo ~45 dias,
+      // com folga para diferença de relógio). Assinatura "ativa" só o servidor
+      // (Cloud Functions / Admin SDK) consegue gravar.
+      allow create: if request.auth != null
+        && request.resource.data.donoUid == request.auth.uid
+        && request.resource.data.assinatura.status == 'teste_gratis'
+        && request.resource.data.assinatura.pagamento == 'gratis'
+        && request.resource.data.assinatura.vencimento <= request.time + duration.value(45, 'd');
+
+      allow read: if request.auth != null
         && resource.data.donoUid == request.auth.uid;
+
+      // O dono pode editar a loja, MAS NÃO os campos de assinatura, dono e código.
+      allow update: if request.auth != null
+        && resource.data.donoUid == request.auth.uid
+        && !request.resource.data.diff(resource.data).affectedKeys()
+              .hasAny(['assinatura', 'donoUid', 'codigo']);
 
       allow delete: if false;
 

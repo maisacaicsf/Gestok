@@ -137,6 +137,49 @@ function contextoGestokCarregado() {
 
 }
 /* =========================================
+   NORMALIZAR ASSINATURA (Timestamp -> ISO)
+   -----------------------------------------
+   O Firestore devolve datas como Timestamp.
+   O espelho local usa texto ISO, que é o
+   formato lido por assinaturaAtivaGestok().
+========================================= */
+
+function normalizarAssinaturaGestok(assinatura) {
+
+    if (!assinatura || typeof assinatura !== "object") {
+
+        return null;
+
+    }
+
+    const copia = Object.assign({}, assinatura);
+
+    ["inicio", "vencimento"].forEach(function (campo) {
+
+        const valor = copia[campo];
+
+        if (valor && typeof valor.toDate === "function") {
+
+            try {
+
+                copia[campo] = valor.toDate().toISOString();
+
+            } catch (erro) {
+
+                copia[campo] = null;
+
+            }
+
+        }
+
+    });
+
+    return copia;
+
+}
+
+
+/* =========================================
    OBTER CONTA LOCAL
 ========================================= */
 
@@ -444,7 +487,7 @@ function observarAutenticacaoGestok(callback) {
                                 loja.codigo || "",
 
                             assinatura:
-                                loja.assinatura || {
+                                normalizarAssinaturaGestok(loja.assinatura) || {
 
                                     plano:
                                         "Gestok",
@@ -1610,7 +1653,7 @@ async function entrarGestok(
                 acesso.codigoLoja,
 
             assinatura:
-                loja.assinatura || {
+                normalizarAssinaturaGestok(loja.assinatura) || {
 
                     plano:
                         "Gestok",
@@ -1752,170 +1795,22 @@ async function entrarGestok(
 
 async function aprovarPagamentoGestok() {
 
-    const conta =
-        obterContaGestok();
+    /* =====================================
+       DESATIVADA POR SEGURANÇA
+       A assinatura só pode ser ativada pelo
+       servidor (Cloud Functions), após a
+       confirmação do pagamento. Nenhuma
+       parte do sistema chamava esta função.
+    ===================================== */
 
+    return {
 
-    const usuarioFirebase =
-        usuarioFirebaseAtualGestok();
+        ok: false,
 
+        mensagem:
+            "A ativação da assinatura é feita apenas pelo servidor de pagamentos."
 
-    if (!usuarioFirebase) {
-
-        return {
-
-            ok: false,
-
-            mensagem:
-                "Usuário não autenticado no Firebase."
-
-        };
-
-    }
-
-
-    if (!conta) {
-
-        return {
-
-            ok: false,
-
-            mensagem:
-                "Conta Gestok não encontrada."
-
-        };
-
-    }
-
-
-    if (!conta.lojaId) {
-
-        return {
-
-            ok: false,
-
-            mensagem:
-                "Loja não identificada."
-
-        };
-
-    }
-
-
-    try {
-
-        const db =
-            firebase.firestore();
-
-
-        const agora =
-            new Date();
-
-
-        const vencimento =
-            new Date(
-                agora
-            );
-
-
-        vencimento.setDate(
-            vencimento.getDate() + 30
-        );
-
-
-        const assinatura = {
-
-            plano:
-                "Gestok",
-
-            valor:
-                30,
-
-            dias:
-                30,
-
-            inicio:
-                agora.toISOString(),
-
-            vencimento:
-                vencimento.toISOString(),
-
-            status:
-                "ativa",
-
-            pagamento:
-                "aprovado"
-
-        };
-
-
-        /* =====================================
-           ATUALIZAR FIRESTORE
-        ===================================== */
-
-        await db
-            .collection("lojas")
-            .doc(
-                conta.lojaId
-            )
-            .update({
-
-                assinatura:
-                    assinatura
-
-            });
-
-
-        /* =====================================
-           ATUALIZAR ESPELHO LOCAL
-        ===================================== */
-
-        conta.assinatura =
-            assinatura;
-
-
-        localStorage.setItem(
-
-            GESTOK_CONTA,
-
-            JSON.stringify(conta)
-
-        );
-
-
-        return {
-
-            ok: true,
-
-            conta:
-                conta
-
-        };
-
-
-    } catch (erro) {
-
-        console.error(
-            "Erro ao aprovar pagamento:",
-            erro
-        );
-
-
-        return {
-
-            ok: false,
-
-            mensagem:
-                mensagemErroFirebaseGestok(
-                    erro
-                ),
-
-            erro:
-                erro
-
-        };
-
-    }
+    };
 
 }
 
@@ -2223,3 +2118,215 @@ function mensagemErroFirebaseGestok(
     return "Ocorreu um erro ao processar a operação.";
 
 }
+
+
+/* =========================================
+   VERIFICAÇÃO DE ASSINATURA A CADA PÁGINA
+   -----------------------------------------
+   O login já confere a assinatura, mas quem
+   continua logado também precisa ser barrado
+   quando o teste grátis ou o plano vencer.
+   Lê a assinatura do Firestore (fonte real,
+   protegida pelas regras) e atualiza o cache
+   local, em vez de confiar no localStorage.
+   Se houver falha de rede/permissão, NÃO
+   bloqueia o usuário.
+========================================= */
+
+(function () {
+
+    function caminhoPaginaGestok() {
+
+        return window.location.pathname.toLowerCase();
+
+    }
+
+
+    function paginaIsentaAssinaturaGestok() {
+
+        const pagina = caminhoPaginaGestok();
+
+        const isentas = [
+
+            "/login/",
+            "/cadastro/",
+            "/planos/",
+            "/pagamento/",
+            "/perfil/",
+            "/suporte/",
+            "/apresentacao.html"
+
+        ];
+
+        if (
+            pagina === "/" ||
+            pagina.endsWith("/index.html") &&
+            pagina.split("/").filter(Boolean).length <= 1
+        ) {
+
+            return true;
+
+        }
+
+        return isentas.some(function (item) {
+
+            return pagina.indexOf(item) !== -1;
+
+        });
+
+    }
+
+
+    function caminhoPagamentoRelativoGestok() {
+
+        const pagina = caminhoPaginaGestok();
+
+        if (
+            pagina.indexOf("/produtos/consulta/") !== -1 ||
+            pagina.indexOf("/suporte/chamados/") !== -1
+        ) {
+
+            return "../../pagamento/index.html";
+
+        }
+
+        return "../pagamento/index.html";
+
+    }
+
+
+    async function verificarAssinaturaGestok(usuario) {
+
+        try {
+
+            if (paginaIsentaAssinaturaGestok()) {
+
+                return;
+
+            }
+
+            const conta = obterContaGestok();
+
+            if (!conta || !conta.lojaId) {
+
+                return;
+
+            }
+
+            const snap =
+                await firebase
+                    .firestore()
+                    .collection("lojas")
+                    .doc(conta.lojaId)
+                    .get();
+
+            if (!snap.exists) {
+
+                return;
+
+            }
+
+            const loja = snap.data();
+
+            if (!loja || loja.donoUid !== usuario.uid) {
+
+                return;
+
+            }
+
+            const assinatura =
+                normalizarAssinaturaGestok(loja.assinatura) || {
+
+                    plano: "Gestok",
+                    valor: 30,
+                    dias: 30,
+                    inicio: null,
+                    vencimento: null,
+                    status: "aguardando_pagamento",
+                    pagamento: "pendente"
+
+                };
+
+            const contaAtual =
+                Object.assign({}, conta, { assinatura: assinatura });
+
+            localStorage.setItem(
+                GESTOK_CONTA,
+                JSON.stringify(contaAtual)
+            );
+
+            if (!assinaturaAtivaGestok(contaAtual)) {
+
+                window.location.replace(
+                    caminhoPagamentoRelativoGestok()
+                );
+
+            }
+
+        } catch (erro) {
+
+            console.warn(
+                "Não foi possível verificar a assinatura agora:",
+                erro && erro.code
+            );
+
+        }
+
+    }
+
+
+    function iniciarVerificacaoAssinaturaGestok() {
+
+        try {
+
+            if (
+                typeof firebase === "undefined" ||
+                !firebase.apps ||
+                !firebase.apps.length ||
+                !firebase.auth ||
+                !firebase.firestore
+            ) {
+
+                return;
+
+            }
+
+            let jaVerificou = false;
+
+            firebase.auth().onAuthStateChanged(function (usuario) {
+
+                if (!usuario || jaVerificou) {
+
+                    return;
+
+                }
+
+                jaVerificou = true;
+
+                verificarAssinaturaGestok(usuario);
+
+            });
+
+        } catch (erro) {
+
+            console.warn("Verificação de assinatura indisponível.");
+
+        }
+
+    }
+
+
+    if (document.readyState === "loading") {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            iniciarVerificacaoAssinaturaGestok
+        );
+
+    } else {
+
+        iniciarVerificacaoAssinaturaGestok();
+
+    }
+
+})();
