@@ -1328,6 +1328,10 @@ function iniciarMonitoramentoAutenticacaoSuporte() {
 function mostrarMensagem(
     mensagem
 ) {
+    if (window.gestokNotificar) {
+        window.gestokNotificar(mensagem, "sucesso");
+        return;
+    }
 
     const existente =
         document.querySelector(
