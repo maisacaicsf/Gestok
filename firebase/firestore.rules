@@ -2,6 +2,27 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Administrador do painel (você): existe um documento admins/{uid} ativo.
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.get('ativo', true) != false;
+    }
+
+    // Cadastro de administradores: cada admin só lê o próprio documento.
+    // Criar/alterar admins só pelo Console do Firebase.
+    match /admins/{adminId} {
+      allow get: if request.auth != null && request.auth.uid == adminId;
+      allow list, write: if false;
+    }
+
+    // Notificações enviadas pelo painel admin e lidas por todas as lojas (somente as ativas).
+    match /notificacoes/{notificacaoId} {
+      allow read: if isAdmin()
+        || (request.auth != null && resource.data.ativa == true);
+      allow create, update, delete: if isAdmin();
+    }
+
     // Resolver mínimo para o login Código da Loja + Usuário.
     // Contém apenas identificadores de acesso e o e-mail técnico do Firebase Auth.
     match /acessos/{chave} {
@@ -24,6 +45,15 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Permite ao admin listar chamados e mensagens de TODAS as lojas de uma vez.
+    match /{caminho=**}/chamados/{chamadoId} {
+      allow read: if isAdmin();
+    }
+
+    match /{caminho=**}/mensagens/{mensagemId} {
+      allow read: if isAdmin();
+    }
+
     match /lojas/{lojaId} {
 
       // Na criação, a loja só pode nascer com TESTE GRÁTIS (no máximo ~45 dias,
@@ -35,14 +65,16 @@ service cloud.firestore {
         && request.resource.data.assinatura.pagamento == 'gratis'
         && request.resource.data.assinatura.vencimento <= request.time + duration.value(45, 'd');
 
-      allow read: if request.auth != null
-        && resource.data.donoUid == request.auth.uid;
+      allow read: if isAdmin()
+        || (request.auth != null && resource.data.donoUid == request.auth.uid);
 
       // O dono pode editar a loja, MAS NÃO os campos de assinatura, dono e código.
-      allow update: if request.auth != null
-        && resource.data.donoUid == request.auth.uid
-        && !request.resource.data.diff(resource.data).affectedKeys()
-              .hasAny(['assinatura', 'donoUid', 'codigo']);
+      // O administrador pode editar tudo (ex.: liberar assinatura manualmente).
+      allow update: if isAdmin()
+        || (request.auth != null
+            && resource.data.donoUid == request.auth.uid
+            && !request.resource.data.diff(resource.data).affectedKeys()
+                  .hasAny(['assinatura', 'donoUid', 'codigo']));
 
       allow delete: if false;
 
@@ -55,6 +87,8 @@ service cloud.firestore {
           && uid == request.auth.uid
           && get(/databases/$(database)/documents/lojas/$(lojaId)).data.donoUid == request.auth.uid;
 
+        allow read: if isAdmin();
+
         allow delete: if false;
       }
 
@@ -65,18 +99,29 @@ service cloud.firestore {
       }
 
       match /produtos/{produtoId} {
+        allow read: if isAdmin();
         allow read, write: if request.auth != null
           && get(/databases/$(database)/documents/lojas/$(lojaId)).data.donoUid == request.auth.uid;
       }
 
       match /movimentacoes/{movimentoId} {
+        allow read: if isAdmin();
         allow read, write: if request.auth != null
           && get(/databases/$(database)/documents/lojas/$(lojaId)).data.donoUid == request.auth.uid;
       }
 
+      // Chamados de suporte: o dono da loja e o administrador (que responde).
       match /chamados/{chamadoId} {
-        allow read, write: if request.auth != null
-          && get(/databases/$(database)/documents/lojas/$(lojaId)).data.donoUid == request.auth.uid;
+        allow read, write: if isAdmin()
+          || (request.auth != null
+              && get(/databases/$(database)/documents/lojas/$(lojaId)).data.donoUid == request.auth.uid);
+
+        // Conversa do chamado (subcoleção usada pelo suporte do Gestok e do admin).
+        match /mensagens/{mensagemId} {
+          allow read, write: if isAdmin()
+            || (request.auth != null
+                && get(/databases/$(database)/documents/lojas/$(lojaId)).data.donoUid == request.auth.uid);
+        }
       }
 
       match /solicitacoes/{solicitacaoId} {
