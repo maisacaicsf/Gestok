@@ -1,0 +1,100 @@
+/* =========================================
+   GESTOK — TEMA PROFISSIONAL
+   Camada visual única, carregada por último.
+   Só altera cores, sombras, foco e transições:
+   não muda layout nem funcionamento.
+   Para desfazer: remova o <link> deste arquivo.
+========================================= */
+
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --background: #f4f6fa;
+    --border: #e3e8ef;
+    --text: #111827;
+    --text-secondary: #5b6676;
+    --shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 4px 14px rgba(16, 24, 40, .05);
+    --gk-shadow-hover: 0 8px 24px rgba(16, 24, 40, .08);
+    --gk-ring: 0 0 0 3px rgba(37, 99, 235, .18);
+}
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+body {
+    font-family: Inter, "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    letter-spacing: -.003em;
+}
+
+h1, h2, h3 { letter-spacing: -.02em; }
+
+::selection { background: rgba(37, 99, 235, .18); }
+
+/* Barras de rolagem discretas */
+* { scrollbar-width: thin; scrollbar-color: #cfd6e1 transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: #cfd6e1; border-radius: 10px; border: 2px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: #aeb8c8; background-clip: content-box; }
+
+/* Foco claro e consistente (acessibilidade) */
+:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
+
+input, select, textarea {
+    transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #2563eb !important;
+    box-shadow: var(--gk-ring) !important;
+}
+input::placeholder, textarea::placeholder { color: #9aa4b2; }
+
+/* Botões */
+button, .primary-button, .secondary-button, .primary-btn {
+    transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease, transform .1s ease, color .15s ease;
+}
+.primary-button, .primary-btn {
+    box-shadow: 0 1px 2px rgba(37, 99, 235, .25), inset 0 1px 0 rgba(255, 255, 255, .12);
+}
+.primary-button:hover:not(:disabled), .primary-btn:hover:not(:disabled) {
+    box-shadow: 0 6px 16px rgba(37, 99, 235, .28);
+}
+.secondary-button:hover:not(:disabled) { border-color: #c5cfdf; }
+button:active:not(:disabled) { transform: translateY(1px); }
+button:disabled { cursor: not-allowed; opacity: .6; }
+
+/* Cartões e painéis */
+.panel, .card, .stat-card, .quick-action, .alert-product-card, .plan-card {
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    transition: box-shadow .2s ease, transform .2s ease, border-color .2s ease;
+}
+.stat-card:hover, .quick-action:hover, .alert-product-card:hover {
+    box-shadow: var(--gk-shadow-hover);
+    border-color: #d5dcea;
+}
+.stat-card:hover, .quick-action:hover { transform: translateY(-2px); }
+
+/* Menu lateral */
+.sidebar-nav-item { transition: background-color .15s ease, color .15s ease; }
+
+/* Tabelas */
+th {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+tbody tr { transition: background-color .12s ease; }
+tbody tr:hover { background-color: #f7f9fd; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

@@ -21,22 +21,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         return;
     }
 
-    /* Texto explicativo conforme a situação da assinatura */
-    (function () {
-        const desc = document.querySelector(".description");
-        const a = conta.assinatura || {};
-        const venc = a.vencimento ? new Date(a.vencimento) : null;
-        const dataTxt = venc && !isNaN(venc.getTime()) ? venc.toLocaleDateString("pt-BR") : "";
-        if (!desc) { return; }
-        if (a.status === "teste_gratis" && assinaturaAtivaGestok(conta)) {
-            desc.textContent = "Você está no período grátis" + (dataTxt ? " até " + dataTxt : "") +
-                ". Depois dessa data, será cobrado R$ 30,00 a cada 30 dias para continuar usando o Gestok.";
-        } else if (venc && !isNaN(venc.getTime()) && venc.getTime() <= Date.now()) {
-            desc.textContent = "Seu período de acesso terminou" + (dataTxt ? " em " + dataTxt : "") +
-                ". Assine por R$ 30,00 (30 dias) para continuar usando o Gestok.";
-        }
-    })();
-
     /*
        Aguarda o Firebase restaurar a sessão.
        Este é o ponto principal da correção:

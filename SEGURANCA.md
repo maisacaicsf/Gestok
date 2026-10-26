@@ -35,9 +35,3 @@ Teste depois: cadastro de loja nova, login, recuperação de senha, cadastro de 
 - [ ] Mercado Pago em **modo produção** (credenciais reais) e URL do webhook cadastrada
 - [ ] Domínio do site em Authentication → Settings → Authorized domains
 - [ ] Teste completo: criar conta, simular vencimento, pagar, conferir liberação
-
-## Painel admin (login)
-O painel só libera quem tem o documento `admins/{UID}` no Firestore, com `ativo: true`.
-O ID do documento precisa ser EXATAMENTE o UID do usuário em Authentication (não o e-mail).
-Se você apagar e recriar o usuário no Authentication, o UID muda: crie de novo o documento em `admins`.
-As regras de `firebase/firestore.rules` já cobrem Gestok + admin (admins, notificacoes, leitura das lojas).

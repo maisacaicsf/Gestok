@@ -12,7 +12,10 @@
         href="../componentes/sidebar.css"
     >
 
-    <script src="../componentes/notificacoes.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../tema-profissional.css">
 </head>
 
 <body>
@@ -182,6 +185,52 @@
                 </div>
 
             </form>
+    <!-- =========================================
+        LISTA DE PRODUTOS
+    ========================================= -->
+
+    <section class="product-container products-list-container">
+
+        <div class="form-header">
+
+            <div>
+                <h2>Produtos cadastrados</h2>
+                <p>Consulte os produtos atualmente cadastrados no estoque.</p>
+            </div>
+
+            <span class="products-count" id="produtosCount">
+                0 produtos
+            </span>
+
+        </div>
+
+
+        <div class="products-list" id="produtosLista">
+
+            <!--
+                Os produtos serão inseridos
+                automaticamente pelo JavaScript.
+            -->
+
+        </div>
+
+
+        <div class="products-empty" id="produtosVazio">
+
+            <div class="products-empty-icon">
+                📦
+            </div>
+
+            <strong>
+                Nenhum produto cadastrado
+            </strong>
+
+            <span>
+                Os produtos cadastrados aparecerão aqui.
+            </span>
+
+        </div>
+
         </section>
 
     </main>
