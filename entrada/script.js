@@ -155,6 +155,19 @@ async function obterLojaAtualEntradaGestok() {
         );
 
     }
+    /* Caminho rápido: a loja já é conhecida da sessão (sem consultar o banco) */
+    try {
+        if (typeof obterContaGestok === "function") {
+            const contaRapida = obterContaGestok();
+            if (
+                contaRapida &&
+                contaRapida.lojaId &&
+                (!contaRapida.firebaseUid || contaRapida.firebaseUid === usuario.uid)
+            ) {
+                return contaRapida.lojaId;
+            }
+        }
+    } catch (erro) { }
 
 
     const uid =
@@ -900,6 +913,28 @@ if (form) {
                     ? observacao.value.trim()
                     : "";
 
+    const validadeCampo = document.getElementById("validade");
+
+    const loteCampo = document.getElementById("lote");
+
+    const validadeValor = validadeCampo ? validadeCampo.value.trim() : "";
+
+    const loteValor = loteCampo ? loteCampo.value.trim() : "";
+
+    if (validadeValor) {
+
+        const anoValidade = Number(validadeValor.slice(0, 4));
+
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(validadeValor) || anoValidade < 2000 || anoValidade > 2100) {
+
+            alert("Informe uma validade válida.");
+
+            return;
+
+        }
+
+    }
+
 
             const botao =
                 form.querySelector(
@@ -1105,6 +1140,28 @@ if (form) {
 
                             }
                         );
+
+                    /* Validade informada: cria o lote deste recebimento */
+                    if (validadeValor) {
+
+                        transaction.set(
+                            referenciaLotes(lojaId).doc(),
+                            {
+                                produtoId: produtoRef.id,
+                                produto: produtoAtual.nome || "",
+                                codigo: produtoAtual.codigo || "",
+                                lote: loteValor,
+                                validade: validadeValor,
+                                quantidade: quantidade,
+                                quantidadeInicial: quantidade,
+                                unidade: produtoAtual.unidade || "UN",
+                                origem: "Entrada",
+                                lojaId: lojaId,
+                                criadoEm: agora
+                            }
+                        );
+
+                    }
 
 
                         resultadoEntrada = {

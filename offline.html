@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2563eb">
+    <title>Gestok | Sem conexão</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            font-family: Inter, "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+            background: #f5f7fa;
+            color: #1e293b;
+        }
+        .cartao {
+            width: min(420px, 100%);
+            padding: 36px 30px;
+            border-radius: 18px;
+            background: #ffffff;
+            border: 1px solid #e5eaf1;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, .08);
+            text-align: center;
+        }
+        .icone {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 18px;
+            border-radius: 18px;
+            background: #eef3fd;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+        h1 { margin: 0 0 8px; font-size: 22px; }
+        p { margin: 0 0 22px; font-size: 14px; line-height: 1.6; color: #64748b; }
+        button {
+            height: 44px;
+            padding: 0 22px;
+            border: 0;
+            border-radius: 10px;
+            background: #2563eb;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        button:hover { background: #1d4ed8; }
+    </style>
+</head>
+<body>
+    <main class="cartao">
+        <div class="icone">⚡</div>
+        <h1>Você está sem conexão</h1>
+        <p>Não foi possível abrir esta página agora. Verifique sua internet e tente de novo. Os dados do Gestok são sincronizados assim que a conexão voltar.</p>
+        <button type="button" onclick="location.reload()">Tentar novamente</button>
+    </main>
+</body>
+</html>

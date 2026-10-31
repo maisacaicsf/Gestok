@@ -170,6 +170,19 @@ async function obterLojaAtualSaidaGestok() {
         );
 
     }
+    /* Caminho rápido: a loja já é conhecida da sessão (sem consultar o banco) */
+    try {
+        if (typeof obterContaGestok === "function") {
+            const contaRapida = obterContaGestok();
+            if (
+                contaRapida &&
+                contaRapida.lojaId &&
+                (!contaRapida.firebaseUid || contaRapida.firebaseUid === usuario.uid)
+            ) {
+                return contaRapida.lojaId;
+            }
+        }
+    } catch (erro) { }
 
 
     const uid =

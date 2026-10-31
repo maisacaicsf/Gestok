@@ -675,11 +675,12 @@ function classeStatus(
 
 
     if (status === "Recusada") {
-
         return "status-recusada";
-
     }
 
+    if (status === "Recebida") {
+        return "status-recebida";
+    }
 
     return "status-cancelada";
 
@@ -1102,22 +1103,7 @@ function renderizarSolicitacoes() {
                 </td>
 
 
-                <td>
-
-                    <button
-                        class="action-button"
-                        type="button"
-                        title="Cancelar solicitação"
-                        data-cancelar="${escaparHtml(
-                            item.id
-                        )}"
-                    >
-
-                        ×
-
-                    </button>
-
-                </td>
+                <td>${gerarAcoesSolicitacao(item)}</td>
 
             `;
 
@@ -1865,3 +1851,717 @@ atualizarResumo();
 renderizarSolicitacoes();
 
 iniciarModuloSolicitacoes();
+
+
+/* =========================================
+   FLUXO DE COMPRA
+   Pendente → (Em análise) → Aprovada → Recebida
+   - Aprovar / Recusar / Reabrir / Cancelar
+   - Receber: dá entrada no estoque e registra a
+     movimentação automaticamente
+   - Sugerir reposição: produtos abaixo do mínimo
+   - Copiar lista de compras
+========================================= */
+
+const STATUS_EM_ABERTO = ["Pendente", "Em análise", "Aprovada"];
+
+
+function gerarAcoesSolicitacao(item) {
+
+    const id = escaparHtml(item.id);
+
+    const botao = function (acao, rotulo, classe, titulo) {
+
+        return `<button type="button" class="sol-acao ${classe}" data-acao="${acao}" data-id="${id}" title="${titulo}">${rotulo}</button>`;
+
+    };
+
+    const botoes = [];
+
+    if (item.status === "Pendente") {
+
+        botoes.push(botao("aprovar", "Aprovar", "ok", "Aprovar a compra"));
+        botoes.push(botao("analisar", "Analisar", "", "Marcar como em análise"));
+        botoes.push(botao("recusar", "Recusar", "perigo", "Recusar a solicitação"));
+
+    } else if (item.status === "Em análise") {
+
+        botoes.push(botao("aprovar", "Aprovar", "ok", "Aprovar a compra"));
+        botoes.push(botao("recusar", "Recusar", "perigo", "Recusar a solicitação"));
+
+    } else if (item.status === "Aprovada") {
+
+        botoes.push(botao("receber", "Receber", "destaque", "A mercadoria chegou: dar entrada no estoque"));
+
+    } else if (item.status === "Recusada" || item.status === "Cancelada") {
+
+        botoes.push(botao("reabrir", "Reabrir", "", "Voltar para pendente"));
+
+    }
+
+    if (STATUS_EM_ABERTO.indexOf(item.status) !== -1) {
+
+        botoes.push(`<button class="action-button" type="button" title="Cancelar solicitação" data-cancelar="${id}">×</button>`);
+
+    }
+
+    return `<div class="sol-acoes">${botoes.join("")}</div>`;
+
+}
+
+
+function obterOverlaySolicitacoes(id) {
+
+    let overlay = document.getElementById(id);
+
+    if (!overlay) {
+
+        overlay = document.createElement("div");
+
+        overlay.id = id;
+
+        overlay.className = "sol-overlay";
+
+        overlay.hidden = true;
+
+        overlay.addEventListener("click", function (event) {
+
+            if (event.target === overlay) {
+                overlay.hidden = true;
+            }
+
+        });
+
+        document.body.appendChild(overlay);
+
+    }
+
+    return overlay;
+
+}
+
+
+document.addEventListener("keydown", function (event) {
+
+    if (event.key === "Escape") {
+
+        document.querySelectorAll(".sol-overlay").forEach(function (o) {
+            o.hidden = true;
+        });
+
+    }
+
+});
+
+
+/* ---------- mudar status ---------- */
+
+const MENSAGENS_STATUS = {
+    aprovar: "Solicitação aprovada.",
+    analisar: "Solicitação marcada como em análise.",
+    recusar: "Solicitação recusada.",
+    reabrir: "Solicitação reaberta (pendente)."
+};
+
+const NOVO_STATUS = {
+    aprovar: "Aprovada",
+    analisar: "Em análise",
+    recusar: "Recusada",
+    reabrir: "Pendente"
+};
+
+if (listaSolicitacoes) {
+
+    listaSolicitacoes.addEventListener("click", async function (event) {
+
+        const botao = event.target.closest("[data-acao]");
+
+        if (!botao) {
+            return;
+        }
+
+        const acao = botao.dataset.acao;
+
+        const item = obterSolicitacoes().find(function (s) {
+            return s.id === botao.dataset.id;
+        });
+
+        if (!item) {
+            return;
+        }
+
+        if (acao === "receber") {
+
+            abrirModalReceber(item);
+
+            return;
+
+        }
+
+        const novoStatus = NOVO_STATUS[acao];
+
+        if (!novoStatus) {
+            return;
+        }
+
+        if (acao === "recusar" && !confirm(`Recusar a solicitação de "${item.produto || "produto"}"?`)) {
+            return;
+        }
+
+        try {
+
+            const lojaId = obterLojaAtualGestok();
+
+            if (!lojaId) {
+
+                alert("Não foi possível identificar a loja atual.");
+
+                return;
+
+            }
+
+            await referenciaSolicitacoes(lojaId)
+                .doc(item.id)
+                .update({
+                    status: novoStatus,
+                    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+            alert(MENSAGENS_STATUS[acao]);
+
+        } catch (erro) {
+
+            console.error("Erro ao atualizar solicitação:", erro);
+
+            alert("Não foi possível atualizar a solicitação.");
+
+        }
+
+    });
+
+}
+
+
+/* ---------- receber mercadoria (dá entrada no estoque) ---------- */
+
+function abrirModalReceber(item) {
+
+    const overlay = obterOverlaySolicitacoes("solModalReceber");
+
+    const unidade = item.unidade || "UN";
+
+    const decimal = unidade === "KG";
+
+    overlay.innerHTML = `
+        <div class="sol-card" role="dialog" aria-modal="true">
+            <h3>Receber mercadoria</h3>
+            <p class="sol-sub">Ao confirmar, o estoque é atualizado e a entrada aparece em Movimentações.</p>
+            <div class="sol-resumo">
+                <span><strong>${escaparHtml(item.produto || "-")}</strong>${item.codigo ? " · " + escaparHtml(item.codigo) : ""}</span>
+                <span>Pedido: <strong>${Number(item.quantidade || 0)} ${escaparHtml(unidade)}</strong></span>
+            </div>
+            <label for="solQtdRecebida">Quantidade recebida</label>
+            <input type="number" id="solQtdRecebida" min="${decimal ? "0.001" : "1"}" step="${decimal ? "0.001" : "1"}" value="${Number(item.quantidade || 0)}">
+            <div class="sol-rodape">
+                <button type="button" class="secondary-button" id="solReceberCancelar">Cancelar</button>
+                <button type="button" class="primary-button" id="solReceberConfirmar">Confirmar recebimento</button>
+            </div>
+        </div>`;
+
+    overlay.hidden = false;
+
+    const campo = overlay.querySelector("#solQtdRecebida");
+
+    campo.focus();
+
+    campo.select();
+
+    overlay.querySelector("#solReceberCancelar").onclick = function () {
+        overlay.hidden = true;
+    };
+
+    const confirmar = overlay.querySelector("#solReceberConfirmar");
+
+    campo.addEventListener("keydown", function (event) {
+
+        if (event.key === "Enter") {
+            confirmar.click();
+        }
+
+    });
+
+    confirmar.onclick = async function () {
+
+        const quantidade = Number(campo.value);
+
+        if (!(quantidade > 0)) {
+
+            alert("Digite a quantidade recebida.");
+
+            return;
+
+        }
+
+        if (!decimal && !Number.isInteger(quantidade)) {
+
+            alert("Este produto aceita apenas quantidade inteira.");
+
+            return;
+
+        }
+
+        confirmar.disabled = true;
+
+        confirmar.textContent = "Registrando...";
+
+        try {
+
+            const resultado = await receberSolicitacao(item, quantidade);
+
+            overlay.hidden = true;
+
+            alert(`Recebimento registrado! Estoque de ${resultado.nome}: ${resultado.anterior} → ${resultado.novo} ${resultado.unidade}.`);
+
+        } catch (erro) {
+
+            console.error("Erro ao receber solicitação:", erro);
+
+            alert(erro && erro.message && erro.codigoGestok
+                ? erro.message
+                : "Não foi possível registrar o recebimento.");
+
+            confirmar.disabled = false;
+
+            confirmar.textContent = "Confirmar recebimento";
+
+        }
+
+    };
+
+}
+
+
+function erroGestok(mensagem) {
+
+    const erro = new Error(mensagem);
+
+    erro.codigoGestok = true;
+
+    return erro;
+
+}
+
+
+async function receberSolicitacao(item, quantidade) {
+
+    const lojaId = obterLojaAtualGestok();
+
+    if (!lojaId) {
+        throw erroGestok("Não foi possível identificar a loja atual.");
+    }
+
+    if (!item.produtoId) {
+        throw erroGestok("Esta solicitação não tem produto vinculado.");
+    }
+
+    const solicitacaoRef = referenciaSolicitacoes(lojaId).doc(item.id);
+
+    const produtoRef = referenciaProdutos(lojaId).doc(item.produtoId);
+
+    const movimentacaoRef = referenciaMovimentacoes(lojaId).doc();
+
+    const usuario = obterDadosUsuarioAtual().usuario;
+
+    let resultado = null;
+
+    await db.runTransaction(async function (transaction) {
+
+        /* todas as leituras antes das escritas */
+        const solicitacaoSnap = await transaction.get(solicitacaoRef);
+
+        const produtoSnap = await transaction.get(produtoRef);
+
+        if (!solicitacaoSnap.exists || solicitacaoSnap.data().status !== "Aprovada") {
+            throw erroGestok("Esta solicitação não está mais aprovada.");
+        }
+
+        if (!produtoSnap.exists) {
+            throw erroGestok("O produto desta solicitação não existe mais.");
+        }
+
+        const produto = produtoSnap.data();
+
+        if (produto.ativo === false) {
+            throw erroGestok("Este produto está inativo.");
+        }
+
+        const anterior = Number(produto.quantidade || 0);
+
+        const novo = Math.round((anterior + quantidade) * 1000) / 1000;
+
+        const agora = new Date().toISOString();
+
+        const motivo = "Compra (solicitação)";
+
+        const observacao = "Recebimento de solicitação de compra";
+
+        transaction.update(produtoRef, {
+            quantidade: novo,
+            ultimaEntrada: {
+                quantidade: quantidade,
+                estoqueAnterior: anterior,
+                estoqueNovo: novo,
+                motivo: motivo,
+                observacao: observacao,
+                data: agora
+            },
+            dataAtualizacao: agora
+        });
+
+        transaction.set(movimentacaoRef, {
+            tipo: "Entrada",
+            produtoId: produtoRef.id,
+            produto: produto.nome || "",
+            codigo: produto.codigo || "",
+            quantidade: quantidade,
+            unidade: produto.unidade || "UN",
+            estoqueAnterior: anterior,
+            estoqueNovo: novo,
+            motivo: motivo,
+            observacao: observacao,
+            usuarioUid: usuario ? usuario.uid : null,
+            lojaId: lojaId,
+            data: agora
+        });
+
+        transaction.update(solicitacaoRef, {
+            status: "Recebida",
+            quantidadeRecebida: quantidade,
+            recebidoEm: agora,
+            atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        resultado = {
+            nome: produto.nome || "produto",
+            anterior: anterior,
+            novo: novo,
+            unidade: produto.unidade || "UN"
+        };
+
+    });
+
+    return resultado;
+
+}
+
+
+/* ---------- sugerir reposição ---------- */
+
+function quantidadeSugerida(produto) {
+
+    const atual = Number(produto.quantidade || 0);
+
+    const minimo = Number(produto.estoqueMinimo || 0);
+
+    const maximo = Number(produto.estoqueMaximo || 0);
+
+    const alvo = maximo > minimo ? maximo : minimo * 2;
+
+    return Math.max(1, Math.ceil(alvo - atual));
+
+}
+
+
+function abrirModalSugestao() {
+
+    const overlay = obterOverlaySolicitacoes("solModalSugestao");
+
+    const emAberto = new Set(
+        obterSolicitacoes()
+            .filter(function (s) { return STATUS_EM_ABERTO.indexOf(s.status) !== -1; })
+            .map(function (s) { return String(s.produtoId); })
+    );
+
+    const abaixo = obterProdutos()
+        .filter(function (p) {
+            return p.ativo !== false &&
+                Number(p.estoqueMinimo || 0) > 0 &&
+                Number(p.quantidade || 0) < Number(p.estoqueMinimo || 0);
+        })
+        .sort(function (a, b) {
+            return String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR");
+        });
+
+    const sugestoes = abaixo.filter(function (p) { return !emAberto.has(String(p.id)); });
+
+    const jaTem = abaixo.length - sugestoes.length;
+
+    if (!sugestoes.length) {
+
+        overlay.innerHTML = `
+            <div class="sol-card" role="dialog" aria-modal="true">
+                <h3>Sugerir reposição</h3>
+                <div class="sol-vazio">${abaixo.length
+                    ? "Todos os produtos abaixo do mínimo já têm uma solicitação em aberto."
+                    : "Nenhum produto está abaixo do estoque mínimo. Tudo certo por aqui!"}</div>
+                <div class="sol-rodape"><button type="button" class="secondary-button" id="solSugFechar">Fechar</button></div>
+            </div>`;
+
+        overlay.hidden = false;
+
+        overlay.querySelector("#solSugFechar").onclick = function () { overlay.hidden = true; };
+
+        return;
+
+    }
+
+    overlay.innerHTML = `
+        <div class="sol-card" role="dialog" aria-modal="true">
+            <h3>Sugerir reposição</h3>
+            <p class="sol-sub">Produtos abaixo do estoque mínimo. Ajuste as quantidades e desmarque o que não quiser pedir.${jaTem ? ` (${jaTem} já ${jaTem === 1 ? "tem" : "têm"} solicitação em aberto e ${jaTem === 1 ? "ficou" : "ficaram"} de fora.)` : ""}</p>
+            <table class="sol-sug">
+                <thead><tr><th><input type="checkbox" id="solSugTodos" checked></th><th>Produto</th><th>Estoque / mín.</th><th>Quantidade</th></tr></thead>
+                <tbody>
+                    ${sugestoes.map(function (p) {
+                        return `<tr data-id="${escaparHtml(p.id)}">
+                            <td><input type="checkbox" class="sol-sug-ck" checked></td>
+                            <td><strong>${escaparHtml(p.nome || "-")}</strong><small>${escaparHtml(p.codigo || "sem código")}</small></td>
+                            <td>${Number(p.quantidade || 0)} / ${Number(p.estoqueMinimo || 0)} ${escaparHtml(p.unidade || "UN")}</td>
+                            <td><input type="number" class="sol-sug-qtd" min="1" step="1" value="${quantidadeSugerida(p)}"></td>
+                        </tr>`;
+                    }).join("")}
+                </tbody>
+            </table>
+            <div class="sol-rodape">
+                <span class="sol-contagem" id="solSugContagem"></span>
+                <button type="button" class="secondary-button" id="solSugCancelar">Cancelar</button>
+                <button type="button" class="primary-button" id="solSugCriar">Criar solicitações</button>
+            </div>
+        </div>`;
+
+    overlay.hidden = false;
+
+    const marcas = function () { return Array.from(overlay.querySelectorAll(".sol-sug-ck")); };
+
+    const atualizarContagem = function () {
+
+        const total = marcas().filter(function (m) { return m.checked; }).length;
+
+        overlay.querySelector("#solSugContagem").textContent = `${total} de ${sugestoes.length} selecionado(s)`;
+
+        overlay.querySelector("#solSugCriar").disabled = total === 0;
+
+    };
+
+    atualizarContagem();
+
+    overlay.querySelector("#solSugTodos").addEventListener("change", function (event) {
+
+        marcas().forEach(function (m) { m.checked = event.target.checked; });
+
+        atualizarContagem();
+
+    });
+
+    overlay.querySelectorAll(".sol-sug-ck").forEach(function (m) {
+        m.addEventListener("change", atualizarContagem);
+    });
+
+    overlay.querySelector("#solSugCancelar").onclick = function () { overlay.hidden = true; };
+
+    const criar = overlay.querySelector("#solSugCriar");
+
+    criar.onclick = async function () {
+
+        const escolhidos = [];
+
+        overlay.querySelectorAll("tbody tr").forEach(function (linha) {
+
+            if (!linha.querySelector(".sol-sug-ck").checked) {
+                return;
+            }
+
+            const produto = sugestoes.find(function (p) { return String(p.id) === linha.dataset.id; });
+
+            const quantidade = Number(linha.querySelector(".sol-sug-qtd").value);
+
+            if (produto && quantidade > 0) {
+                escolhidos.push({ produto: produto, quantidade: Math.ceil(quantidade) });
+            }
+
+        });
+
+        if (!escolhidos.length) {
+
+            alert("Informe a quantidade dos produtos selecionados.");
+
+            return;
+
+        }
+
+        criar.disabled = true;
+
+        criar.textContent = "Criando...";
+
+        try {
+
+            const lojaId = obterLojaAtualGestok();
+
+            if (!lojaId) {
+                throw new Error("loja");
+            }
+
+            const dados = obterDadosUsuarioAtual();
+
+            const usuario = dados.usuario;
+
+            const contexto = dados.contexto;
+
+            const referencia = referenciaSolicitacoes(lojaId);
+
+            for (let i = 0; i < escolhidos.length; i += 400) {
+
+                const lote = db.batch();
+
+                escolhidos.slice(i, i + 400).forEach(function (escolhido) {
+
+                    const p = escolhido.produto;
+
+                    lote.set(referencia.doc(), {
+                        lojaId: lojaId,
+                        uid: usuario?.uid || contexto?.uid || null,
+                        usuario: contexto?.usuario || "",
+                        email: usuario?.email || contexto?.email || "",
+                        codigoLoja: contexto?.codigoLoja || "",
+                        produtoId: p.id,
+                        produto: p.nome || "",
+                        codigo: p.codigo || "",
+                        estoqueAtual: Number(p.quantidade || 0),
+                        estoqueMinimo: Number(p.estoqueMinimo || 0),
+                        quantidade: escolhido.quantidade,
+                        unidade: p.unidade || "UN",
+                        motivo: "Estoque abaixo do mínimo",
+                        observacao: "Criada pela sugestão de reposição",
+                        status: "Pendente",
+                        data: firebase.firestore.FieldValue.serverTimestamp(),
+                        criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
+                        atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                });
+
+                await lote.commit();
+
+            }
+
+            overlay.hidden = true;
+
+            alert(`${escolhidos.length} ${escolhidos.length === 1 ? "solicitação criada" : "solicitações criadas"} com sucesso!`);
+
+        } catch (erro) {
+
+            console.error("Erro ao criar solicitações sugeridas:", erro);
+
+            alert("Não foi possível criar as solicitações.");
+
+            criar.disabled = false;
+
+            criar.textContent = "Criar solicitações";
+
+        }
+
+    };
+
+}
+
+
+/* ---------- copiar lista de compras ---------- */
+
+async function copiarListaDeCompras() {
+
+    const abertas = obterSolicitacoes().filter(function (s) {
+        return STATUS_EM_ABERTO.indexOf(s.status) !== -1;
+    });
+
+    if (!abertas.length) {
+
+        alert("Não há solicitações em aberto para a lista de compras.");
+
+        return;
+
+    }
+
+    const agrupado = new Map();
+
+    abertas.forEach(function (s) {
+
+        const chave = String(s.produtoId || s.produto);
+
+        const atual = agrupado.get(chave) || {
+            produto: s.produto || "-",
+            unidade: s.unidade || "UN",
+            quantidade: 0
+        };
+
+        atual.quantidade += Number(s.quantidade || 0);
+
+        agrupado.set(chave, atual);
+
+    });
+
+    const linhas = Array.from(agrupado.values())
+        .sort(function (a, b) { return a.produto.localeCompare(b.produto, "pt-BR"); })
+        .map(function (i) { return `• ${i.produto} — ${i.quantidade} ${i.unidade}`; });
+
+    const texto = `Lista de compras (${new Date().toLocaleDateString("pt-BR")})\n\n${linhas.join("\n")}`;
+
+    try {
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+
+            await navigator.clipboard.writeText(texto);
+
+        } else {
+
+            const area = document.createElement("textarea");
+
+            area.value = texto;
+
+            area.style.position = "fixed";
+
+            area.style.opacity = "0";
+
+            document.body.appendChild(area);
+
+            area.select();
+
+            document.execCommand("copy");
+
+            area.remove();
+
+        }
+
+        alert(`Lista copiada! ${linhas.length} ${linhas.length === 1 ? "produto" : "produtos"}. Cole no WhatsApp ou onde quiser.`);
+
+    } catch (erro) {
+
+        console.error("Erro ao copiar lista:", erro);
+
+        alert("Não foi possível copiar a lista.");
+
+    }
+
+}
+
+
+const btnSugerir = document.getElementById("btnSugerir");
+
+const btnCopiarLista = document.getElementById("btnCopiarLista");
+
+if (btnSugerir) {
+    btnSugerir.addEventListener("click", abrirModalSugestao);
+}
+
+if (btnCopiarLista) {
+    btnCopiarLista.addEventListener("click", copiarListaDeCompras);
+}

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <script src="../componentes/tema.js"></script>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://securetoken.googleapis.com" crossorigin>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestok | Validade</title>
+    <link rel="stylesheet" href="../produtos/consulta/style.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../componentes/sidebar.css">
+    <script src="../componentes/notificacoes.js"></script>
+
+    <!-- Aplicativo (PWA) -->
+    <link rel="manifest" href="../manifest.webmanifest">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32.png">
+    <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Gestok">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <script src="../componentes/pwa.js" defer></script>
+</head>
+<body>
+
+<div id="gestok-sidebar-container"></div>
+
+<header class="header">
+    <div class="header-left">
+        <button class="menu-button" id="menuButton" aria-label="Abrir menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="page-name">Validade</div>
+    </div>
+</header>
+
+<main class="page">
+
+    <!-- CABEÇALHO -->
+    <div class="page-header">
+        <div>
+            <span class="eyebrow">ESTOQUE</span>
+            <h1>Controle de validade</h1>
+            <p>Acompanhe os lotes, evite perdas e dê baixa no que venceu.</p>
+        </div>
+        <div class="val-header-actions">
+            <button type="button" class="val-btn" id="btnExportar">⬇ Exportar CSV</button>
+            <button type="button" class="val-btn danger" id="btnBaixaVencidos">Dar baixa nos vencidos</button>
+            <button type="button" class="primary-button" id="btnNovoLote">＋ Adicionar lote</button>
+        </div>
+    </div>
+
+    <!-- RESUMO (clique para filtrar) -->
+    <section class="val-cards">
+        <button type="button" class="val-card vencido" data-filtro="vencido">
+            <span class="val-card-label">Vencidos</span>
+            <strong id="cardVencidos">0</strong>
+            <small id="cardVencidosSub">nenhum lote</small>
+        </button>
+        <button type="button" class="val-card alerta" data-filtro="7d">
+            <span class="val-card-label">Vencem em até 7 dias</span>
+            <strong id="card7d">0</strong>
+            <small id="card7dSub">nenhum lote</small>
+        </button>
+        <button type="button" class="val-card atencao" data-filtro="30d">
+            <span class="val-card-label">Vencem em até 30 dias</span>
+            <strong id="card30d">0</strong>
+            <small id="card30dSub">nenhum lote</small>
+        </button>
+        <button type="button" class="val-card valor" data-filtro="vencido">
+            <span class="val-card-label">Valor em risco</span>
+            <strong id="cardRisco">R$ 0,00</strong>
+            <small>vencidos + até 7 dias</small>
+        </button>
+        <button type="button" class="val-card sem" data-filtro="sem">
+            <span class="val-card-label">Sem validade informada</span>
+            <strong id="cardSem">0</strong>
+            <small id="cardSemSub">nenhum produto</small>
+        </button>
+    </section>
+
+    <!-- LISTA -->
+    <section class="products-panel">
+
+        <div class="products-panel-header">
+            <div>
+                <h2>Lotes e validades</h2>
+                <p><span id="valCount">0 itens</span></p>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <span class="search-icon">⌕</span>
+            <input type="text" id="pesquisaValidade" placeholder="Buscar por produto, código ou lote..." autocomplete="off">
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="filtroSituacao">Situação</label>
+                <select id="filtroSituacao">
+                    <option value="">Todas</option>
+                    <option value="vencido">Vencidos</option>
+                    <option value="7d">Vencem em até 7 dias</option>
+                    <option value="30d">Vencem em até 30 dias</option>
+                    <option value="60d">Vencem em até 60 dias</option>
+                    <option value="ok">Em dia (mais de 60 dias)</option>
+                    <option value="sem">Sem validade informada</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filtroCategoriaVal">Categoria</label>
+                <select id="filtroCategoriaVal">
+                    <option value="">Todas</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="ordenacaoVal">Ordenar por</label>
+                <select id="ordenacaoVal">
+                    <option value="validade">Vence primeiro</option>
+                    <option value="validade-desc">Vence por último</option>
+                    <option value="nome">Produto (A–Z)</option>
+                    <option value="valor">Maior valor</option>
+                </select>
+            </div>
+            <button type="button" class="clear-filters" id="limparFiltrosVal">Limpar filtros</button>
+        </div>
+
+        <div class="table-container">
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Lote</th>
+                        <th>Validade</th>
+                        <th>Situação</th>
+                        <th>Quantidade</th>
+                        <th>Valor</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="validadeTabela"></tbody>
+            </table>
+        </div>
+
+        <div class="pagination" id="paginacaoVal" style="display:none;">
+            <label class="page-size">
+                Itens por página
+                <select id="itensPorPaginaVal">
+                    <option value="10">10</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+            <span class="page-info" id="paginaInfoVal"></span>
+            <div class="page-nav" id="paginaNavVal"></div>
+        </div>
+
+        <div class="no-results" id="semResultadosVal" style="display:none;">
+            <strong>Nenhum item encontrado</strong>
+            <span id="semResultadosTexto">Cadastre a validade na Entrada de estoque ou use "Adicionar lote".</span>
+        </div>
+
+    </section>
+
+</main>
+
+<!-- ADICIONAR LOTE -->
+<div class="val-overlay" id="modalLote" hidden>
+    <div class="val-modal" role="dialog" aria-modal="true" aria-labelledby="modalLoteTitulo">
+        <h3 id="modalLoteTitulo">Adicionar lote</h3>
+        <p class="val-sub">Informe a validade de um produto que já está no estoque. Isso <strong>não altera</strong> a quantidade em estoque.</p>
+        <form id="formLote">
+            <div class="val-campo">
+                <label for="produto">Produto *</label>
+                <select id="produto" name="produto"></select>
+            </div>
+            <div class="val-linha">
+                <div class="val-campo">
+                    <label for="loteValidade">Validade *</label>
+                    <input type="date" id="loteValidade" required>
+                </div>
+                <div class="val-campo">
+                    <label for="loteQuantidade">Quantidade *</label>
+                    <input type="number" id="loteQuantidade" min="0.001" step="any" required placeholder="Ex.: 12">
+                </div>
+            </div>
+            <div class="val-campo">
+                <label for="loteCodigo">Lote (opcional)</label>
+                <input type="text" id="loteCodigo" maxlength="40" placeholder="Ex.: L2026-10">
+            </div>
+            <div class="val-rodape">
+                <button type="button" class="secondary-button" id="btnLoteCancelar">Cancelar</button>
+                <button type="submit" class="primary-button" id="btnLoteSalvar">Salvar lote</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="../firebase/config.js"></script>
+<script>firebase.initializeApp(firebaseConfig);</script>
+<script src="../firebase/auth.js"></script>
+<script src="../firebase/firestore.js"></script>
+<script src="../auth.js"></script>
+<script src="../componentes/sidebar.js"></script>
+<script src="../componentes/validade-core.js"></script>
+<script src="script.js"></script>
+<!-- Busca de produto com lupa e lista paginada -->
+<script src="../componentes/seletor-produto.js"></script>
+</body>
+</html>

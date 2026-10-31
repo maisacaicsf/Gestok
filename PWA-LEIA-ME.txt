@@ -1,0 +1,41 @@
+GESTOK COMO APLICATIVO (PWA)
+============================
+
+O QUE JÁ ESTÁ PRONTO NO PROJETO
+- manifest.webmanifest  -> nome, cores, ícones e atalhos do aplicativo
+- icons/                -> ícones (Android, iPhone e navegador)
+- sw.js                 -> abre mais rápido e mostra uma tela amigável sem internet
+- offline.html          -> tela "sem conexão"
+- componentes/pwa.js    -> botão "Instalar o Gestok" (Perfil > Aplicativo e aviso no painel)
+- firebase.json         -> configuração para publicar o site (Firebase Hosting)
+
+IMPORTANTE: o PWA só funciona com o site PUBLICADO em endereço seguro (https).
+Abrindo os arquivos direto do computador (C:\...) ele NÃO instala.
+
+PUBLICAR O SITE (Firebase Hosting, plano gratuito)
+1) Instale o Node.js e rode:  npm install -g firebase-tools
+2) Dentro da pasta do Gestok:
+     firebase login
+     firebase deploy --only hosting
+3) O endereço será:  https://gestok-3bce2.web.app  (ou .firebaseapp.com)
+   Esses endereços já são aceitos pelo login do Firebase. Se você usar um domínio
+   próprio, cadastre-o em Authentication > Settings > Authorized domains.
+4) Para publicar também as regras do banco (opcional):
+     firebase deploy --only firestore:rules
+   (publique só depois de conferir as regras, guardando uma cópia das atuais)
+
+COMO O CLIENTE INSTALA
+- Android (Chrome): aparece "Instalar" (aviso no painel e no Perfil > Aplicativo).
+- Computador (Chrome/Edge): ícone de instalar na barra de endereço, ou o botão do Perfil.
+- iPhone/iPad (Safari): Compartilhar > "Adicionar à Tela de Início".
+
+O QUE FUNCIONA SEM INTERNET
+- O aplicativo abre e mostra o que já foi carregado antes.
+- Registrar entradas, saídas, vendas e pagamentos PRECISA de internet.
+
+ATUALIZAÇÕES
+- Páginas, CSS e JS sempre buscam a versão mais nova quando há internet.
+- Para forçar a troca do que está guardado, mude VERSAO no início do sw.js.
+
+TESTAR
+- No Chrome: F12 > aba Lighthouse > "Progressive Web App", ou aba Application > Manifest.

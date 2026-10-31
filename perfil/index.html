@@ -2,6 +2,11 @@
 <html lang="pt-BR">
 
 <head>
+    <script src="../componentes/tema.js"></script>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://securetoken.googleapis.com" crossorigin>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -13,10 +18,18 @@
         href="../componentes/sidebar.css"
     >
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="../tema-profissional.css">
+    <script src="../componentes/notificacoes.js"></script>
+
+    <!-- Aplicativo (PWA) -->
+    <link rel="manifest" href="../manifest.webmanifest">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32.png">
+    <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Gestok">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <script src="../componentes/pwa.js" defer></script>
 </head>
 
 <body>
@@ -246,6 +259,59 @@
                     Alterar senha
                 </button>
 
+            </div>
+
+            <!-- APARÊNCIA -->
+            <div class="card" id="cardAparencia">
+                <div class="card-title">
+                    <div>
+                        <h2>
+                            Aparência
+                        </h2>
+                        <p>
+                            Escolha o tema do sistema. A escolha fica salva neste navegador.
+                        </p>
+                    </div>
+                </div>
+                <div class="tema-opcoes" role="radiogroup" aria-label="Tema do sistema">
+                    <button type="button" class="tema-opcao" data-tema-opcao="claro" role="radio" aria-checked="false">
+                        <span class="tema-previa tema-previa-claro"><i></i><i></i><i></i></span>
+                        <strong>Claro</strong>
+                        <small>Fundo branco</small>
+                    </button>
+                    <button type="button" class="tema-opcao" data-tema-opcao="escuro" role="radio" aria-checked="false">
+                        <span class="tema-previa tema-previa-escuro"><i></i><i></i><i></i></span>
+                        <strong>Escuro</strong>
+                        <small>Mais confortável à noite</small>
+                    </button>
+                    <button type="button" class="tema-opcao" data-tema-opcao="automatico" role="radio" aria-checked="false">
+                        <span class="tema-previa tema-previa-auto"><i></i><i></i><i></i></span>
+                        <strong>Automático</strong>
+                        <small>Segue o seu dispositivo</small>
+                    </button>
+                </div>
+            </div>
+
+            <!-- APLICATIVO -->
+            <div class="card" id="cardAplicativo">
+                <div class="card-title">
+                    <div>
+                        <h2>
+                            Aplicativo
+                        </h2>
+                        <p>
+                            Use o Gestok como um aplicativo no celular, tablet ou computador.
+                        </p>
+                    </div>
+                </div>
+                <div class="pwa-box">
+                    <p class="pwa-estado" data-pwa-estado>
+                        Verificando...
+                    </p>
+                    <button type="button" class="primary" data-pwa-botao style="display:none;">
+                        Instalar o Gestok
+                    </button>
+                </div>
             </div>
         </section>
 

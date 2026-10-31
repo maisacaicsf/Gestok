@@ -1027,3 +1027,159 @@ td {
 .sidebar .nav-item.active svg {
     color: #2563eb !important;
 }
+
+/* =========================================
+   FLUXO DE COMPRA (ações, modais, botões)
+========================================= */
+
+.status-recebida {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.sol-btn {
+    height: 44px;
+    padding: 0 16px;
+    border: 1px solid #dbe2ec;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #3155a5;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.sol-btn:hover {
+    background: #f1f5ff;
+    border-color: #b9c8ec;
+}
+
+.sol-acoes {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.sol-acao {
+    height: 30px;
+    padding: 0 11px;
+    border: 1px solid #dbe2ec;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #475569;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.sol-acao:hover { background: #f4f6fa; }
+.sol-acao.ok { color: #16a34a; border-color: #bfe6cf; background: #f3fbf6; }
+.sol-acao.ok:hover { background: #e4f6ea; }
+.sol-acao.perigo { color: #dc2626; border-color: #f2c4c4; background: #fff7f7; }
+.sol-acao.perigo:hover { background: #ffecec; }
+.sol-acao.destaque { color: #ffffff; background: #3155a5; border-color: #3155a5; }
+.sol-acao.destaque:hover { background: #274690; }
+
+.sol-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, .45);
+}
+
+.sol-overlay[hidden] { display: none; }
+
+.sol-card {
+    width: min(680px, 100%);
+    max-height: 88vh;
+    overflow: auto;
+    padding: 26px;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 30px 80px rgba(15, 23, 42, .3);
+}
+
+.sol-card h3 { margin: 0 0 4px; font-size: 18px; color: #1e293b; }
+.sol-card .sol-sub { margin: 0 0 18px; font-size: 13px; color: #64748b; line-height: 1.5; }
+
+.sol-card label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.sol-card input[type="number"] {
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid #dfe4eb;
+    border-radius: 9px;
+    font-family: inherit;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.sol-resumo {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    background: #f5f7fa;
+    font-size: 13px;
+    color: #475569;
+}
+
+.sol-rodape {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.sol-rodape .sol-contagem { margin-right: auto; font-size: 13px; color: #64748b; }
+
+.sol-sug {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.sol-sug th {
+    text-align: left;
+    padding: 8px 10px;
+    font-size: 11px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: #64748b;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.sol-sug td { padding: 10px; border-bottom: 1px solid #f1f4f8; vertical-align: middle; }
+.sol-sug small { display: block; color: #7b8794; font-size: 11px; margin-top: 2px; }
+.sol-sug input[type="number"] { width: 90px; height: 36px; }
+.sol-sug input[type="checkbox"] { width: 17px; height: 17px; cursor: pointer; }
+.sol-vazio { padding: 26px 10px; text-align: center; color: #64748b; font-size: 14px; }
+
+@media (max-width: 760px) {
+    .header-actions { width: 100%; }
+    .sol-btn, .header-actions .primary-button { flex: 1 1 100%; }
+}

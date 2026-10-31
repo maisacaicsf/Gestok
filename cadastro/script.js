@@ -348,7 +348,7 @@ document.addEventListener(
 
                 mostrarMensagem(
 
-                    "Conta criada com sucesso! Vamos para o pagamento...",
+                    "Conta criada com sucesso! Você ganhou 30 dias grátis. Entrando no sistema...",
 
                     false
 
@@ -363,10 +363,10 @@ document.addEventListener(
                     function () {
 
                         window.location.href =
-                            "../pagamento/index.html";
+                            "../sistema/index.html";
 
                     },
-                    700
+                    1500
                 );
 
             }

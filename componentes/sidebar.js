@@ -24,6 +24,11 @@
             caminho.split("/");
 
 
+        /* Ignora barras no final (ex.: /validade/) */
+        while (partes.length > 0 && partes[partes.length - 1] === "") {
+            partes.pop();
+        }
+
         /*
          * Remove o nome do arquivo
          */
@@ -79,7 +84,9 @@
             "operadores",
             "login",
             "cadastro",
-            "planos"
+            "planos",
+            "validade",
+            "pagamento"
 
         ];
 
@@ -397,6 +404,23 @@
 
                         <span>
                             Solicitações
+                        </span>
+
+                    </a>
+
+
+                    <a
+                        href="${urlGestok("validade/index.html")}"
+                        class="sidebar-nav-item"
+                        data-page="validade"
+                    >
+
+                        <span class="sidebar-nav-icon">
+                            ⏳
+                        </span>
+
+                        <span>
+                            Validade
                         </span>
 
                     </a>
@@ -748,6 +772,15 @@
                     "active"
                 );
 
+            }
+
+            if (
+                pagina === "validade" &&
+                caminho.includes("/validade/")
+            ) {
+                item.classList.add(
+                    "active"
+                );
             }
 
 

@@ -1920,3 +1920,181 @@ a {
     }
 
 }
+
+/* =========================================
+   GRÁFICO DE MOVIMENTAÇÕES
+========================================= */
+
+.chart-panel {
+    margin-top: 15px;
+    padding: 20px;
+}
+
+.chart-period {
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid #dbe2ec;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #334155;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+}
+
+.chart-period:focus {
+    border-color: #5790ed;
+    box-shadow: 0 0 0 3px rgba(87, 144, 237, .15);
+}
+
+.mov-chart {
+    padding: 8px 4px 4px;
+}
+
+.mov-plot-wrap {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    grid-template-rows: 230px auto;
+    column-gap: 10px;
+}
+
+.mov-y {
+    position: relative;
+}
+
+.mov-y span {
+    position: absolute;
+    right: 0;
+    transform: translateY(50%);
+    font-size: 12px;
+    color: #7b8794;
+}
+
+.mov-plot {
+    position: relative;
+}
+
+.mov-grid-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #eef1f6;
+}
+
+.mov-bars {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    padding: 0 8px;
+}
+
+.mov-col {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.mov-bar {
+    position: relative;
+    width: min(62%, 58px);
+    background: linear-gradient(180deg, #3b8bff 0%, #2563eb 100%);
+    border-radius: 8px 8px 0 0;
+    transition: height .45s ease, filter .2s ease;
+    cursor: default;
+}
+
+.mov-bar:hover {
+    filter: brightness(1.1);
+}
+
+.mov-bar.vazio {
+    min-height: 3px;
+    opacity: .3;
+}
+
+.mov-tip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 11px;
+    border-radius: 8px;
+    background: #1e293b;
+    color: #ffffff;
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.mov-tip strong {
+    display: block;
+    text-transform: capitalize;
+}
+
+.mov-bar:hover .mov-tip {
+    display: block;
+}
+
+.mov-col:first-child .mov-tip {
+    left: 0;
+    transform: none;
+}
+
+.mov-col:last-child .mov-tip {
+    left: auto;
+    right: 0;
+    transform: none;
+}
+
+.mov-x {
+    grid-column: 2;
+    display: flex;
+    gap: 14px;
+    padding: 10px 8px 0;
+}
+
+.mov-x span {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.mov-x small {
+    display: block;
+    font-size: 10px;
+    color: #94a3b8;
+}
+
+.mov-empty {
+    padding: 60px 10px;
+    text-align: center;
+    font-size: 14px;
+    color: #7b8794;
+}
+
+.mov-plot .mov-empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    pointer-events: none;
+}
+
+@media (max-width: 700px) {
+    .mov-plot-wrap { grid-template-columns: 30px 1fr; grid-template-rows: 190px auto; column-gap: 6px; }
+    .mov-bars, .mov-x { gap: 6px; padding-left: 4px; padding-right: 4px; }
+}

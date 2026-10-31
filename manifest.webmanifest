@@ -1,0 +1,26 @@
+{
+  "id": "./",
+  "name": "Gestok - Gestão de Estoque",
+  "short_name": "Gestok",
+  "description": "Controle de estoque, validade, compras e relatórios da sua loja.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "./sistema/index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5f7fa",
+  "theme_color": "#2563eb",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Nova entrada", "short_name": "Entrada", "url": "./entrada/index.html", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Nova saída", "short_name": "Saída", "url": "./saida/index.html", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Produtos", "short_name": "Produtos", "url": "./produtos/consulta/index.html", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Validade", "short_name": "Validade", "url": "./validade/index.html", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

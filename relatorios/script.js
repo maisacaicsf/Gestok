@@ -34,6 +34,8 @@ document.addEventListener(
 
         const produtoFiltro =
             document.getElementById("produtoFiltro");
+        const categoriaFiltro =
+            document.getElementById("categoriaFiltro");
 
         const tipoMovimentacao =
             document.getElementById("tipoMovimentacao");
@@ -59,6 +61,31 @@ document.addEventListener(
 
         const resultCount =
             document.getElementById("resultCount");
+
+        /* =========================================
+           PAGINAÇÃO DA PRÉVIA
+        ========================================= */
+
+        const OPCOES_PREVIA = [10, 50, 100];
+
+        let previaPorPagina = 10;
+        let previaPagina = 1;
+        let ultimaAssinaturaPrevia = "";
+
+        try {
+
+            const salvoPrevia = Number(
+                localStorage.getItem("gestok_relatorio_por_pagina")
+            );
+
+            if (OPCOES_PREVIA.includes(salvoPrevia)) {
+
+                previaPorPagina = salvoPrevia;
+
+            }
+
+        } catch (erro) { }
+
 
         const nomeUsuarioMenu =
             document.getElementById(
@@ -259,7 +286,58 @@ document.addEventListener(
            CARREGAR PRODUTOS NO SELECT
         ========================================= */
 
+        /* Fonte de produtos para o seletor com lupa */
+        window.gestokFonteProdutos = function () {
+            return obterProdutos();
+        };
+
+        /* =========================================
+           FILTRO DE CATEGORIA
+        ========================================= */
+
+        function carregarCategoriasFiltro() {
+
+            if (!categoriaFiltro) {
+                return;
+            }
+
+            const atual = categoriaFiltro.value;
+
+            const categorias = Array.from(new Set(
+                obterProdutos()
+                    .filter(function (p) { return p && p.ativo !== false; })
+                    .map(function (p) { return String(p.categoria || "").trim(); })
+                    .filter(Boolean)
+            )).sort(function (a, b) { return a.localeCompare(b, "pt-BR"); });
+
+            categoriaFiltro.innerHTML =
+                '<option value="">Todas as categorias</option>' +
+                categorias.map(function (c) {
+                    return '<option value="' + escaparHTML(c) + '">' + escaparHTML(c) + '</option>';
+                }).join("");
+
+            if (atual && categorias.indexOf(atual) !== -1) {
+                categoriaFiltro.value = atual;
+            }
+
+        }
+
+        function idsProdutosSelecionados() {
+
+            return typeof window.gestokProdutosSelecionados === "function"
+                ? window.gestokProdutosSelecionados()
+                : [];
+
+        }
+
+        function categoriaSelecionadaNorm() {
+
+            return String(categoriaFiltro?.value || "").trim().toLowerCase();
+
+        }
+
         function carregarProdutos() {
+            carregarCategoriasFiltro();
 
             if (!produtoFiltro) {
                 return;
@@ -653,6 +731,38 @@ document.addEventListener(
             );
 
 
+            const idsSelMov = idsProdutosSelecionados();
+            if (idsSelMov.length) {
+                const codigosSel = {};
+                obterProdutos().forEach(function (p) {
+                    if (idsSelMov.indexOf(String(p.id ?? "")) !== -1 && p.codigo) {
+                        codigosSel[String(p.codigo)] = true;
+                    }
+                });
+                movimentacoes = movimentacoes.filter(function (movimento) {
+                    return idsSelMov.indexOf(String(movimento.produtoId ?? "")) !== -1 ||
+                        (movimento.codigo && codigosSel[String(movimento.codigo)] === true);
+                });
+            }
+
+            const categoriaSelMov = categoriaSelecionadaNorm();
+            if (categoriaSelMov) {
+                const catPorId = {};
+                const catPorCodigo = {};
+                obterProdutos().forEach(function (p) {
+                    const c = String(p.categoria || "").trim().toLowerCase();
+                    catPorId[String(p.id ?? "")] = c;
+                    if (p.codigo) { catPorCodigo[String(p.codigo)] = c; }
+                });
+                movimentacoes = movimentacoes.filter(function (movimento) {
+                    const propria = String(movimento.categoria || "").trim().toLowerCase();
+                    const c = propria ||
+                        catPorId[String(movimento.produtoId ?? "")] ||
+                        catPorCodigo[String(movimento.codigo ?? "")] || "";
+                    return c === categoriaSelMov;
+                });
+            }
+
             return movimentacoes;
 
         }
@@ -706,6 +816,19 @@ document.addEventListener(
             }
 
 
+            const idsSel = idsProdutosSelecionados();
+            if (idsSel.length) {
+                produtos = produtos.filter(function (produto) {
+                    return idsSel.indexOf(String(produto.id ?? "")) !== -1;
+                });
+            }
+
+            const categoriaSel = categoriaSelecionadaNorm();
+            if (categoriaSel) {
+                produtos = produtos.filter(function (produto) {
+                    return String(produto.categoria || "").trim().toLowerCase() === categoriaSel;
+                });
+            }
             return produtos;
 
         }
@@ -906,6 +1029,7 @@ document.addEventListener(
 
             previewContent.innerHTML =
                 html;
+            paginarPrevia();
 
         }
 
@@ -1073,6 +1197,7 @@ document.addEventListener(
 
             previewContent.innerHTML =
                 html;
+            paginarPrevia();
 
         }
 
@@ -1229,6 +1354,7 @@ document.addEventListener(
 
             previewContent.innerHTML =
                 html;
+            paginarPrevia();
 
         }
 
@@ -1236,6 +1362,191 @@ document.addEventListener(
         /* =========================================
            PRÉVIA
         ========================================= */
+
+        /* =========================================
+           PAGINAÇÃO DA PRÉVIA (somente na tela)
+           O PDF continua saindo com todos os dados.
+        ========================================= */
+
+        function assinaturaFiltrosPrevia() {
+
+            return [
+                "tipoRelatorio",
+                "periodo",
+                "dataInicial",
+                "dataFinal",
+                "produtoFiltro",
+                "categoriaFiltro"
+            ].map(function (id) {
+
+                const campo = document.getElementById(id);
+
+                return campo ? campo.value : "";
+
+            }).join("|") + "|" + idsProdutosSelecionados().join(",");
+
+        }
+
+
+        function paginarPrevia() {
+
+            const linhas = Array.from(
+                previewContent.querySelectorAll("tbody tr")
+            );
+
+            if (!linhas.length) {
+                return;
+            }
+
+            /* Mudou o relatório/filtro? volta para a página 1.
+               Só atualizou os dados? continua na mesma página. */
+            const assinatura = assinaturaFiltrosPrevia();
+
+            if (assinatura !== ultimaAssinaturaPrevia) {
+
+                ultimaAssinaturaPrevia = assinatura;
+
+                previaPagina = 1;
+
+            }
+
+            const total = linhas.length;
+
+            const totalPaginas = Math.max(
+                1,
+                Math.ceil(total / previaPorPagina)
+            );
+
+            previaPagina = Math.min(
+                Math.max(1, previaPagina),
+                totalPaginas
+            );
+
+            const inicio = (previaPagina - 1) * previaPorPagina;
+
+            const fim = Math.min(inicio + previaPorPagina, total);
+
+            linhas.forEach(function (tr, indice) {
+
+                tr.style.display =
+                    indice >= inicio && indice < fim ? "" : "none";
+
+            });
+
+            const antiga = document.getElementById("previaPaginacao");
+
+            if (antiga) {
+                antiga.remove();
+            }
+
+            const numeros = [...new Set([
+                1,
+                totalPaginas,
+                previaPagina - 1,
+                previaPagina,
+                previaPagina + 1
+            ])]
+                .filter(function (n) { return n >= 1 && n <= totalPaginas; })
+                .sort(function (a, b) { return a - b; });
+
+            let nav = "";
+
+            if (totalPaginas > 1) {
+
+                nav += `<button type="button" class="page-btn" data-pagina="${previaPagina - 1}" ${previaPagina === 1 ? "disabled" : ""}>‹ Anterior</button>`;
+
+                let anterior = 0;
+
+                numeros.forEach(function (n) {
+
+                    if (n - anterior > 1) {
+
+                        nav += `<span class="page-gap">…</span>`;
+
+                    }
+
+                    nav += `<button type="button" class="page-btn ${n === previaPagina ? "active" : ""}" data-pagina="${n}">${n}</button>`;
+
+                    anterior = n;
+
+                });
+
+                nav += `<button type="button" class="page-btn" data-pagina="${previaPagina + 1}" ${previaPagina === totalPaginas ? "disabled" : ""}>Próxima ›</button>`;
+
+            }
+
+            const barra = document.createElement("div");
+
+            barra.id = "previaPaginacao";
+
+            barra.className = "pagination";
+
+            barra.innerHTML = `
+                <label class="page-size">
+                    Itens por página
+                    <select id="previaPorPagina">
+                        ${OPCOES_PREVIA.map(function (n) {
+                            return `<option value="${n}" ${n === previaPorPagina ? "selected" : ""}>${n}</option>`;
+                        }).join("")}
+                    </select>
+                </label>
+                <span class="page-info">Mostrando ${inicio + 1}–${fim} de ${total}</span>
+                <div class="page-nav">${nav}</div>
+            `;
+
+            previewContent.appendChild(barra);
+
+        }
+
+
+        previewContent.addEventListener("click", function (event) {
+
+            const botao = event.target.closest("button[data-pagina]");
+
+            if (!botao || botao.disabled) {
+                return;
+            }
+
+            previaPagina = Number(botao.dataset.pagina);
+
+            paginarPrevia();
+
+            const painel = document.getElementById("previewPanel");
+
+            if (painel) {
+
+                painel.scrollIntoView({ behavior: "smooth", block: "start" });
+
+            }
+
+        });
+
+
+        previewContent.addEventListener("change", function (event) {
+
+            if (event.target.id !== "previaPorPagina") {
+                return;
+            }
+
+            const valor = Number(event.target.value);
+
+            previaPorPagina = OPCOES_PREVIA.includes(valor) ? valor : 10;
+
+            try {
+
+                localStorage.setItem(
+                    "gestok_relatorio_por_pagina",
+                    String(previaPorPagina)
+                );
+
+            } catch (erro) { }
+
+            previaPagina = 1;
+
+            paginarPrevia();
+
+        });
+
 
         function atualizarPrevia() {
 
@@ -2500,6 +2811,11 @@ document.addEventListener(
             if (produtoFiltro) {
                 produtoFiltro.value = "";
             }
+            if (categoriaFiltro) {
+                categoriaFiltro.value = "";
+            }
+            document.dispatchEvent(new Event("gk-limpar-selecao"));
+            document.dispatchEvent(new Event("gk-sincronizar"));
 
             if (tipoMovimentacao) {
                 tipoMovimentacao.value = "";
@@ -2553,6 +2869,15 @@ document.addEventListener(
             );
 
         }
+
+        if (categoriaFiltro) {
+            categoriaFiltro.addEventListener(
+                "change",
+                atualizarPrevia
+            );
+        }
+
+        document.addEventListener("gk-selecao-produtos", atualizarPrevia);
 
 
         if (tipoMovimentacao) {

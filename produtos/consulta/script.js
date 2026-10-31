@@ -15,6 +15,34 @@ const semResultados = document.getElementById("semResultados");
 
 let todosProdutos = [];
 
+/* =========================================
+   PAGINAÇÃO
+========================================= */
+
+const paginacao = document.getElementById("paginacao");
+const seletorItens = document.getElementById("itensPorPagina");
+const paginaInfo = document.getElementById("paginaInfo");
+const paginaNav = document.getElementById("paginaNav");
+
+const OPCOES_ITENS = [10, 50, 100];
+
+let itensPorPagina = 10;
+let paginaAtual = 1;
+let resultadoFiltrado = [];
+
+try {
+
+    const salvo = Number(localStorage.getItem("gestok_produtos_por_pagina"));
+
+    if (OPCOES_ITENS.includes(salvo)) {
+
+        itensPorPagina = salvo;
+
+    }
+
+} catch (erro) { }
+
+
 function obterLojaAtualGestok() {
     const conta = obterContaGestok();
     const usuario = usuarioFirebaseAtualGestok();
@@ -67,7 +95,10 @@ async function carregarProdutos() {
         });
 
         carregarCategorias();
-        filtrarProdutos();
+
+        const restaurou = restaurarEstadoConsulta();
+
+        filtrarProdutos(restaurou);
 
     } catch (erro) {
         console.error("Erro ao carregar consulta de produtos:", erro);
@@ -121,7 +152,7 @@ function ordenarProdutos(produtos) {
     });
 }
 
-function filtrarProdutos() {
+function filtrarProdutos(manterPagina) {
 
     const termo = pesquisa.value.trim().toLowerCase();
     const categoria = filtroCategoria.value;
@@ -156,17 +187,24 @@ function filtrarProdutos() {
         return true;
     });
 
-    resultado = ordenarProdutos(resultado);
-    renderizarProdutos(resultado);
+    resultadoFiltrado = ordenarProdutos(resultado);
+
+    if (!manterPagina) {
+
+        paginaAtual = 1;
+
+    }
+
+    renderizarPagina();
 }
 
-function renderizarProdutos(produtos) {
+function renderizarProdutos(produtos, totalFiltrado) {
 
     tabela.innerHTML = "";
 
-    contador.textContent = `${produtos.length} ${produtos.length === 1 ? "produto" : "produtos"}`;
+    contador.textContent = `${totalFiltrado} ${totalFiltrado === 1 ? "produto" : "produtos"}`;
 
-    if (produtos.length === 0) {
+    if (totalFiltrado === 0) {
         semResultados.style.display = "flex";
         return;
     }
@@ -201,7 +239,11 @@ function renderizarProdutos(produtos) {
                 </span>
             </td>
             <td>
-                <button type="button" class="edit-button" data-id="${escaparHTML(produto.id)}">✎ Editar</button>
+                <div class="row-actions">
+                    <button type="button" class="edit-button" data-action="editar" data-id="${escaparHTML(produto.id)}">✎ Editar</button>
+                    <button type="button" class="row-action" data-action="toggle" data-id="${escaparHTML(produto.id)}" title="${produto.ativo === false ? "Ativar produto" : "Desativar produto"}">${produto.ativo === false ? "▶" : "⏸"}</button>
+                    <button type="button" class="row-action danger" data-action="excluir" data-id="${escaparHTML(produto.id)}" title="Excluir produto">🗑</button>
+                </div>
             </td>
         `;
 
@@ -210,20 +252,51 @@ function renderizarProdutos(produtos) {
 }
 
 tabela.addEventListener("click", function (event) {
-    const botao = event.target.closest(".edit-button");
+
+    const botao = event.target.closest("button[data-action]");
+
     if (!botao) return;
 
     const id = botao.dataset.id;
+
     if (!id) return;
 
-    window.location.href = `../index.html?editar=${encodeURIComponent(id)}`;
+    if (botao.dataset.action === "editar") {
+
+        /* Marca que vamos voltar para esta página depois da edição */
+        salvarEstadoConsulta();
+
+        try {
+
+            sessionStorage.setItem("gestok_consulta_voltar", "1");
+
+        } catch (erro) { }
+
+        window.location.href = `../index.html?editar=${encodeURIComponent(id)}`;
+
+        return;
+
+    }
+
+    if (botao.dataset.action === "toggle") {
+
+        alternarStatusProduto(id);
+
+    }
+
+    if (botao.dataset.action === "excluir") {
+
+        excluirProduto(id);
+
+    }
+
 });
 
-pesquisa.addEventListener("input", filtrarProdutos);
-filtroCategoria.addEventListener("change", filtrarProdutos);
-filtroStatus.addEventListener("change", filtrarProdutos);
-filtroEstoque.addEventListener("change", filtrarProdutos);
-ordenacao.addEventListener("change", filtrarProdutos);
+pesquisa.addEventListener("input", function () { filtrarProdutos(false); });
+filtroCategoria.addEventListener("change", function () { filtrarProdutos(false); });
+filtroStatus.addEventListener("change", function () { filtrarProdutos(false); });
+filtroEstoque.addEventListener("change", function () { filtrarProdutos(false); });
+ordenacao.addEventListener("change", function () { filtrarProdutos(false); });
 
 limparFiltros.addEventListener("click", function () {
     pesquisa.value = "";
@@ -243,3 +316,250 @@ document.addEventListener("DOMContentLoaded", function () {
         carregarProdutos();
     });
 });
+
+
+/* =========================================
+   PAGINAÇÃO - RENDERIZAR
+========================================= */
+
+function renderizarPagina() {
+
+    const total = resultadoFiltrado.length;
+
+    const totalPaginas = Math.max(1, Math.ceil(total / itensPorPagina));
+
+    paginaAtual = Math.min(Math.max(1, paginaAtual), totalPaginas);
+
+    const inicio = (paginaAtual - 1) * itensPorPagina;
+
+    const pagina = resultadoFiltrado.slice(inicio, inicio + itensPorPagina);
+
+    renderizarProdutos(pagina, total);
+
+    renderizarPaginacao(total, totalPaginas, inicio, pagina.length);
+
+    salvarEstadoConsulta();
+
+}
+
+
+function renderizarPaginacao(total, totalPaginas, inicio, quantidadeNaPagina) {
+
+    if (total === 0) {
+
+        paginacao.style.display = "none";
+
+        return;
+
+    }
+
+    paginacao.style.display = "flex";
+
+    seletorItens.value = String(itensPorPagina);
+
+    paginaInfo.textContent =
+        `Mostrando ${inicio + 1}–${inicio + quantidadeNaPagina} de ${total}`;
+
+    if (totalPaginas <= 1) {
+
+        paginaNav.innerHTML = "";
+
+        return;
+
+    }
+
+    const conjunto = new Set([
+        1,
+        totalPaginas,
+        paginaAtual - 1,
+        paginaAtual,
+        paginaAtual + 1
+    ]);
+
+    const numeros = [...conjunto]
+        .filter(function (n) { return n >= 1 && n <= totalPaginas; })
+        .sort(function (a, b) { return a - b; });
+
+    let html =
+        `<button type="button" class="page-btn" data-pagina="${paginaAtual - 1}" ${paginaAtual === 1 ? "disabled" : ""}>‹ Anterior</button>`;
+
+    let anterior = 0;
+
+    numeros.forEach(function (n) {
+
+        if (n - anterior > 1) {
+
+            html += `<span class="page-gap">…</span>`;
+
+        }
+
+        html += `<button type="button" class="page-btn ${n === paginaAtual ? "active" : ""}" data-pagina="${n}">${n}</button>`;
+
+        anterior = n;
+
+    });
+
+    html +=
+        `<button type="button" class="page-btn" data-pagina="${paginaAtual + 1}" ${paginaAtual === totalPaginas ? "disabled" : ""}>Próxima ›</button>`;
+
+    paginaNav.innerHTML = html;
+
+}
+
+
+paginaNav.addEventListener("click", function (event) {
+
+    const botao = event.target.closest("button[data-pagina]");
+
+    if (!botao || botao.disabled) return;
+
+    paginaAtual = Number(botao.dataset.pagina);
+
+    renderizarPagina();
+
+    document.querySelector(".products-panel")
+        .scrollIntoView({ behavior: "smooth", block: "start" });
+
+});
+
+
+seletorItens.addEventListener("change", function () {
+
+    const valor = Number(seletorItens.value);
+
+    itensPorPagina = OPCOES_ITENS.includes(valor) ? valor : 10;
+
+    try {
+
+        localStorage.setItem("gestok_produtos_por_pagina", String(itensPorPagina));
+
+    } catch (erro) { }
+
+    paginaAtual = 1;
+
+    renderizarPagina();
+
+});
+
+
+/* =========================================
+   ESTADO (voltar da edição na mesma página)
+========================================= */
+
+function salvarEstadoConsulta() {
+
+    try {
+
+        sessionStorage.setItem("gestok_consulta_estado", JSON.stringify({
+            pagina: paginaAtual,
+            pesquisa: pesquisa.value,
+            categoria: filtroCategoria.value,
+            status: filtroStatus.value,
+            estoque: filtroEstoque.value,
+            ordenacao: ordenacao.value
+        }));
+
+    } catch (erro) { }
+
+}
+
+
+function restaurarEstadoConsulta() {
+
+    try {
+
+        const voltando = sessionStorage.getItem("gestok_consulta_voltar") === "1";
+
+        sessionStorage.removeItem("gestok_consulta_voltar");
+
+        if (!voltando) return false;
+
+        const estado = JSON.parse(sessionStorage.getItem("gestok_consulta_estado") || "null");
+
+        if (!estado) return false;
+
+        pesquisa.value = estado.pesquisa || "";
+        filtroCategoria.value = estado.categoria || "";
+        filtroStatus.value = estado.status || "";
+        filtroEstoque.value = estado.estoque || "";
+        ordenacao.value = estado.ordenacao || "nome";
+
+        paginaAtual = Number(estado.pagina) || 1;
+
+        return true;
+
+    } catch (erro) {
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================
+   ATIVAR / DESATIVAR E EXCLUIR
+========================================= */
+
+async function alternarStatusProduto(id) {
+
+    const produto = todosProdutos.find(function (p) { return p.id === id; });
+
+    if (!produto) return;
+
+    try {
+
+        const novoAtivo = produto.ativo === false;
+
+        const agora = new Date().toISOString();
+
+        await referenciaProdutosGestok()
+            .doc(id)
+            .update({ ativo: novoAtivo, dataAtualizacao: agora });
+
+        produto.ativo = novoAtivo;
+
+        produto.dataAtualizacao = agora;
+
+        filtrarProdutos(true);
+
+    } catch (erro) {
+
+        console.error("Erro ao alterar status:", erro);
+
+        alert("Não foi possível alterar o status do produto.");
+
+    }
+
+}
+
+
+async function excluirProduto(id) {
+
+    const produto = todosProdutos.find(function (p) { return p.id === id; });
+
+    if (!produto) return;
+
+    if (!confirm(`Deseja realmente excluir o produto "${produto.nome || ""}"?`)) {
+
+        return;
+
+    }
+
+    try {
+
+        await referenciaProdutosGestok().doc(id).delete();
+
+        todosProdutos = todosProdutos.filter(function (p) { return p.id !== id; });
+
+        filtrarProdutos(true);
+
+    } catch (erro) {
+
+        console.error("Erro ao excluir produto:", erro);
+
+        alert("Não foi possível excluir o produto.");
+
+    }
+
+}

@@ -2330,3 +2330,97 @@ function mensagemErroFirebaseGestok(
     }
 
 })();
+
+
+/* =========================================
+   AVISO DO PERÍODO GRÁTIS (tela do sistema)
+   Mostra até quando vai o teste grátis e
+   quanto será cobrado depois.
+========================================= */
+
+(function () {
+
+    function mostrarAvisoTesteGratisGestok() {
+
+        try {
+
+            if (window.location.pathname.toLowerCase().indexOf("/sistema/") === -1) {
+                return;
+            }
+
+            const conta = obterContaGestok();
+            const a = conta && conta.assinatura;
+
+            if (
+                !a ||
+                a.status !== "teste_gratis" ||
+                a.pagamento !== "gratis" ||
+                !assinaturaAtivaGestok(conta)
+            ) {
+                return;
+            }
+
+            try {
+                if (sessionStorage.getItem("gestok_aviso_teste_fechado") === "1") {
+                    return;
+                }
+            } catch (e) { }
+
+            const principal = document.querySelector("main.main-content");
+
+            if (!principal || document.getElementById("gestokAvisoTeste")) {
+                return;
+            }
+
+            const vencimento = new Date(a.vencimento);
+            const dias = Math.max(0, Math.ceil((vencimento.getTime() - Date.now()) / 86400000));
+            const dataTxt = vencimento.toLocaleDateString("pt-BR");
+            const urgente = dias <= 5;
+
+            const caixa = document.createElement("div");
+            caixa.id = "gestokAvisoTeste";
+            caixa.setAttribute("role", "status");
+            caixa.style.cssText =
+                "display:flex;align-items:flex-start;justify-content:space-between;gap:14px;" +
+                "margin:0 0 20px;padding:14px 18px;border-radius:14px;font-size:14px;line-height:1.55;" +
+                "border:1px solid " + (urgente ? "#fcd9a8" : "#cfe0fb") + ";" +
+                "background:" + (urgente ? "#fff6e8" : "#eef5ff") + ";" +
+                "color:" + (urgente ? "#7a4a06" : "#1e3a6e") + ";";
+
+            const texto = document.createElement("div");
+            texto.innerHTML =
+                "<strong>🎁 Você está no período grátis</strong> até <strong>" + dataTxt +
+                "</strong> (" + (dias === 1 ? "1 dia restante" : dias + " dias restantes") + ").<br>" +
+                "Depois dessa data, será cobrado <strong>R$ 30,00</strong> a cada 30 dias para continuar usando o Gestok. " +
+                '<a href="../pagamento/index.html" style="color:inherit;font-weight:700;">Ver pagamento</a>';
+
+            const fechar = document.createElement("button");
+            fechar.type = "button";
+            fechar.setAttribute("aria-label", "Fechar aviso");
+            fechar.textContent = "×";
+            fechar.style.cssText =
+                "border:0;background:transparent;color:inherit;font-size:22px;line-height:1;cursor:pointer;padding:0 4px;";
+            fechar.addEventListener("click", function () {
+                caixa.remove();
+                try {
+                    sessionStorage.setItem("gestok_aviso_teste_fechado", "1");
+                } catch (e) { }
+            });
+
+            caixa.appendChild(texto);
+            caixa.appendChild(fechar);
+            principal.insertBefore(caixa, principal.firstChild);
+
+        } catch (erro) {
+            console.warn("Aviso do período grátis indisponível.");
+        }
+
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", mostrarAvisoTesteGratisGestok);
+    } else {
+        mostrarAvisoTesteGratisGestok();
+    }
+
+})();

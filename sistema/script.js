@@ -2783,3 +2783,225 @@ verTodasMovimentacoes.addEventListener(
 );
 
 }
+
+
+/* =========================================
+   GRÁFICO DE MOVIMENTAÇÕES (por mês)
+========================================= */
+
+let movimentosGrafico = [];
+let graficoCarregado = false;
+let mesesGrafico = 7;
+
+try {
+
+    const mesesSalvo = Number(localStorage.getItem("gestok_grafico_meses"));
+
+    if (mesesSalvo === 7 || mesesSalvo === 12) {
+        mesesGrafico = mesesSalvo;
+    }
+
+} catch (erro) { }
+
+const MESES_CURTOS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+const MESES_LONGOS = [
+    "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+    "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
+];
+
+function passoEixoGrafico(maximo) {
+
+    const candidatos = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000];
+
+    for (let i = 0; i < candidatos.length; i++) {
+
+        if (Math.ceil(maximo / candidatos[i]) <= 5) {
+            return candidatos[i];
+        }
+
+    }
+
+    return candidatos[candidatos.length - 1];
+
+}
+
+function montarMesesGrafico(quantidade) {
+
+    const hoje = new Date();
+
+    const lista = [];
+
+    for (let i = quantidade - 1; i >= 0; i--) {
+
+        const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+
+        lista.push({ ano: d.getFullYear(), mes: d.getMonth(), total: 0, entradas: 0, saidas: 0 });
+
+    }
+
+    return lista;
+
+}
+
+function desenharGraficoMovimentacoes() {
+
+    const alvo = document.getElementById("movChart");
+
+    if (!alvo) {
+        return;
+    }
+
+    if (!graficoCarregado) {
+
+        alvo.innerHTML = '<div class="mov-empty">Carregando dados...</div>';
+
+        return;
+
+    }
+
+    const meses = montarMesesGrafico(mesesGrafico);
+
+    const indice = new Map();
+
+    meses.forEach(function (m, i) {
+        indice.set(m.ano * 12 + m.mes, i);
+    });
+
+    movimentosGrafico.forEach(function (movimento) {
+
+        const data = obterDataMovimentacaoDashboard(
+            movimento.data || movimento.criadoEm || movimento.dataCadastro
+        );
+
+        if (!data) {
+            return;
+        }
+
+        const posicao = indice.get(data.getFullYear() * 12 + data.getMonth());
+
+        if (posicao === undefined) {
+            return;
+        }
+
+        const mes = meses[posicao];
+
+        mes.total++;
+
+        const tipo = String(movimento.tipo || "").toLowerCase();
+
+        if (tipo.indexOf("entrada") === 0) {
+            mes.entradas++;
+        } else if (tipo.indexOf("sa") === 0) {
+            mes.saidas++;
+        }
+
+    });
+
+    const maximo = Math.max.apply(null, meses.map(function (m) { return m.total; }).concat([0]));
+
+    const passo = passoEixoGrafico(Math.max(maximo, 1));
+
+    const intervalos = Math.max(2, Math.ceil(maximo / passo));
+
+    const topo = passo * intervalos;
+
+    const marcas = [];
+
+    for (let i = 0; i <= intervalos; i++) {
+        marcas.push({ valor: i * passo, posicao: (i / intervalos) * 100 });
+    }
+
+    const vazio = maximo === 0;
+
+    alvo.innerHTML =
+        '<div class="mov-plot-wrap">' +
+            '<div class="mov-y">' +
+                marcas.map(function (t) {
+                    return '<span style="bottom:' + t.posicao + '%">' + t.valor.toLocaleString("pt-BR") + '</span>';
+                }).join("") +
+            '</div>' +
+            '<div class="mov-plot">' +
+                marcas.map(function (t) {
+                    return '<div class="mov-grid-line" style="bottom:' + t.posicao + '%"></div>';
+                }).join("") +
+                (vazio ? '<div class="mov-empty">Nenhuma movimentação nos últimos ' + mesesGrafico + ' meses.</div>' : "") +
+                '<div class="mov-bars">' +
+                    meses.map(function (m) {
+
+                        const altura = (m.total / topo) * 100;
+
+                        return '<div class="mov-col">' +
+                            '<div class="mov-bar' + (m.total ? "" : " vazio") + '" style="height:' + altura + '%">' +
+                                '<span class="mov-tip"><strong>' + MESES_LONGOS[m.mes] + ' de ' + m.ano + '</strong>' +
+                                m.total + (m.total === 1 ? " movimentação" : " movimentações") + '<br>' +
+                                m.entradas + (m.entradas === 1 ? " entrada" : " entradas") + ' · ' +
+                                m.saidas + (m.saidas === 1 ? " saída" : " saídas") + '</span>' +
+                            '</div>' +
+                        '</div>';
+
+                    }).join("") +
+                '</div>' +
+            '</div>' +
+            '<div class="mov-x">' +
+                meses.map(function (m, i) {
+                    return '<span>' + MESES_CURTOS[m.mes] +
+                        (i === 0 || m.mes === 0 ? '<small>' + m.ano + '</small>' : "") + '</span>';
+                }).join("") +
+            '</div>' +
+        '</div>';
+
+}
+
+function atualizarGraficoMovimentacoes(movimentos) {
+
+    movimentosGrafico = Array.isArray(movimentos) ? movimentos : [];
+
+    graficoCarregado = true;
+
+    desenharGraficoMovimentacoes();
+
+}
+
+(function iniciarGraficoMovimentacoes() {
+
+    const seletor = document.getElementById("graficoPeriodo");
+
+    if (seletor) {
+
+        seletor.value = String(mesesGrafico);
+
+        seletor.addEventListener("change", function () {
+
+            mesesGrafico = Number(seletor.value) === 12 ? 12 : 7;
+
+            try {
+                localStorage.setItem("gestok_grafico_meses", String(mesesGrafico));
+            } catch (erro) { }
+
+            desenharGraficoMovimentacoes();
+
+        });
+
+    }
+
+    /* O gráfico acompanha a mesma lista de movimentações do painel */
+    if (typeof renderizarUltimasMovimentacoesDashboard === "function") {
+
+        const original = renderizarUltimasMovimentacoesDashboard;
+
+        renderizarUltimasMovimentacoesDashboard = function (movimentos) {
+
+            original(movimentos);
+
+            try {
+                atualizarGraficoMovimentacoes(movimentos);
+            } catch (erro) {
+                console.warn("Não foi possível desenhar o gráfico:", erro);
+            }
+
+        };
+
+    }
+
+})();
