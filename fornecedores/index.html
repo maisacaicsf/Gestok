@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <script src="../componentes/tema.js"></script>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://securetoken.googleapis.com" crossorigin>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestok | Fornecedores</title>
+    <link rel="stylesheet" href="../produtos/consulta/style.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../componentes/sidebar.css">
+    <script src="../componentes/notificacoes.js"></script>
+
+    <!-- Aplicativo (PWA) -->
+    <link rel="manifest" href="../manifest.webmanifest">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32.png">
+    <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Gestok">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <script src="../componentes/pwa.js" defer></script>
+</head>
+<body>
+
+<div id="gestok-sidebar-container"></div>
+
+<header class="header">
+    <div class="header-left">
+        <button class="menu-button" id="menuButton" aria-label="Abrir menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="page-name">Fornecedores</div>
+    </div>
+</header>
+
+<main class="page">
+
+    <!-- CABEÇALHO -->
+    <div class="page-header">
+        <div>
+            <span class="eyebrow">COMPRAS</span>
+            <h1>Fornecedores</h1>
+            <p>Cadastre quem abastece a sua loja e vincule cada fornecedor aos produtos.</p>
+        </div>
+        <div class="forn-header-actions">
+            <button type="button" class="primary-button" id="btnNovoFornecedor">＋ Novo fornecedor</button>
+        </div>
+    </div>
+
+    <!-- RESUMO -->
+    <section class="forn-cards">
+        <div class="forn-card">
+            <span class="forn-card-label">Fornecedores</span>
+            <strong id="cardTotal">0</strong>
+            <small id="cardTotalSub">nenhum cadastrado</small>
+        </div>
+        <div class="forn-card ok">
+            <span class="forn-card-label">Ativos</span>
+            <strong id="cardAtivos">0</strong>
+            <small>disponíveis para vincular</small>
+        </div>
+        <div class="forn-card alerta">
+            <span class="forn-card-label">Produtos sem fornecedor</span>
+            <strong id="cardSemForn">0</strong>
+            <small>vincule no cadastro do produto</small>
+        </div>
+    </section>
+
+    <!-- LISTA -->
+    <section class="products-panel">
+
+        <div class="products-panel-header">
+            <div>
+                <h2>Lista de fornecedores</h2>
+                <p><span id="fornCount">0 fornecedores</span></p>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <span class="search-icon">⌕</span>
+            <input type="text" id="pesquisaForn" placeholder="Buscar por nome, CNPJ/CPF, contato, telefone ou e-mail..." autocomplete="off">
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="filtroStatusForn">Status</label>
+                <select id="filtroStatusForn">
+                    <option value="">Todos</option>
+                    <option value="ativo">Ativos</option>
+                    <option value="inativo">Inativos</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="ordenacaoForn">Ordenar por</label>
+                <select id="ordenacaoForn">
+                    <option value="nome">Nome (A–Z)</option>
+                    <option value="produtos">Mais produtos</option>
+                    <option value="recentes">Mais recentes</option>
+                </select>
+            </div>
+            <button type="button" class="clear-filters" id="limparFiltrosForn">Limpar filtros</button>
+        </div>
+
+        <div class="table-container">
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th>Fornecedor</th>
+                        <th>Contato</th>
+                        <th>E-mail / Cidade</th>
+                        <th>Produtos</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="fornecedoresTabela"></tbody>
+            </table>
+        </div>
+
+        <div class="pagination" id="paginacaoForn" style="display:none;">
+            <label class="page-size">
+                Itens por página
+                <select id="itensPorPaginaForn">
+                    <option value="10">10</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+            <span class="page-info" id="paginaInfoForn"></span>
+            <div class="page-nav" id="paginaNavForn"></div>
+        </div>
+
+        <div class="no-results" id="semResultadosForn" style="display:none;">
+            <strong>Nenhum fornecedor encontrado</strong>
+            <span id="semResultadosFornTexto">Clique em "＋ Novo fornecedor" para cadastrar o primeiro.</span>
+        </div>
+
+    </section>
+
+</main>
+
+<!-- NOVO / EDITAR FORNECEDOR -->
+<div class="forn-overlay" id="modalFornecedor" hidden>
+    <div class="forn-modal" role="dialog" aria-modal="true" aria-labelledby="modalFornTitulo">
+        <h3 id="modalFornTitulo">Novo fornecedor</h3>
+        <p class="forn-sub">Apenas o nome é obrigatório. O restante ajuda na hora de comprar.</p>
+        <form id="formFornecedor" autocomplete="off">
+            <div class="forn-campo">
+                <label for="fornNome">Nome / Razão social *</label>
+                <input type="text" id="fornNome" maxlength="120" required placeholder="Ex.: Distribuidora Boa Compra">
+            </div>
+            <div class="forn-linha">
+                <div class="forn-campo">
+                    <label for="fornDocumento">CNPJ ou CPF</label>
+                    <input type="text" id="fornDocumento" inputmode="numeric" placeholder="00.000.000/0000-00">
+                </div>
+                <div class="forn-campo">
+                    <label for="fornContato">Pessoa de contato</label>
+                    <input type="text" id="fornContato" maxlength="80" placeholder="Ex.: João (vendedor)">
+                </div>
+            </div>
+            <div class="forn-linha">
+                <div class="forn-campo">
+                    <label for="fornTelefone">Telefone / WhatsApp</label>
+                    <input type="text" id="fornTelefone" inputmode="tel" placeholder="(00) 00000-0000">
+                </div>
+                <div class="forn-campo">
+                    <label for="fornEmail">E-mail</label>
+                    <input type="email" id="fornEmail" maxlength="120" placeholder="contato@fornecedor.com">
+                </div>
+            </div>
+            <div class="forn-campo">
+                <label for="fornCidade">Cidade / Endereço</label>
+                <input type="text" id="fornCidade" maxlength="150" placeholder="Ex.: Aracaju - SE">
+            </div>
+            <div class="forn-campo">
+                <label for="fornObs">Observações</label>
+                <textarea id="fornObs" rows="3" maxlength="500" placeholder="Prazo de entrega, pedido mínimo, forma de pagamento..."></textarea>
+            </div>
+            <label class="forn-check" id="grupoFornAtivo">
+                <input type="checkbox" id="fornAtivo" checked>
+                <span>Fornecedor ativo (aparece na lista ao cadastrar produtos)</span>
+            </label>
+            <div class="forn-rodape">
+                <button type="button" class="secondary-button" id="btnFornCancelar">Cancelar</button>
+                <button type="submit" class="primary-button" id="btnFornSalvar">Salvar fornecedor</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="../firebase/config.js"></script>
+<script>firebase.initializeApp(firebaseConfig);</script>
+<script src="../firebase/auth.js"></script>
+<script src="../firebase/firestore.js"></script>
+<script src="../auth.js"></script>
+<script src="../componentes/sidebar.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

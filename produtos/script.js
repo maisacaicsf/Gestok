@@ -222,9 +222,105 @@ function alternarCamposValidade(mostrar) {
 }
 
 
+/* =========================================
+   FORNECEDOR DO PRODUTO
+========================================= */
+
+const campoFornecedor = document.getElementById("fornecedor");
+
+let fornecedoresLista = [];
+
+let fornecedoresProntos = Promise.resolve();
+
+
+function carregarFornecedores() {
+
+    fornecedoresProntos = (async function () {
+
+        try {
+
+            const snap = await referenciaProdutosGestok()
+                .parent
+                .collection("fornecedores")
+                .get();
+
+            fornecedoresLista = snap.docs
+                .map(function (d) { return Object.assign({ id: d.id }, d.data()); })
+                .sort(function (a, b) {
+                    return String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR");
+                });
+
+            popularFornecedores();
+
+        } catch (erro) {
+
+            console.error("Erro ao carregar fornecedores:", erro);
+
+        }
+
+    })();
+
+    return fornecedoresProntos;
+
+}
+
+
+/* Lista os fornecedores ativos; mantém o atual mesmo que esteja inativo */
+function popularFornecedores(selecionadoId, selecionadoNome) {
+
+    if (!campoFornecedor) {
+        return;
+    }
+
+    const atual = selecionadoId !== undefined ? selecionadoId : campoFornecedor.value;
+
+    const ativos = fornecedoresLista.filter(function (f) { return f.ativo !== false; });
+
+    let html = '<option value="">Sem fornecedor</option>' +
+        ativos.map(function (f) {
+            return '<option value="' + escaparHTML(f.id) + '">' + escaparHTML(f.nome || "Sem nome") + '</option>';
+        }).join("");
+
+    if (atual && !ativos.some(function (f) { return f.id === atual; })) {
+
+        const encontrado = fornecedoresLista.find(function (f) { return f.id === atual; });
+
+        html += '<option value="' + escaparHTML(atual) + '">' +
+            escaparHTML((encontrado && encontrado.nome) || selecionadoNome || "Fornecedor") + ' (inativo)</option>';
+
+    }
+
+    campoFornecedor.innerHTML = html;
+
+    campoFornecedor.value = atual || "";
+
+}
+
+
+function nomeDoFornecedorSelecionado() {
+
+    if (!campoFornecedor || !campoFornecedor.value) {
+        return "";
+    }
+
+    const encontrado = fornecedoresLista.find(function (f) { return f.id === campoFornecedor.value; });
+
+    if (encontrado) {
+        return encontrado.nome || "";
+    }
+
+    const opcao = campoFornecedor.options[campoFornecedor.selectedIndex];
+
+    return opcao ? String(opcao.textContent).replace(/\s*\(inativo\)\s*$/, "").trim() : "";
+
+}
+
+
 function limparFormulario() {
 
     form.reset();
+
+    popularFornecedores("");
 
     document.getElementById("quantidade").value = 0;
     document.getElementById("estoqueMinimo").value = 0;
@@ -261,6 +357,8 @@ function entrarModoEdicao(produto) {
     document.getElementById("estoqueMaximo").value = produto.estoqueMaximo ?? 0;
     document.getElementById("preco").value = produto.preco ?? 0;
     document.getElementById("descricao").value = produto.descricao || "";
+
+    popularFornecedores(produto.fornecedorId || "", produto.fornecedorNome || "");
 
     alternarCamposValidade(false);
 
@@ -343,6 +441,8 @@ async function editarProduto(id) {
 
     try {
 
+        await fornecedoresProntos;
+
         const doc = await referenciaProdutosGestok().doc(id).get();
 
         if (!doc.exists) {
@@ -412,6 +512,10 @@ form.addEventListener("submit", async function (event) {
             dataAtualizacao: new Date().toISOString()
         };
 
+        const fornecedorId = campoFornecedor ? campoFornecedor.value : "";
+
+        const fornecedorNome = fornecedorId ? nomeDoFornecedorSelecionado() : "";
+
         const campoValidade = document.getElementById("validade");
 
         const campoLote = document.getElementById("lote");
@@ -452,10 +556,18 @@ form.addEventListener("submit", async function (event) {
 
             await referenciaProdutosGestok()
                 .doc(produtoEditandoId)
-                .update(dados);
+                .update({
+                    ...dados,
+                    ...(fornecedorId
+                        ? { fornecedorId: fornecedorId, fornecedorNome: fornecedorNome }
+                        : {
+                            fornecedorId: firebase.firestore.FieldValue.delete(),
+                            fornecedorNome: firebase.firestore.FieldValue.delete()
+                        })
+                });
 
             /* Continua na tela do produto editado, para editar de novo se quiser */
-            entrarModoEdicao({ id: produtoEditandoId, ...dados });
+            entrarModoEdicao({ id: produtoEditandoId, ...dados, fornecedorId: fornecedorId, fornecedorNome: fornecedorNome });
 
             mostrarMensagemForm(`✓ Produto "${nome}" atualizado com sucesso!`);
 
@@ -471,6 +583,7 @@ form.addEventListener("submit", async function (event) {
 
         gravacao.set(produtosRef.doc(id), {
             ...dados,
+            ...(fornecedorId ? { fornecedorId: fornecedorId, fornecedorNome: fornecedorNome } : {}),
             ativo: true,
             dataCadastro: new Date().toISOString()
         });
@@ -530,6 +643,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         carregarProdutos();
+
+        carregarFornecedores();
 
         const parametros = new URLSearchParams(window.location.search);
 

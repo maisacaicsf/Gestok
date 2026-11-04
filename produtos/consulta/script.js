@@ -6,6 +6,7 @@
 const tabela = document.getElementById("produtosTabela");
 const pesquisa = document.getElementById("pesquisaProduto");
 const filtroCategoria = document.getElementById("filtroCategoria");
+const filtroFornecedor = document.getElementById("filtroFornecedor");
 const filtroStatus = document.getElementById("filtroStatus");
 const filtroEstoque = document.getElementById("filtroEstoque");
 const ordenacao = document.getElementById("ordenacao");
@@ -96,6 +97,8 @@ async function carregarProdutos() {
 
         carregarCategorias();
 
+        carregarFornecedoresFiltro();
+
         const restaurou = restaurarEstadoConsulta();
 
         filtrarProdutos(restaurou);
@@ -104,6 +107,37 @@ async function carregarProdutos() {
         console.error("Erro ao carregar consulta de produtos:", erro);
         alert("Não foi possível carregar os produtos do Firebase.");
     }
+}
+
+function carregarFornecedoresFiltro() {
+
+    const atual = filtroFornecedor.value;
+
+    const mapa = new Map();
+
+    todosProdutos.forEach(function (produto) {
+
+        if (produto.fornecedorId) {
+            mapa.set(produto.fornecedorId, produto.fornecedorNome || "Fornecedor");
+        }
+
+    });
+
+    const lista = Array.from(mapa.entries()).sort(function (a, b) {
+        return String(a[1]).localeCompare(String(b[1]), "pt-BR");
+    });
+
+    filtroFornecedor.innerHTML =
+        '<option value="">Todos</option>' +
+        '<option value="__sem__">Sem fornecedor</option>' +
+        lista.map(function (par) {
+            return '<option value="' + escaparHTML(par[0]) + '">' + escaparHTML(par[1]) + '</option>';
+        }).join("");
+
+    if (atual) {
+        filtroFornecedor.value = atual;
+    }
+
 }
 
 function carregarCategorias() {
@@ -158,6 +192,7 @@ function filtrarProdutos(manterPagina) {
     const categoria = filtroCategoria.value;
     const status = filtroStatus.value;
     const estoque = filtroEstoque.value;
+    const fornecedorSel = filtroFornecedor.value;
 
     let resultado = todosProdutos.filter(function (produto) {
 
@@ -170,6 +205,18 @@ function filtrarProdutos(manterPagina) {
 
         if (categoria && produto.categoria !== categoria) {
             return false;
+        }
+
+        if (fornecedorSel === "__sem__") {
+
+            if (produto.fornecedorId) {
+                return false;
+            }
+
+        } else if (fornecedorSel && produto.fornecedorId !== fornecedorSel) {
+
+            return false;
+
         }
 
         if (status === "ativo" && produto.ativo === false) {
@@ -225,6 +272,7 @@ function renderizarProdutos(produtos, totalFiltrado) {
                 <div class="product-name">
                     <strong>${escaparHTML(produto.nome)}</strong>
                     ${produto.descricao ? `<small>${escaparHTML(produto.descricao)}</small>` : ""}
+                    ${produto.fornecedorNome ? `<small>Fornecedor: ${escaparHTML(produto.fornecedorNome)}</small>` : ""}
                 </div>
             </td>
             <td>${produto.codigo ? escaparHTML(produto.codigo) : "—"}</td>
@@ -294,6 +342,7 @@ tabela.addEventListener("click", function (event) {
 
 pesquisa.addEventListener("input", function () { filtrarProdutos(false); });
 filtroCategoria.addEventListener("change", function () { filtrarProdutos(false); });
+filtroFornecedor.addEventListener("change", function () { filtrarProdutos(false); });
 filtroStatus.addEventListener("change", function () { filtrarProdutos(false); });
 filtroEstoque.addEventListener("change", function () { filtrarProdutos(false); });
 ordenacao.addEventListener("change", function () { filtrarProdutos(false); });
@@ -301,6 +350,7 @@ ordenacao.addEventListener("change", function () { filtrarProdutos(false); });
 limparFiltros.addEventListener("click", function () {
     pesquisa.value = "";
     filtroCategoria.value = "";
+    filtroFornecedor.value = "";
     filtroStatus.value = "";
     filtroEstoque.value = "";
     ordenacao.value = "nome";
@@ -454,6 +504,7 @@ function salvarEstadoConsulta() {
             pagina: paginaAtual,
             pesquisa: pesquisa.value,
             categoria: filtroCategoria.value,
+            fornecedor: filtroFornecedor.value,
             status: filtroStatus.value,
             estoque: filtroEstoque.value,
             ordenacao: ordenacao.value
@@ -480,6 +531,7 @@ function restaurarEstadoConsulta() {
 
         pesquisa.value = estado.pesquisa || "";
         filtroCategoria.value = estado.categoria || "";
+        filtroFornecedor.value = estado.fornecedor || "";
         filtroStatus.value = estado.status || "";
         filtroEstoque.value = estado.estoque || "";
         ordenacao.value = estado.ordenacao || "nome";

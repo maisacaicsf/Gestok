@@ -2477,6 +2477,17 @@ function abrirModalSugestao() {
 
 /* ---------- copiar lista de compras ---------- */
 
+function nomeFornecedorDoProduto(produtoId) {
+
+    const produto = obterProdutos().find(function (p) {
+        return String(p.id) === String(produtoId);
+    });
+
+    return (produto && produto.fornecedorNome) || "Sem fornecedor";
+
+}
+
+
 async function copiarListaDeCompras() {
 
     const abertas = obterSolicitacoes().filter(function (s) {
@@ -2500,6 +2511,7 @@ async function copiarListaDeCompras() {
         const atual = agrupado.get(chave) || {
             produto: s.produto || "-",
             unidade: s.unidade || "UN",
+            fornecedor: nomeFornecedorDoProduto(s.produtoId),
             quantidade: 0
         };
 
@@ -2509,11 +2521,37 @@ async function copiarListaDeCompras() {
 
     });
 
-    const linhas = Array.from(agrupado.values())
-        .sort(function (a, b) { return a.produto.localeCompare(b.produto, "pt-BR"); })
-        .map(function (i) { return `• ${i.produto} — ${i.quantidade} ${i.unidade}`; });
+    const porFornecedor = new Map();
 
-    const texto = `Lista de compras (${new Date().toLocaleDateString("pt-BR")})\n\n${linhas.join("\n")}`;
+    Array.from(agrupado.values())
+        .sort(function (a, b) { return a.produto.localeCompare(b.produto, "pt-BR"); })
+        .forEach(function (i) {
+
+            if (!porFornecedor.has(i.fornecedor)) {
+                porFornecedor.set(i.fornecedor, []);
+            }
+
+            porFornecedor.get(i.fornecedor).push(`• ${i.produto} — ${i.quantidade} ${i.unidade}`);
+
+        });
+
+    /* Fornecedores em ordem alfabética; "Sem fornecedor" por último */
+    const nomesFornecedores = Array.from(porFornecedor.keys()).sort(function (a, b) {
+
+        if (a === "Sem fornecedor") { return 1; }
+        if (b === "Sem fornecedor") { return -1; }
+
+        return a.localeCompare(b, "pt-BR");
+
+    });
+
+    const linhas = Array.from(agrupado.values());
+
+    const blocos = nomesFornecedores.map(function (nome) {
+        return `*${nome}*\n${porFornecedor.get(nome).join("\n")}`;
+    });
+
+    const texto = `Lista de compras (${new Date().toLocaleDateString("pt-BR")})\n\n${blocos.join("\n\n")}`;
 
     try {
 

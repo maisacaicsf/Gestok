@@ -86,6 +86,8 @@
             "cadastro",
             "planos",
             "validade",
+            "fornecedores",
+            "vendas",
             "pagamento"
 
         ];
@@ -316,6 +318,23 @@
                     <!-- ENTRADA -->
 
                     <a
+                        href="${urlGestok("vendas/index.html")}"
+                        class="sidebar-nav-item"
+                        data-page="vendas"
+                    >
+
+                        <span class="sidebar-nav-icon">
+                            🧾
+                        </span>
+
+                        <span>
+                            Vendas
+                        </span>
+
+                    </a>
+
+
+                    <a
                         href="${urlGestok("entrada/index.html")}"
                         class="sidebar-nav-item"
                         data-page="entrada"
@@ -404,6 +423,23 @@
 
                         <span>
                             Solicitações
+                        </span>
+
+                    </a>
+
+
+                    <a
+                        href="${urlGestok("fornecedores/index.html")}"
+                        class="sidebar-nav-item"
+                        data-page="fornecedores"
+                    >
+
+                        <span class="sidebar-nav-icon">
+                            🚚
+                        </span>
+
+                        <span>
+                            Fornecedores
                         </span>
 
                     </a>
@@ -777,6 +813,24 @@
             if (
                 pagina === "validade" &&
                 caminho.includes("/validade/")
+            ) {
+                item.classList.add(
+                    "active"
+                );
+            }
+
+            if (
+                pagina === "fornecedores" &&
+                caminho.includes("/fornecedores/")
+            ) {
+                item.classList.add(
+                    "active"
+                );
+            }
+
+            if (
+                pagina === "vendas" &&
+                caminho.includes("/vendas/")
             ) {
                 item.classList.add(
                     "active"

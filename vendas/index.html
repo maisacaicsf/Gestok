@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <script src="../componentes/tema.js"></script>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://securetoken.googleapis.com" crossorigin>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestok | Vendas</title>
+    <link rel="stylesheet" href="../produtos/consulta/style.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../componentes/sidebar.css">
+    <script src="../componentes/notificacoes.js"></script>
+
+    <!-- Aplicativo (PWA) -->
+    <link rel="manifest" href="../manifest.webmanifest">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32.png">
+    <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Gestok">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <script src="../componentes/pwa.js" defer></script>
+</head>
+<body>
+
+<div id="gestok-sidebar-container"></div>
+
+<header class="header">
+    <div class="header-left">
+        <button class="menu-button" id="menuButton" aria-label="Abrir menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="page-name">Vendas</div>
+    </div>
+</header>
+
+<main class="page">
+
+    <div class="page-header">
+        <div>
+            <span class="eyebrow">VENDAS</span>
+            <h1>Registrar venda</h1>
+            <p>Bipe o código de barras (ou digite o nome), escolha a forma de pagamento e finalize.</p>
+        </div>
+        <div class="vend-header-actions">
+            <button type="button" class="vend-btn" id="btnSom" title="Ligar ou desligar o som do leitor">🔊 Som ligado</button>
+            <button type="button" class="vend-btn" id="btnLimparVenda">Limpar venda</button>
+        </div>
+    </div>
+
+    <!-- ============ CAIXA ============ -->
+    <section class="vend-pdv">
+
+        <div class="vend-esquerda">
+
+            <div class="vend-busca">
+                <span class="vend-busca-icone">⌕</span>
+                <input
+                    type="text"
+                    id="campoBusca"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    placeholder="Bipe o código de barras ou digite o nome do produto"
+                    aria-label="Buscar ou ler produto"
+                >
+                <div class="vend-resultados" id="resultadosBusca" hidden></div>
+            </div>
+
+            <div class="vend-dica" id="ultimaLeitura">
+                Dica: use <strong>3*código</strong> para lançar 3 unidades de uma vez.
+            </div>
+
+            <div class="vend-lista-cab">
+                <span>ITENS DA VENDA</span>
+                <span id="contaItens">0 itens</span>
+            </div>
+
+            <div class="vend-carrinho" id="carrinho"></div>
+
+            <div class="vend-vazio" id="carrinhoVazio">
+                <div class="vend-vazio-icone">🛒</div>
+                <strong>Nenhum item ainda</strong>
+                <span>Passe o produto no leitor ou procure pelo nome.</span>
+            </div>
+
+        </div>
+
+        <aside class="vend-direita">
+
+            <div class="vend-total">
+                <div class="vend-linha"><span>Subtotal</span><b id="subtotalTxt">R$ 0,00</b></div>
+                <div class="vend-linha desconto" id="linhaDesconto" hidden><span>Desconto</span><b id="descontoTxt">- R$ 0,00</b></div>
+                <div class="vend-total-grande"><span>TOTAL</span><strong id="totalTxt">R$ 0,00</strong></div>
+            </div>
+
+            <div class="vend-rotulo">FORMA DE PAGAMENTO</div>
+            <div class="vend-formas">
+                <button type="button" class="vend-forma ativo" data-forma="dinheiro">💵 Dinheiro</button>
+                <button type="button" class="vend-forma" data-forma="pix">▣ PIX</button>
+                <button type="button" class="vend-forma" data-forma="debito">💳 Débito</button>
+                <button type="button" class="vend-forma" data-forma="credito">💳 Crédito</button>
+            </div>
+
+            <div class="vend-recebido" id="blocoRecebido">
+                <label for="campoRecebido">Valor recebido</label>
+                <input type="text" id="campoRecebido" inputmode="decimal" autocomplete="off" placeholder="0,00">
+                <div class="vend-rapidos">
+                    <button type="button" data-rapido="exato">Exato</button>
+                    <button type="button" data-rapido="20">R$ 20</button>
+                    <button type="button" data-rapido="50">R$ 50</button>
+                    <button type="button" data-rapido="100">R$ 100</button>
+                </div>
+                <div class="vend-troco"><span>Troco</span><b id="trocoTxt">R$ 0,00</b></div>
+            </div>
+
+            <div class="vend-extras">
+                <div class="vend-campo">
+                    <label for="campoDesconto">Desconto (opcional)</label>
+                    <input type="text" id="campoDesconto" autocomplete="off" placeholder="Ex.: 5,00 ou 10%">
+                </div>
+                <div class="vend-campo">
+                    <label for="campoObs">Observação (opcional)</label>
+                    <input type="text" id="campoObs" maxlength="120" autocomplete="off" placeholder="Ex.: cliente João">
+                </div>
+            </div>
+
+            <button type="button" class="vend-finalizar" id="btnFinalizar" disabled>
+                <span id="rotuloFinalizar">FINALIZAR VENDA</span><small>F9</small>
+            </button>
+
+            <div class="vend-atalhos"><span><b>F2</b> Buscar</span><span><b>F9</b> Finalizar</span><span><b>ESC</b> Cancelar</span></div>
+
+        </aside>
+
+    </section>
+
+    <!-- ============ HISTÓRICO ============ -->
+    <section class="products-panel" id="painelHistorico">
+
+        <div class="products-panel-header vend-hist-cab">
+            <div>
+                <h2>Vendas do dia</h2>
+                <p><span id="histCount">0 vendas</span></p>
+            </div>
+            <div class="vend-data">
+                <label for="dataHistorico">Dia</label>
+                <input type="date" id="dataHistorico">
+            </div>
+        </div>
+
+        <div class="vend-resumo">
+            <div class="vend-card"><span>Vendas</span><strong id="resQtd">0</strong></div>
+            <div class="vend-card"><span>Faturamento</span><strong id="resFat">R$ 0,00</strong></div>
+            <div class="vend-card"><span>Ticket médio</span><strong id="resTicket">R$ 0,00</strong></div>
+            <div class="vend-card wide"><span>Por forma de pagamento</span><small id="resFormas">—</small></div>
+        </div>
+
+        <div class="table-container">
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th>Nº</th>
+                        <th>Hora</th>
+                        <th>Itens</th>
+                        <th>Pagamento</th>
+                        <th>Total</th>
+                        <th>Origem</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="historicoTabela"></tbody>
+            </table>
+        </div>
+
+        <div class="pagination" id="paginacaoVend" style="display:none;">
+            <label class="page-size">
+                Itens por página
+                <select id="itensPorPaginaVend">
+                    <option value="10">10</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+            <span class="page-info" id="paginaInfoVend"></span>
+            <div class="page-nav" id="paginaNavVend"></div>
+        </div>
+
+        <div class="no-results" id="semVendas" style="display:none;">
+            <strong>Nenhuma venda neste dia</strong>
+            <span>As vendas registradas aqui e no PDV aparecem nesta lista.</span>
+        </div>
+
+    </section>
+
+</main>
+
+<!-- VENDA CONCLUÍDA -->
+<div class="vend-overlay" id="modalConcluida" hidden>
+    <div class="vend-modal vend-ok">
+        <div class="vend-ok-icone">✓</div>
+        <h3>Venda registrada!</h3>
+        <p class="vend-sub">Venda nº <b id="okNumero">0</b> · estoque atualizado</p>
+        <div class="vend-ok-linha"><span>Total</span><b id="okTotal">R$ 0,00</b></div>
+        <div class="vend-ok-linha" id="okLinhaTroco"><span>Troco</span><b id="okTroco" class="troco">R$ 0,00</b></div>
+        <div class="vend-rodape">
+            <button type="button" class="secondary-button" id="btnOkImprimir">🖨 Comprovante</button>
+            <button type="button" class="primary-button" id="btnOkNova">Nova venda</button>
+        </div>
+    </div>
+</div>
+
+<!-- DETALHE DA VENDA -->
+<div class="vend-overlay" id="modalDetalhe" hidden>
+    <div class="vend-modal">
+        <h3 id="detTitulo">Venda</h3>
+        <p class="vend-sub" id="detSub"></p>
+        <div class="vend-det-itens" id="detItens"></div>
+        <div class="vend-det-resumo" id="detResumo"></div>
+        <div class="vend-rodape">
+            <button type="button" class="secondary-button" id="btnDetImprimir">🖨 Comprovante</button>
+            <button type="button" class="secondary-button danger" id="btnDetCancelar">Cancelar venda</button>
+            <button type="button" class="primary-button" id="btnDetFechar">Fechar</button>
+        </div>
+    </div>
+</div>
+
+<!-- COMPROVANTE NÃO FISCAL (só aparece na impressão) -->
+<div id="receipt"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="../firebase/config.js"></script>
+<script>firebase.initializeApp(firebaseConfig);</script>
+<script src="../firebase/auth.js"></script>
+<script src="../firebase/firestore.js"></script>
+<script src="../auth.js"></script>
+<script src="../componentes/sidebar.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

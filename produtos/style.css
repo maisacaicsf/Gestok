@@ -1273,3 +1273,21 @@ textarea::placeholder {
 
     margin-top: 2px;
 }
+
+/* Dica abaixo de um campo do formulário */
+.form-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #7b8794;
+}
+
+.form-hint a {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.form-hint a:hover {
+    text-decoration: underline;
+}

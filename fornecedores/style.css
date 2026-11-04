@@ -1,0 +1,282 @@
+/* =========================================
+   FORNECEDORES (complementa o estilo da consulta)
+========================================= */
+
+.forn-header-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* ----- cartões de resumo ----- */
+
+.forn-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.forn-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 18px;
+    border: 1px solid #e5eaf1;
+    border-left: 4px solid #3b82f6;
+    border-radius: 14px;
+    background: #ffffff;
+}
+
+.forn-card.ok { border-left-color: #16a34a; }
+.forn-card.alerta { border-left-color: #f59e0b; }
+.forn-card-label { font-size: 12px; font-weight: 600; color: #64748b; }
+.forn-card strong { font-size: 26px; line-height: 1.15; color: #1e293b; }
+.forn-card small { font-size: 12px; color: #7b8794; }
+
+/* ----- tabela ----- */
+
+.forn-nome strong { display: block; }
+.forn-nome small,
+.forn-duas small { display: block; margin-top: 2px; color: #7b8794; font-size: 12px; }
+.forn-duas strong { font-weight: 600; }
+
+.forn-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.forn-badge.ativo { background: #dcfce7; color: #15803d; }
+.forn-badge.inativo { background: #eef2f7; color: #64748b; }
+
+.forn-qtd {
+    display: inline-block;
+    min-width: 28px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: #eef3fd;
+    color: #274690;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.forn-acoes { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+
+.forn-acao {
+    display: inline-flex;
+    align-items: center;
+    height: 30px;
+    padding: 0 11px;
+    border: 1px solid #dbe2ec;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #475569;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.forn-acao:hover { background: #f4f6fa; }
+.forn-acao.zap { color: #15803d; border-color: #bfe6cf; background: #f3fbf6; }
+.forn-acao.zap:hover { background: #e4f6ea; }
+.forn-acao.perigo { color: #dc2626; border-color: #f2c4c4; background: #fff7f7; }
+.forn-acao.perigo:hover { background: #ffecec; }
+
+/* ----- janela ----- */
+
+.forn-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, .45);
+}
+
+.forn-overlay[hidden] { display: none; }
+
+.forn-modal {
+    width: min(560px, 100%);
+    max-height: 92vh;
+    overflow: auto;
+    padding: 26px;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 30px 80px rgba(15, 23, 42, .3);
+}
+
+.forn-modal h3 { margin: 0 0 4px; font-size: 18px; color: #1e293b; }
+.forn-sub { margin: 0 0 18px; font-size: 13px; color: #64748b; line-height: 1.5; }
+.forn-campo { margin-bottom: 14px; }
+.forn-campo label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #334155; }
+
+.forn-campo input,
+.forn-campo textarea {
+    width: 100%;
+    padding: 0 12px;
+    border: 1px solid #dfe4eb;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #1e293b;
+    font-family: inherit;
+    font-size: 14px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.forn-campo input { height: 42px; }
+.forn-campo textarea { padding: 10px 12px; resize: vertical; min-height: 76px; }
+
+.forn-campo input:focus,
+.forn-campo textarea:focus {
+    border-color: #5790ed;
+    box-shadow: 0 0 0 3px rgba(87, 144, 237, .15);
+}
+
+.forn-linha { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.forn-check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 2px;
+    font-size: 13px;
+    color: #334155;
+    cursor: pointer;
+}
+
+.forn-check input { width: 17px; height: 17px; cursor: pointer; }
+.forn-rodape { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+.forn-rodape .primary-button,
+.forn-rodape .secondary-button {
+    height: 44px;
+    padding: 0 20px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+@media (max-width: 900px) {
+    .forn-cards { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+    .forn-linha { grid-template-columns: 1fr; }
+    .forn-header-actions { width: 100%; }
+    .forn-header-actions > * { flex: 1 1 100%; }
+}
+
+
+/* =========================================
+   BOTÕES NO PADRÃO DO GESTOK
+========================================= */
+
+button.primary-button,
+button.secondary-button {
+    font-family: inherit;
+}
+
+.secondary-button {
+    border: 1px solid #dbe2ec;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #475569;
+    cursor: pointer;
+    transition: background .2s ease, border-color .2s ease;
+}
+
+.secondary-button:hover {
+    background: #f4f6fa;
+    border-color: #c9d2e0;
+}
+
+.val-rodape .primary-button,
+.val-rodape .secondary-button {
+    height: 44px;
+    padding: 0 20px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.primary-button:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+
+/* =========================================
+   PAGINAÇÃO (itens por página) - garantido
+   mesmo sem o CSS da consulta
+========================================= */
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 16px 26px;
+    border-top: 1px solid #edf0f4;
+    font-size: 13px;
+    color: #5b6678;
+}
+
+.page-size {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.page-size select {
+    height: 34px;
+    padding: 0 10px;
+    border: 1px solid #dbe2ec;
+    border-radius: 8px;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 13px;
+    color: #1f2937;
+    cursor: pointer;
+}
+
+.page-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.page-btn {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 11px;
+    border: 1px solid #dbe2ec;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #3155a5;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.page-btn:hover:not(:disabled) { background: #f1f5ff; border-color: #b9c8ec; }
+.page-btn.active { background: #3155a5; border-color: #3155a5; color: #ffffff; }
+.page-btn:disabled { opacity: .45; cursor: not-allowed; }
+.page-gap { padding: 0 4px; color: #9aa3b2; }
+
+@media (max-width: 650px) {
+    .pagination { justify-content: center; padding: 14px 16px; }
+}
