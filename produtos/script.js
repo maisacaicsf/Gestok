@@ -227,6 +227,8 @@ function alternarCamposValidade(mostrar) {
 ========================================= */
 
 const campoFornecedor = document.getElementById("fornecedor");
+const buscaFornecedor = document.getElementById("buscaFornecedor");
+const listaFornecedoresBusca = document.getElementById("listaFornecedoresBusca");
 
 let fornecedoresLista = [];
 
@@ -294,6 +296,17 @@ function popularFornecedores(selecionadoId, selecionadoNome) {
 
     campoFornecedor.value = atual || "";
 
+    if (listaFornecedoresBusca) {
+        listaFornecedoresBusca.innerHTML = ativos.map(function (f) {
+            const rotulo = [f.nome, f.documento, f.contato, f.telefone, f.cidade].filter(Boolean).join(" · ");
+            return '<option value="' + escaparHTML(rotulo) + '"></option>';
+        }).join("");
+    }
+    if (buscaFornecedor) {
+        const selecionado = fornecedoresLista.find(function (f) { return f.id === (atual || ""); });
+        buscaFornecedor.value = selecionado ? [selecionado.nome, selecionado.documento, selecionado.contato, selecionado.telefone, selecionado.cidade].filter(Boolean).join(" · ") : "";
+    }
+
 }
 
 
@@ -315,6 +328,30 @@ function nomeDoFornecedorSelecionado() {
 
 }
 
+
+if (buscaFornecedor) {
+    buscaFornecedor.addEventListener("input", function () {
+        const termo = String(buscaFornecedor.value || "").trim().toLocaleLowerCase("pt-BR");
+        if (!termo) { campoFornecedor.value = ""; return; }
+        const encontrado = fornecedoresLista.find(function (f) {
+            const rotulo = [f.nome, f.documento, f.contato, f.telefone, f.cidade].filter(Boolean).join(" · ").toLocaleLowerCase("pt-BR");
+            return rotulo === termo;
+        });
+        if (encontrado) campoFornecedor.value = encontrado.id;
+    });
+    buscaFornecedor.addEventListener("change", function () {
+        const termo = String(buscaFornecedor.value || "").trim().toLocaleLowerCase("pt-BR");
+        const encontrado = fornecedoresLista.find(function (f) {
+            const rotulo = [f.nome, f.documento, f.contato, f.telefone, f.cidade].filter(Boolean).join(" · ").toLocaleLowerCase("pt-BR");
+            return rotulo === termo || String(f.nome || "").toLocaleLowerCase("pt-BR") === termo;
+        });
+        campoFornecedor.value = encontrado ? encontrado.id : "";
+        if (termo && !encontrado) {
+            alert("Fornecedor não encontrado. Confira a pesquisa ou cadastre um novo fornecedor.");
+            buscaFornecedor.focus();
+        }
+    });
+}
 
 function limparFormulario() {
 

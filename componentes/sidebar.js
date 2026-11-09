@@ -317,20 +317,12 @@
 
                     <!-- ENTRADA -->
 
-                    <a
-                        href="${urlGestok("vendas/index.html")}"
-                        class="sidebar-nav-item"
-                        data-page="vendas"
-                    >
+                    <a href="${urlGestok("vendas/index.html#pdv")}" class="sidebar-nav-item" data-page="pdv">
+                        <span class="sidebar-nav-icon">▰</span><span>Pdv Não Fiscal</span>
+                    </a>
 
-                        <span class="sidebar-nav-icon">
-                            🧾
-                        </span>
-
-                        <span>
-                            Vendas
-                        </span>
-
+                    <a href="${urlGestok("vendas/index.html#historico")}" class="sidebar-nav-item" data-page="historico-vendas">
+                        <span class="sidebar-nav-icon">▥</span><span>Histórico de Vendas</span>
                     </a>
 
 
@@ -435,7 +427,7 @@
                     >
 
                         <span class="sidebar-nav-icon">
-                            🚚
+                            ⛟
                         </span>
 
                         <span>
@@ -452,7 +444,7 @@
                     >
 
                         <span class="sidebar-nav-icon">
-                            ⏳
+                            ⧖
                         </span>
 
                         <span>
@@ -680,6 +672,8 @@
                 document.body.style.overflow =
                     "hidden";
 
+                rolarParaItemAtivo();
+
             }
         );
 
@@ -731,6 +725,19 @@
 
 
         /* =================================
+           FECHAR AO NAVEGAR
+        ================================= */
+
+        sidebar.querySelectorAll(".sidebar-nav-item").forEach(function (item) {
+
+            item.addEventListener("click", function () {
+                fecharMenu();
+            });
+
+        });
+
+
+        /* =================================
            ESC
         ================================= */
 
@@ -755,6 +762,38 @@
         ================================= */
 
         marcarPaginaAtual();
+
+        rolarParaItemAtivo();
+
+    }
+
+
+    /* =====================================
+       ROLAR O MENU ATÉ O ITEM SELECIONADO
+       (ex.: estando em Redes Sociais, o menu
+       abre já mostrando Redes Sociais)
+    ===================================== */
+
+    function rolarParaItemAtivo() {
+
+        const ativo =
+            document.querySelector(
+                "#gestokSidebar .sidebar-nav-item.active"
+            );
+
+        if (!ativo) {
+            return;
+        }
+
+        /* Pequeno atraso para o menu já estar visível */
+        requestAnimationFrame(function () {
+
+            ativo.scrollIntoView({
+                block: "center",
+                inline: "nearest"
+            });
+
+        });
 
     }
 
@@ -828,13 +867,11 @@
                 );
             }
 
-            if (
-                pagina === "vendas" &&
-                caminho.includes("/vendas/")
-            ) {
-                item.classList.add(
-                    "active"
-                );
+            if (caminho.includes("/vendas/")) {
+                const historico = window.location.hash === "#historico";
+                if ((pagina === "historico-vendas" && historico) || (pagina === "pdv" && !historico)) {
+                    item.classList.add("active");
+                }
             }
 
 
@@ -933,7 +970,7 @@
 
             }
             if (
-                pagina === "redes-sociais" &&
+                pagina === "redes_sociais" &&
                 caminho.includes("/redes_sociais/")
             ) {
 
@@ -944,6 +981,11 @@
         });
 
     }
+
+
+    /* Atualiza a opção selecionada ao alternar entre #pdv e #historico
+       sem recarregar a página. */
+    window.addEventListener("hashchange", marcarPaginaAtual);
 
 
     /* =====================================

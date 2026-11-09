@@ -1648,3 +1648,22 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+
+
+/* Alternância entre PDV e histórico pela opção da sidebar. */
+(function(){
+  function aplicarAba(){
+    const historico = window.location.hash === "#historico";
+    document.body.classList.toggle("modo-historico", historico);
+    document.body.classList.toggle("modo-pdv", !historico);
+    const titulo = document.querySelector(".page-name");
+    const h1 = document.querySelector(".page-header h1");
+    const desc = document.querySelector(".page-header p");
+    if(titulo) titulo.textContent = historico ? "Histórico de vendas" : "PDV Não Fiscal";
+    if(h1) h1.textContent = historico ? "Histórico de vendas" : "PDV Não Fiscal";
+    if(desc) desc.textContent = historico ? "Consulte as vendas realizadas, filtre por data e confira os detalhes." : "Registre vendas não fiscais, consulte produtos e finalize o pagamento.";
+  }
+  window.addEventListener("hashchange", aplicarAba);
+  document.addEventListener("DOMContentLoaded", aplicarAba);
+  aplicarAba();
+})();

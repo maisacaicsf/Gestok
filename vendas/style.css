@@ -541,3 +541,9 @@ button.secondary-button {
 @media (max-width: 650px) {
     .pagination { justify-content: center; padding: 14px 16px; }
 }
+
+/* Navegação independente entre caixa e histórico */
+body.modo-historico #painelPDV{display:none!important}
+body.modo-pdv #painelHistorico{display:none!important}
+/* Controles de operação pertencem somente ao PDV, nunca ao histórico. */
+body.modo-historico .vend-header-actions{display:none!important}

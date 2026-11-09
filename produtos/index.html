@@ -114,10 +114,12 @@
 
                     <div class="form-group" id="grupoFornecedor">
                         <label for="fornecedor">Fornecedor</label>
-                        <select id="fornecedor" name="fornecedor">
+                        <input type="search" id="buscaFornecedor" list="listaFornecedoresBusca" placeholder="Pesquisar por nome, CNPJ, contato ou cidade..." autocomplete="off">
+                        <datalist id="listaFornecedoresBusca"></datalist>
+                        <select id="fornecedor" name="fornecedor" aria-label="Fornecedor selecionado">
                             <option value="">Sem fornecedor</option>
                         </select>
-                        <small class="form-hint">Não encontrou? <a href="../fornecedores/index.html">Cadastre em Fornecedores</a>.</small>
+                        <small class="form-hint">Pesquise na lista completa ou <a href="../fornecedores/index.html">cadastre um novo fornecedor</a>.</small>
                     </div>
 
                     <div class="form-group">
@@ -234,6 +236,7 @@
     <script>firebase.initializeApp(firebaseConfig);</script>
     <script src="../firebase/auth.js"></script>
     <script src="../firebase/firestore.js"></script>
+    <script src="../componentes/carregamento.js"></script>
     <script src="../auth.js"></script>
     <script src="../componentes/sidebar.js"></script>
     <script src="script.js"></script>
