@@ -902,3 +902,84 @@ select {
         justify-content: center;
     }
 }
+
+/* =========================================
+   PRÉVIA EM CARDS NO CELULAR
+   (igual à lista de Produtos: sem rolagem lateral)
+========================================= */
+
+@media (max-width: 700px) {
+
+    .preview-content {
+        padding: 0;
+        overflow-x: visible;
+    }
+
+    .preview-table {
+        min-width: 0;
+        display: block;
+    }
+
+    .preview-table thead {
+        display: none;
+    }
+
+    .preview-table tbody {
+        display: block;
+    }
+
+    .preview-table tr {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        padding: 16px;
+        border-bottom: 1px solid #edf0f4;
+    }
+
+    .preview-table tr:last-child {
+        border-bottom: none;
+    }
+
+    .preview-table td {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        padding: 0;
+        border-bottom: none;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        color: #334155;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .preview-table td::before {
+        content: attr(data-label);
+        color: #a0a9b6;
+        font-size: 9px;
+        font-weight: 400;
+    }
+
+    /* Nome do produto ocupa a linha toda, como título do card */
+    .preview-table td.cell-titulo {
+        grid-column: 1 / -1;
+        order: -1;
+        font-size: 13px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .preview-table td.cell-titulo::before {
+        content: none;
+    }
+
+    .preview-table td .badge {
+        align-self: flex-start;
+    }
+
+    .preview-table tr:hover td {
+        background: transparent;
+    }
+
+}
+

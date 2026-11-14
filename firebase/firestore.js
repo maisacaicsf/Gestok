@@ -49,3 +49,6 @@ function referenciaFornecedores(lojaId) {
 function referenciaCategorias(lojaId) {
     return referenciaLoja(lojaId).collection('categorias');
 }
+
+/* Categorias nativas do Gestok: usadas no cadastro de produtos e nos relatórios. */
+const CATEGORIAS_NATIVAS_GESTOK = ['Eletrônicos', 'Informática', 'Escritório', 'Ferramentas', 'Materiais', 'Outros'];

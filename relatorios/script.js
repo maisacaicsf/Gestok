@@ -54,6 +54,39 @@ document.addEventListener(
         const previewContent =
             document.getElementById("previewContent");
 
+        /* Etiquetas para o modo "cards" no celular: cada célula recebe o
+           nome da coluna (data-label) e a célula do produto vira o título. */
+        function prepararCardsPrevia() {
+
+            previewContent.querySelectorAll("table.preview-table").forEach(function (tabela) {
+
+                const titulos = Array.from(tabela.querySelectorAll("thead th")).map(function (th) {
+                    return th.textContent.trim();
+                });
+
+                tabela.querySelectorAll("tbody tr").forEach(function (tr) {
+
+                    Array.from(tr.children).forEach(function (td, i) {
+
+                        if (td.dataset.label === undefined) {
+                            td.dataset.label = titulos[i] || "";
+                        }
+
+                        if (td.querySelector("strong")) {
+                            td.classList.add("cell-titulo");
+                        }
+
+                    });
+
+                });
+
+            });
+
+        }
+
+        new MutationObserver(prepararCardsPrevia)
+            .observe(previewContent, { childList: true });
+
         const previewDescription =
             document.getElementById(
                 "previewDescription"
@@ -109,6 +142,10 @@ document.addEventListener(
         let lojaIdRelatorios = null;
 
         let cancelarProdutosRelatorios = null;
+
+        let cancelarCategoriasRelatorios = null;
+
+        let categoriasPersonalizadasRelatorios = [];
 
         let cancelarMovimentacoesRelatorios = null;
 
@@ -303,12 +340,48 @@ document.addEventListener(
 
             const atual = categoriaFiltro.value;
 
-            const categorias = Array.from(new Set(
-                obterProdutos()
-                    .filter(function (p) { return p && p.ativo !== false; })
-                    .map(function (p) { return String(p.categoria || "").trim(); })
-                    .filter(Boolean)
-            )).sort(function (a, b) { return a.localeCompare(b, "pt-BR"); });
+            /* Nativas do sistema + criadas por você + as que já estão em produtos.
+               Sem repetir (ignora maiúsculas, acentos e espaços extras). */
+            const nativas = typeof CATEGORIAS_NATIVAS_GESTOK !== "undefined"
+                ? CATEGORIAS_NATIVAS_GESTOK
+                : [];
+
+            const dosProdutos = obterProdutos()
+                .filter(function (p) { return p && p.ativo !== false; })
+                .map(function (p) { return String(p.categoria || "").trim(); })
+                .filter(Boolean);
+
+            const vistas = {};
+
+            const categorias = nativas
+                .concat(categoriasPersonalizadasRelatorios, dosProdutos)
+                .filter(function (nome) {
+
+                    const chave = String(nome || "")
+                        .normalize("NFD")
+                        .replace(/[\u0300-\u036f]/g, "")
+                        .toLowerCase()
+                        .replace(/\s+/g, " ")
+                        .trim();
+
+                    if (!chave || vistas[chave]) {
+                        return false;
+                    }
+
+                    vistas[chave] = true;
+
+                    return true;
+
+                })
+                .sort(function (a, b) {
+
+                    if (a === "Outros") { return 1; }
+
+                    if (b === "Outros") { return -1; }
+
+                    return a.localeCompare(b, "pt-BR");
+
+                });
 
             categoriaFiltro.innerHTML =
                 '<option value="">Todas as categorias</option>' +
@@ -3023,6 +3096,16 @@ document.addEventListener(
             }
 
 
+            if (typeof cancelarCategoriasRelatorios === "function") {
+
+                cancelarCategoriasRelatorios();
+
+                cancelarCategoriasRelatorios = null;
+
+            }
+
+            categoriasPersonalizadasRelatorios = [];
+
             produtosCache = [];
 
             movimentacoesCache = [];
@@ -3102,6 +3185,30 @@ document.addEventListener(
                             produtosCache = [];
 
                             atualizarDadosRelatorios();
+
+                        }
+                    );
+
+
+            cancelarCategoriasRelatorios =
+                referenciaCategorias(lojaId)
+                    .onSnapshot(
+                        function (snapshot) {
+
+                            categoriasPersonalizadasRelatorios =
+                                snapshot.docs
+                                    .map(function (doc) {
+                                        return String(doc.data().nome || "").trim();
+                                    })
+                                    .filter(Boolean);
+
+                            carregarCategoriasFiltro();
+
+                        },
+                        function (erro) {
+
+                            /* Sem permissão/offline: o filtro segue com as nativas e as dos produtos */
+                            console.error("Erro ao carregar categorias dos relatórios:", erro);
 
                         }
                     );

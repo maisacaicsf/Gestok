@@ -572,7 +572,7 @@ body.modo-historico .vend-header-actions{display:none!important}
     body.modo-pdv .vend-pdv {
         height: calc(100vh - 164px);
         height: calc(100dvh - 164px);
-        min-height: 500px;
+        min-height: 420px;
         align-items: stretch;
         margin-bottom: 0;
     }
@@ -663,16 +663,20 @@ body.modo-historico .vend-header-actions{display:none!important}
     body.modo-pdv .vend-direita { padding: 0; }
     body.modo-pdv .vend-direita-corpo { padding: 16px; }
 
+    /* rodapé fixo na tela: FINALIZAR sempre à vista, sem precisar descer */
     body.modo-pdv .vend-direita-rodape {
-        position: sticky;
+        position: fixed;
+        left: 0;
+        right: 0;
         bottom: 0;
-        z-index: 5;
+        z-index: 40;
         padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
         border-top: 1px solid #edf0f4;
-        border-radius: 0 0 16px 16px;
         background: #ffffff;
-        box-shadow: 0 -6px 16px rgba(15, 23, 42, .06);
+        box-shadow: 0 -6px 16px rgba(15, 23, 42, .08);
     }
+
+    body.modo-pdv .vend-pdv { padding-bottom: 96px; }
 
 }
 

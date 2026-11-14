@@ -364,7 +364,9 @@ if (buscaFornecedor) {
      validade seguem funcionando sem mudanças.
 ========================================= */
 
-const CATEGORIAS_PADRAO = ["Eletrônicos", "Informática", "Escritório", "Ferramentas", "Materiais", "Outros"];
+const CATEGORIAS_PADRAO = (typeof CATEGORIAS_NATIVAS_GESTOK !== "undefined")
+    ? CATEGORIAS_NATIVAS_GESTOK.slice()
+    : ["Eletrônicos", "Informática", "Escritório", "Ferramentas", "Materiais", "Outros"];
 
 const campoCategoria = document.getElementById("categoria");
 const modalCategoria = document.getElementById("modalCategoria");
