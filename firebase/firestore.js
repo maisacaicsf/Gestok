@@ -45,3 +45,7 @@ function referenciaLotes(lojaId) {
 function referenciaFornecedores(lojaId) {
     return referenciaLoja(lojaId).collection('fornecedores');
 }
+
+function referenciaCategorias(lojaId) {
+    return referenciaLoja(lojaId).collection('categorias');
+}

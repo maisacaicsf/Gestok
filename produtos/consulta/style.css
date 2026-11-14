@@ -1042,3 +1042,113 @@ body {
         padding: 14px 16px;
     }
 }
+
+/* =========================================
+   TABELA SEM ROLAGEM LATERAL
+   - Telas grandes: colunas se ajustam e o texto
+     longo quebra linha em vez de empurrar a tabela.
+   - Celular/tablet: cada produto vira um cartão.
+========================================= */
+
+.products-table {
+    min-width: 0;
+}
+
+.products-table th {
+    padding: 12px 12px;
+}
+
+.products-table td {
+    padding: 14px 12px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    vertical-align: middle;
+}
+
+.products-table td:nth-child(n+4) {
+    white-space: nowrap;
+    overflow-wrap: normal;
+}
+
+.product-name small {
+    max-width: none;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+@media (max-width: 900px) {
+
+    .table-container {
+        overflow: visible;
+        border-top: none;
+        padding: 4px 14px 14px;
+    }
+
+    .products-table,
+    .products-table tbody {
+        display: block;
+        width: 100%;
+    }
+
+    .products-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+    }
+
+    .products-table tbody tr {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px 14px;
+        margin-top: 12px;
+        padding: 16px;
+        border: 1px solid #edf0f4;
+        border-radius: 12px;
+        background: #ffffff;
+    }
+
+    .products-table td,
+    .products-table td:nth-child(n+4) {
+        display: block;
+        padding: 0;
+        border-top: none;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    .products-table td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: 3px;
+        color: #8993a3;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .products-table td:first-child {
+        grid-column: 1 / -1;
+    }
+
+    .products-table td:last-child {
+        grid-column: 1 / -1;
+        padding-top: 12px;
+        border-top: 1px solid #edf0f4;
+    }
+
+    .products-table .row-actions .edit-button {
+        flex: 1;
+        height: 38px;
+    }
+
+    .products-table .row-actions .row-action {
+        width: 38px;
+        height: 38px;
+    }
+
+}

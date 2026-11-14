@@ -353,6 +353,715 @@ if (buscaFornecedor) {
     });
 }
 
+/* =========================================
+   CATEGORIAS DO PRODUTO
+   -----------------------------------------
+   - Categorias padrão ficam no código.
+   - As criadas pelo usuário ficam em
+     lojas/{loja}/categorias (uma por loja).
+   - O produto continua guardando só o NOME da
+     categoria, então relatórios, filtros e
+     validade seguem funcionando sem mudanças.
+========================================= */
+
+const CATEGORIAS_PADRAO = ["Eletrônicos", "Informática", "Escritório", "Ferramentas", "Materiais", "Outros"];
+
+const campoCategoria = document.getElementById("categoria");
+const modalCategoria = document.getElementById("modalCategoria");
+const inputNovaCategoria = document.getElementById("novaCategoriaNome");
+const mensagemCategoria = document.getElementById("categoriaMsg");
+const blocoMinhasCategorias = document.getElementById("categoriaMinhas");
+const listaMinhasCategorias = document.getElementById("categoriaLista");
+const botaoNovaCategoria = document.getElementById("botaoNovaCategoria");
+const botaoSalvarCategoria = document.getElementById("botaoSalvarCategoria");
+const botaoFecharCategoria = document.getElementById("botaoFecharCategoria");
+const botaoGerenciarCategorias = document.getElementById("botaoGerenciarCategorias");
+const blocoCriarCategoria = document.getElementById("categoriaBlocoCriar");
+const tituloModalCategoria = document.getElementById("modalCategoriaTitulo");
+const subModalCategoria = document.getElementById("modalCategoriaSub");
+
+/* "criar" = só o campo de nova categoria | "gerenciar" = só a lista (renomear/remover) */
+let modoModalCategoria = "criar";
+
+let categoriasPersonalizadas = [];
+
+let categoriaEmEdicaoId = null;
+
+let categoriasProntas = Promise.resolve();
+
+
+function normalizarCategoria(texto) {
+
+    return String(texto || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim();
+
+}
+
+/* Id estável: "Bebidas  Geladas" e "bebidas geladas" geram o mesmo documento */
+function idDaCategoria(nome) {
+
+    return normalizarCategoria(nome)
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+}
+
+function referenciaCategoriasGestok() {
+
+    const lojaId = obterLojaAtualGestok();
+
+    if (!lojaId) {
+        throw new Error("Loja atual não identificada.");
+    }
+
+    return referenciaCategorias(lojaId);
+
+}
+
+function categoriaJaExiste(nome) {
+
+    const alvo = normalizarCategoria(nome);
+
+    return CATEGORIAS_PADRAO.concat(categoriasPersonalizadas.map(function (c) { return c.nome; }))
+        .some(function (n) { return normalizarCategoria(n) === alvo; });
+
+}
+
+
+function carregarCategorias() {
+
+    categoriasProntas = (async function () {
+
+        try {
+
+            const snap = await referenciaCategoriasGestok().get();
+
+            categoriasPersonalizadas = snap.docs.map(function (d) {
+                return { id: d.id, nome: String(d.data().nome || "").trim(), dataCriacao: d.data().dataCriacao };
+            }).filter(function (c) { return c.nome; });
+
+            popularCategorias();
+
+        } catch (erro) {
+
+            console.error("Erro ao carregar categorias:", erro);
+
+        }
+
+    })();
+
+    return categoriasProntas;
+
+}
+
+
+/* Monta o select: padrão + criadas por você. Se o produto tiver uma
+   categoria antiga que não está na lista, ela é mantida para não se perder. */
+function popularCategorias(selecionado) {
+
+    const atual = selecionado !== undefined ? selecionado : campoCategoria.value;
+
+    const nomes = CATEGORIAS_PADRAO.slice();
+
+    categoriasPersonalizadas.forEach(function (c) {
+        if (!nomes.some(function (n) { return normalizarCategoria(n) === normalizarCategoria(c.nome); })) {
+            nomes.push(c.nome);
+        }
+    });
+
+    if (atual && !nomes.some(function (n) { return normalizarCategoria(n) === normalizarCategoria(atual); })) {
+        nomes.push(atual);
+    }
+
+    nomes.sort(function (a, b) {
+        if (a === "Outros") { return 1; }
+        if (b === "Outros") { return -1; }
+        return a.localeCompare(b, "pt-BR");
+    });
+
+    campoCategoria.innerHTML = "";
+
+    const vazio = document.createElement("option");
+    vazio.value = "";
+    vazio.textContent = "Selecione uma categoria";
+    campoCategoria.appendChild(vazio);
+
+    nomes.forEach(function (nome) {
+        const opcao = document.createElement("option");
+        opcao.value = nome;
+        opcao.textContent = nome;
+        campoCategoria.appendChild(opcao);
+    });
+
+    campoCategoria.value = atual || "";
+
+    atualizarBotaoGerenciarCategorias();
+
+}
+
+
+/* ---------- janela "Nova categoria" ---------- */
+
+/* Mensagem no padrão do Gestok (toast); cai no alert se o componente não carregou */
+function avisarCategoria(texto, tipo) {
+
+    if (window.gestokNotificar) {
+        window.gestokNotificar(texto, tipo || "sucesso");
+        return;
+    }
+
+    alert(texto);
+
+}
+
+function mostrarMensagemCategoria(texto) {
+
+    mensagemCategoria.textContent = texto || "";
+    mensagemCategoria.hidden = !texto;
+
+}
+
+function abrirModalCategoria(modo) {
+
+    modoModalCategoria = modo === "gerenciar" ? "gerenciar" : "criar";
+
+    const gerenciando = modoModalCategoria === "gerenciar";
+
+    tituloModalCategoria.textContent = gerenciando ? "Minhas categorias" : "Nova categoria";
+    subModalCategoria.textContent = gerenciando
+        ? "Renomeie ou remova as categorias que você criou."
+        : "Crie uma categoria para organizar seus produtos.";
+
+    blocoCriarCategoria.hidden = gerenciando;
+    botaoSalvarCategoria.hidden = gerenciando;
+    botaoFecharCategoria.textContent = gerenciando ? "Fechar" : "Cancelar";
+
+    inputNovaCategoria.value = "";
+    categoriaEmEdicaoId = null;
+    mostrarMensagemCategoria("");
+    renderizarMinhasCategorias();
+
+    modalCategoria.hidden = false;
+
+    setTimeout(function () {
+        (gerenciando ? botaoFecharCategoria : inputNovaCategoria).focus();
+    }, 30);
+
+}
+
+/* O atalho "Renomear ou remover" só aparece se existir alguma categoria criada por você */
+function atualizarBotaoGerenciarCategorias() {
+
+    botaoGerenciarCategorias.hidden = categoriasPersonalizadas.length === 0;
+
+}
+
+function fecharModalCategoria() {
+
+    modalCategoria.hidden = true;
+
+    campoCategoria.focus();
+
+}
+
+function renderizarMinhasCategorias() {
+
+    listaMinhasCategorias.innerHTML = "";
+
+    blocoMinhasCategorias.hidden = modoModalCategoria !== "gerenciar" || categoriasPersonalizadas.length === 0;
+
+    categoriasPersonalizadas
+        .slice()
+        .sort(function (a, b) { return a.nome.localeCompare(b.nome, "pt-BR"); })
+        .forEach(function (cat) {
+
+            const item = document.createElement("li");
+
+            if (categoriaEmEdicaoId === cat.id) {
+
+                const campo = document.createElement("input");
+                campo.type = "text";
+                campo.className = "categoria-edicao-input";
+                campo.maxLength = 40;
+                campo.value = cat.nome;
+                campo.setAttribute("aria-label", "Novo nome da categoria " + cat.nome);
+
+                const salvar = document.createElement("button");
+                salvar.type = "button";
+                salvar.className = "categoria-acao categoria-acao-salvar";
+                salvar.textContent = "Salvar";
+                salvar.addEventListener("click", function () { renomearCategoria(cat, campo.value, salvar); });
+
+                const cancelar = document.createElement("button");
+                cancelar.type = "button";
+                cancelar.className = "categoria-acao";
+                cancelar.textContent = "Cancelar";
+                cancelar.addEventListener("click", function () {
+                    categoriaEmEdicaoId = null;
+                    mostrarMensagemCategoria("");
+                    renderizarMinhasCategorias();
+                });
+
+                campo.addEventListener("keydown", function (e) {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        renomearCategoria(cat, campo.value, salvar);
+                    } else if (e.key === "Escape") {
+                        e.stopPropagation();
+                        cancelar.click();
+                    }
+                });
+
+                item.className = "categoria-item-edicao";
+                item.appendChild(campo);
+                item.appendChild(salvar);
+                item.appendChild(cancelar);
+                listaMinhasCategorias.appendChild(item);
+
+                setTimeout(function () { campo.focus(); campo.select(); }, 30);
+
+                return;
+
+            }
+
+            const nome = document.createElement("span");
+            nome.textContent = cat.nome;
+
+            const acoes = document.createElement("span");
+            acoes.className = "categoria-acoes";
+
+            const renomear = document.createElement("button");
+            renomear.type = "button";
+            renomear.className = "categoria-acao";
+            renomear.textContent = "Renomear";
+            renomear.setAttribute("aria-label", "Renomear categoria " + cat.nome);
+            renomear.addEventListener("click", function () {
+                categoriaEmEdicaoId = cat.id;
+                mostrarMensagemCategoria("");
+                renderizarMinhasCategorias();
+            });
+
+            const remover = document.createElement("button");
+            remover.type = "button";
+            remover.className = "categoria-remover";
+            remover.textContent = "Remover";
+            remover.setAttribute("aria-label", "Remover categoria " + cat.nome);
+            remover.addEventListener("click", function () { removerCategoria(cat); });
+
+            acoes.appendChild(renomear);
+            acoes.appendChild(remover);
+
+            item.appendChild(nome);
+            item.appendChild(acoes);
+            listaMinhasCategorias.appendChild(item);
+
+        });
+
+}
+
+async function salvarNovaCategoria() {
+
+    const nome = inputNovaCategoria.value.replace(/\s+/g, " ").trim();
+
+    if (!nome) {
+        mostrarMensagemCategoria("Digite o nome da categoria.");
+        inputNovaCategoria.focus();
+        return;
+    }
+
+    const id = idDaCategoria(nome);
+
+    if (!id) {
+        mostrarMensagemCategoria("Use pelo menos uma letra ou número no nome.");
+        inputNovaCategoria.focus();
+        return;
+    }
+
+    if (categoriaJaExiste(nome)) {
+        mostrarMensagemCategoria("Essa categoria já existe. Selecione-a na lista.");
+        inputNovaCategoria.focus();
+        return;
+    }
+
+    botaoSalvarCategoria.disabled = true;
+
+    try {
+
+        await referenciaCategoriasGestok().doc(id).set({
+            nome: nome,
+            dataCriacao: new Date().toISOString()
+        });
+
+        categoriasPersonalizadas.push({ id: id, nome: nome });
+
+        popularCategorias(nome);
+
+        fecharModalCategoria();
+
+        avisarCategoria('Categoria "' + nome + '" criada com sucesso.', "sucesso");
+
+    } catch (erro) {
+
+        console.error("Erro ao criar categoria:", erro);
+
+        mostrarMensagemCategoria("Não foi possível criar a categoria. Tente novamente.");
+
+    } finally {
+
+        botaoSalvarCategoria.disabled = false;
+
+    }
+
+}
+
+/* ---------- confirmação no estilo do Gestok (substitui o confirm() do navegador) ---------- */
+
+const modalConfirma = document.getElementById("confirmaCategoria");
+const confirmaTitulo = document.getElementById("confirmaCategoriaTitulo");
+const confirmaIcone = document.getElementById("confirmaCategoriaIcone");
+const confirmaFluxo = document.getElementById("confirmaCategoriaFluxo");
+const confirmaDe = document.getElementById("confirmaCategoriaDe");
+const confirmaPara = document.getElementById("confirmaCategoriaPara");
+const confirmaSeta = document.getElementById("confirmaCategoriaSeta");
+const confirmaQtd = document.getElementById("confirmaCategoriaQtd");
+const confirmaTexto = document.getElementById("confirmaCategoriaTexto");
+const confirmaBotaoOk = document.getElementById("confirmaCategoriaOk");
+const confirmaBotaoCancelar = document.getElementById("confirmaCategoriaCancelar");
+
+let resolverConfirmacao = null;
+
+function fecharConfirmacao(resultado) {
+
+    modalConfirma.hidden = true;
+
+    const resolver = resolverConfirmacao;
+
+    resolverConfirmacao = null;
+
+    if (resolver) { resolver(resultado); }
+
+}
+
+/* Abre a janela e devolve uma Promise: true (confirmou) ou false (cancelou) */
+function confirmarCategoria(opcoes) {
+
+    if (resolverConfirmacao) { fecharConfirmacao(false); }
+
+    confirmaTitulo.textContent = opcoes.titulo;
+    confirmaIcone.textContent = opcoes.icone || "↻";
+    confirmaIcone.classList.toggle("perigo", !!opcoes.perigo);
+
+    confirmaDe.textContent = opcoes.de || "";
+    confirmaPara.textContent = opcoes.para || "";
+    confirmaPara.hidden = !opcoes.para;
+    confirmaSeta.hidden = !opcoes.para;
+    confirmaFluxo.hidden = !opcoes.de;
+
+    confirmaQtd.innerHTML = "";
+
+    if (typeof opcoes.produtos === "number") {
+
+        confirmaQtd.hidden = false;
+
+        if (opcoes.produtos === 0) {
+
+            confirmaQtd.className = "categoria-confirma-qtd vazio";
+            confirmaQtd.textContent = "Nenhum produto usa esta categoria";
+
+        } else {
+
+            confirmaQtd.className = "categoria-confirma-qtd";
+
+            const numero = document.createElement("strong");
+            numero.textContent = String(opcoes.produtos);
+
+            const rotulo = document.createElement("span");
+            rotulo.textContent = opcoes.produtos === 1 ? "produto será atualizado" : "produtos serão atualizados";
+
+            confirmaQtd.appendChild(numero);
+            confirmaQtd.appendChild(rotulo);
+
+        }
+
+    } else {
+
+        confirmaQtd.hidden = true;
+
+    }
+
+    confirmaTexto.textContent = opcoes.texto || "";
+    confirmaTexto.hidden = !opcoes.texto;
+
+    confirmaBotaoOk.textContent = opcoes.textoBotao || "Confirmar";
+    confirmaBotaoOk.classList.toggle("perigo", !!opcoes.perigo);
+
+    modalConfirma.hidden = false;
+
+    /* Em ações destrutivas o foco começa em "Cancelar" (evita Enter sem querer) */
+    setTimeout(function () {
+        (opcoes.perigo ? confirmaBotaoCancelar : confirmaBotaoOk).focus();
+    }, 30);
+
+    return new Promise(function (resolver) { resolverConfirmacao = resolver; });
+
+}
+
+confirmaBotaoOk.addEventListener("click", function () { fecharConfirmacao(true); });
+confirmaBotaoCancelar.addEventListener("click", function () { fecharConfirmacao(false); });
+
+modalConfirma.addEventListener("click", function (e) {
+    if (e.target === modalConfirma) { fecharConfirmacao(false); }
+});
+
+
+/* Renomeia a categoria e atualiza TODOS os produtos que a usam.
+   - Nome novo: grava a categoria nova, atualiza os produtos e só então
+     apaga a antiga (seguro e repetível se a internet cair).
+   - Nome que já existe: JUNTA as duas (os produtos vão para a existente
+     e a categoria antiga é removida). Serve também para concluir um
+     renomear que ficou pela metade. */
+async function renomearCategoria(cat, novoNomeDigitado, botao) {
+
+    const novoNome = String(novoNomeDigitado || "").replace(/\s+/g, " ").trim();
+
+    if (!novoNome) {
+        mostrarMensagemCategoria("Digite o novo nome da categoria.");
+        return;
+    }
+
+    if (novoNome === cat.nome) {
+        categoriaEmEdicaoId = null;
+        mostrarMensagemCategoria("");
+        renderizarMinhasCategorias();
+        return;
+    }
+
+    const novoId = idDaCategoria(novoNome);
+
+    if (!novoId) {
+        mostrarMensagemCategoria("Use pelo menos uma letra ou número no nome.");
+        return;
+    }
+
+    /* Mudar só maiúsculas/acentos/espaços da própria categoria é um renomear normal */
+    const mesmoNomeNormalizado = normalizarCategoria(novoNome) === normalizarCategoria(cat.nome);
+
+    /* Se o nome já existe (padrão ou criada por você), vira "juntar" */
+    let destino = null;
+
+    if (!mesmoNomeNormalizado && categoriaJaExiste(novoNome)) {
+
+        const alvo = normalizarCategoria(novoNome);
+
+        const custom = categoriasPersonalizadas.find(function (c) { return normalizarCategoria(c.nome) === alvo; });
+        const padrao = CATEGORIAS_PADRAO.find(function (n) { return normalizarCategoria(n) === alvo; });
+
+        destino = custom ? { id: custom.id, nome: custom.nome } : { id: null, nome: padrao };
+
+    }
+
+    if (botao) { botao.disabled = true; }
+
+    try {
+
+        const produtosDaCategoria = await referenciaProdutosGestok()
+            .where("categoria", "==", cat.nome)
+            .get();
+
+        const total = produtosDaCategoria.size;
+
+        const nomeFinal = destino ? destino.nome : novoNome;
+
+        const confirmou = await confirmarCategoria(destino
+            ? {
+                titulo: "Juntar categorias",
+                icone: "⇄",
+                de: cat.nome,
+                para: destino.nome,
+                produtos: total,
+                texto: 'A categoria "' + destino.nome + '" já existe. Os produtos serão movidos para ela e "' + cat.nome + '" será removida.',
+                textoBotao: "Juntar categorias"
+            }
+            : {
+                titulo: "Renomear categoria",
+                icone: "✎",
+                de: cat.nome,
+                para: novoNome,
+                produtos: total,
+                texto: total > 0 ? "Todos esses produtos passarão a usar o novo nome." : "",
+                textoBotao: "Renomear"
+            });
+
+        if (!confirmou) {
+            return;
+        }
+
+        const colecao = referenciaCategoriasGestok();
+
+        const dataCriacao = cat.dataCriacao || new Date().toISOString();
+
+        /* 1) renomear: grava a categoria com o novo nome (juntar: ela já existe) */
+        if (!destino) {
+            await colecao.doc(novoId).set({
+                nome: novoNome,
+                dataCriacao: dataCriacao,
+                dataAtualizacao: new Date().toISOString()
+            });
+        }
+
+        /* 2) produtos, em lotes (limite do Firestore: 500 por lote) */
+        const docs = produtosDaCategoria.docs;
+
+        for (let i = 0; i < docs.length; i += 400) {
+
+            const lote = db.batch();
+
+            docs.slice(i, i + 400).forEach(function (d) {
+                lote.update(d.ref, { categoria: nomeFinal });
+            });
+
+            await lote.commit();
+
+        }
+
+        /* 3) só no fim remove a categoria antiga */
+        if (destino || novoId !== cat.id) {
+            await colecao.doc(cat.id).delete();
+        }
+
+        const selecionadaAgora = normalizarCategoria(campoCategoria.value) === normalizarCategoria(cat.nome);
+
+        categoriasPersonalizadas = categoriasPersonalizadas.filter(function (c) {
+            return c.id !== cat.id && (destino || c.id !== novoId);
+        });
+
+        if (!destino) {
+            categoriasPersonalizadas.push({ id: novoId, nome: novoNome, dataCriacao: dataCriacao });
+        }
+
+        categoriaEmEdicaoId = null;
+
+        popularCategorias(selecionadaAgora ? nomeFinal : undefined);
+
+        renderizarMinhasCategorias();
+
+        mostrarMensagemCategoria("");
+
+        const atualizados = total === 0
+            ? ""
+            : " " + total + (total === 1 ? " produto atualizado." : " produtos atualizados.");
+
+        avisarCategoria(
+            destino
+                ? 'Categoria "' + cat.nome + '" juntada em "' + nomeFinal + '".' + atualizados
+                : 'Categoria renomeada para "' + nomeFinal + '".' + atualizados,
+            "sucesso"
+        );
+
+    } catch (erro) {
+
+        console.error("Erro ao renomear categoria:", erro);
+
+        mostrarMensagemCategoria("Não foi possível concluir a alteração. Confira a conexão e tente novamente: nenhum dado foi perdido.");
+
+    } finally {
+
+        if (botao) { botao.disabled = false; }
+
+    }
+
+}
+
+async function removerCategoria(cat) {
+
+    try {
+
+        /* Não remove categoria que ainda está em uso por algum produto */
+        const emUso = await referenciaProdutosGestok()
+            .where("categoria", "==", cat.nome)
+            .limit(1)
+            .get();
+
+        if (!emUso.empty) {
+            mostrarMensagemCategoria('A categoria "' + cat.nome + '" está em uso por produtos. Altere esses produtos antes de removê-la.');
+            return;
+        }
+
+        const confirmou = await confirmarCategoria({
+            titulo: "Remover categoria",
+            icone: "🗑",
+            de: cat.nome,
+            produtos: 0,
+            texto: "Essa ação não pode ser desfeita. Você poderá criar a categoria de novo quando quiser.",
+            textoBotao: "Remover",
+            perigo: true
+        });
+
+        if (!confirmou) {
+            return;
+        }
+
+        await referenciaCategoriasGestok().doc(cat.id).delete();
+
+        categoriasPersonalizadas = categoriasPersonalizadas.filter(function (c) { return c.id !== cat.id; });
+
+        const selecionadaAgora = normalizarCategoria(campoCategoria.value) === normalizarCategoria(cat.nome);
+
+        popularCategorias(selecionadaAgora ? "" : undefined);
+
+        renderizarMinhasCategorias();
+
+        mostrarMensagemCategoria("");
+
+        avisarCategoria('Categoria "' + cat.nome + '" removida.', "sucesso");
+
+        if (categoriasPersonalizadas.length === 0) {
+            fecharModalCategoria();
+        }
+
+    } catch (erro) {
+
+        console.error("Erro ao remover categoria:", erro);
+
+        mostrarMensagemCategoria("Não foi possível remover a categoria.");
+
+    }
+
+}
+
+botaoNovaCategoria.addEventListener("click", function () { abrirModalCategoria("criar"); });
+botaoGerenciarCategorias.addEventListener("click", function () { abrirModalCategoria("gerenciar"); });
+botaoSalvarCategoria.addEventListener("click", salvarNovaCategoria);
+botaoFecharCategoria.addEventListener("click", fecharModalCategoria);
+
+inputNovaCategoria.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        salvarNovaCategoria();
+    }
+});
+
+modalCategoria.addEventListener("click", function (e) {
+    if (e.target === modalCategoria) {
+        fecharModalCategoria();
+    }
+});
+
+document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") { return; }
+    if (!modalConfirma.hidden) {
+        fecharConfirmacao(false);
+    } else if (!modalCategoria.hidden) {
+        fecharModalCategoria();
+    }
+});
+
+
 function limparFormulario() {
 
     form.reset();
@@ -387,7 +1096,7 @@ function entrarModoEdicao(produto) {
 
     document.getElementById("nome").value = produto.nome || "";
     document.getElementById("codigo").value = produto.codigo || "";
-    document.getElementById("categoria").value = produto.categoria || "";
+    popularCategorias(produto.categoria || "");
     document.getElementById("quantidade").value = produto.quantidade ?? 0;
     document.getElementById("unidade").value = produto.unidade || "UN";
     document.getElementById("estoqueMinimo").value = produto.estoqueMinimo ?? 0;
@@ -478,7 +1187,7 @@ async function editarProduto(id) {
 
     try {
 
-        await fornecedoresProntos;
+        await Promise.all([fornecedoresProntos, categoriasProntas]);
 
         const doc = await referenciaProdutosGestok().doc(id).get();
 
@@ -682,6 +1391,8 @@ document.addEventListener("DOMContentLoaded", function () {
         carregarProdutos();
 
         carregarFornecedores();
+
+        carregarCategorias();
 
         const parametros = new URLSearchParams(window.location.search);
 

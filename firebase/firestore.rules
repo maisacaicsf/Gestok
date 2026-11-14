@@ -147,6 +147,13 @@ service cloud.firestore {
           && get(/databases/$(database)/documents/lojas/$(lojaId)).data.donoUid == request.auth.uid;
       }
 
+      // Categorias de produtos criadas pelo usuário: dono da loja (e leitura/exclusão do admin).
+      match /categorias/{categoriaId} {
+        allow read, delete: if isAdmin();
+        allow read, write: if request.auth != null
+          && get(/databases/$(database)/documents/lojas/$(lojaId)).data.donoUid == request.auth.uid;
+      }
+
       // Lotes de validade: dono da loja (e leitura/exclusão do admin).
       match /lotes/{loteId} {
         allow read, delete: if isAdmin();

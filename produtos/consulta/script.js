@@ -85,28 +85,83 @@ function obterStatus(produto) {
     return { classe: "success", texto: "Normal" };
 }
 
+/* Abre já com o que está salvo no aparelho (cache) e, em seguida, confere
+   com o servidor e atualiza a tela. Filtros e página escolhidos no meio
+   do caminho são mantidos, e se nada mudou a tela nem é redesenhada. */
 async function carregarProdutos() {
-    try {
-        const snapshot = await referenciaProdutosGestok()
-            .orderBy("nome")
-            .get();
 
-        todosProdutos = snapshot.docs.map(function (doc) {
+    const consulta = referenciaProdutosGestok().orderBy("nome");
+
+    let primeiraRenderizacao = true;
+    let assinaturaAtual = null;
+
+    function aplicar(snapshot) {
+
+        const lista = snapshot.docs.map(function (doc) {
             return { id: doc.id, ...doc.data() };
         });
+
+        const assinatura = JSON.stringify(lista);
+
+        if (!primeiraRenderizacao && assinatura === assinaturaAtual) {
+            return;
+        }
+
+        assinaturaAtual = assinatura;
+
+        todosProdutos = lista;
 
         carregarCategorias();
 
         carregarFornecedoresFiltro();
 
-        const restaurou = restaurarEstadoConsulta();
+        if (primeiraRenderizacao) {
 
-        filtrarProdutos(restaurou);
+            primeiraRenderizacao = false;
+
+            const restaurou = restaurarEstadoConsulta();
+
+            filtrarProdutos(restaurou);
+
+        } else {
+
+            filtrarProdutos(true);
+
+        }
+
+    }
+
+    /* 1) Cache local: instantâneo. Se estiver vazio (1º acesso), segue direto para o servidor. */
+    try {
+
+        const doCache = await consulta.get({ source: "cache" });
+
+        if (!doCache.empty) {
+            aplicar(doCache);
+        }
+
+    } catch (erro) { }
+
+    /* 2) Servidor: confirma e atualiza */
+    try {
+
+        const doServidor = await consulta.get();
+
+        aplicar(doServidor);
 
     } catch (erro) {
+
         console.error("Erro ao carregar consulta de produtos:", erro);
-        alert("Não foi possível carregar os produtos do Firebase.");
+
+        /* Já há dados do cache na tela? Então só avisa; senão, mostra o erro. */
+        if (primeiraRenderizacao) {
+            alert("Não foi possível carregar os produtos do Firebase.");
+        } else {
+            alert("Não foi possível atualizar os produtos agora. Mostrando os dados salvos neste aparelho.");
+        }
+
     }
+
 }
 
 function carregarFornecedoresFiltro() {
@@ -153,6 +208,8 @@ function carregarCategorias() {
         return a.localeCompare(b, "pt-BR");
     });
 
+    const categoriaAtual = filtroCategoria.value;
+
     filtroCategoria.innerHTML = `<option value="">Todas</option>`;
 
     categorias.forEach(function (categoria) {
@@ -161,6 +218,10 @@ function carregarCategorias() {
         option.textContent = categoria;
         filtroCategoria.appendChild(option);
     });
+
+    if (categoriaAtual && categorias.indexOf(categoriaAtual) !== -1) {
+        filtroCategoria.value = categoriaAtual;
+    }
 }
 
 function ordenarProdutos(produtos) {
@@ -275,12 +336,12 @@ function renderizarProdutos(produtos, totalFiltrado) {
                     ${produto.fornecedorNome ? `<small>Fornecedor: ${escaparHTML(produto.fornecedorNome)}</small>` : ""}
                 </div>
             </td>
-            <td>${produto.codigo ? escaparHTML(produto.codigo) : "—"}</td>
-            <td>${produto.categoria ? escaparHTML(produto.categoria) : "—"}</td>
-            <td><strong>${quantidade}</strong> <span class="unit">${escaparHTML(unidade)}</span></td>
-            <td>${minimo} ${escaparHTML(unidade)}</td>
-            <td>${maximo > 0 ? `${maximo} ${escaparHTML(unidade)}` : "—"}</td>
-            <td>
+            <td data-label="Código">${produto.codigo ? escaparHTML(produto.codigo) : "—"}</td>
+            <td data-label="Categoria">${produto.categoria ? escaparHTML(produto.categoria) : "—"}</td>
+            <td data-label="Estoque"><strong>${quantidade}</strong> <span class="unit">${escaparHTML(unidade)}</span></td>
+            <td data-label="Mínimo">${minimo} ${escaparHTML(unidade)}</td>
+            <td data-label="Máximo">${maximo > 0 ? `${maximo} ${escaparHTML(unidade)}` : "—"}</td>
+            <td data-label="Status">
                 <span class="stock-status ${status.classe}">
                     <span class="status-dot"></span>
                     ${status.texto}

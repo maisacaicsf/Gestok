@@ -1,38 +1,100 @@
 /* =========================================
-   GESTOK — CARREGAMENTO INICIAL
-   Aguarda os primeiros retornos do Firebase antes de liberar a tela.
+   GESTOK — CARREGAMENTO
+   -----------------------------------------
+   - 1ª tela aberta no app (cada vez que o app/aba é
+     aberto): tela cheia "Conectando ao sistema...".
+   - Telas seguintes: NADA cobre a tela; só uma barrinha
+     azul fina no topo, e apenas se a carga demorar.
+   - Para desligar a tela cheia da 1ª vez, mude
+     TELA_CHEIA_NA_PRIMEIRA_VEZ para false.
+   - Uso manual (ex.: botão de atualizar/sincronizar):
+       GestokLoading.show("Atualizando...");
+       GestokLoading.hide();
 ========================================= */
 (function () {
     if (window.__gestokLoadingInstalled) return;
     window.__gestokLoadingInstalled = true;
+
+    const TELA_CHEIA_NA_PRIMEIRA_VEZ = true;
+
+    const CHAVE_VISTO = 'gestok_carregamento_inicial_visto';
+    const naTelaLogin = /\/login(\/|$)/.test(location.pathname);
+
+    let jaVisto = false;
+    try { jaVisto = sessionStorage.getItem(CHAVE_VISTO) === '1'; } catch (e) { }
+
+    /* Tela cheia só na primeira vez (a tela de login não conta como "vista") */
+    const modoCompleto = TELA_CHEIA_NA_PRIMEIRA_VEZ && !jaVisto;
+    if (modoCompleto && !naTelaLogin) {
+        try { sessionStorage.setItem(CHAVE_VISTO, '1'); } catch (e) { }
+    }
 
     const inicio = Date.now();
     let pendentes = 0;
     let ultimoEvento = Date.now();
     let encerrado = false;
     let timer;
+    let telaManual = null;
 
-    const estilo = document.createElement('style');
-    estilo.textContent = `
-      #gestok-loading-screen{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(248,250,252,.97);backdrop-filter:blur(5px);opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease;font-family:inherit}
-      #gestok-loading-screen.gestok-loading-hidden{opacity:0;visibility:hidden;pointer-events:none}
-      #gestok-loading-screen .gestok-loading-card{display:flex;flex-direction:column;align-items:center;gap:12px;padding:30px 36px;text-align:center}
-      #gestok-loading-screen .gestok-loading-brand{font-size:23px;font-weight:750;letter-spacing:-.5px;color:#172554}
-      #gestok-loading-screen .gestok-loading-brand span{display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;margin-right:8px;border-radius:9px;background:#2563eb;color:white;font-size:15px;vertical-align:middle}
-      #gestok-loading-screen .gestok-loading-spinner{width:34px;height:34px;border:3px solid #dbeafe;border-top-color:#2563eb;border-radius:50%;animation:gestok-spin .8s linear infinite}
-      #gestok-loading-screen .gestok-loading-title{font-size:14px;font-weight:650;color:#334155}
-      #gestok-loading-screen .gestok-loading-subtitle{font-size:12px;color:#94a3b8}
+    function injetarEstilo(id, css) {
+        if (document.getElementById(id)) return;
+        const estilo = document.createElement('style');
+        estilo.id = id;
+        estilo.textContent = css;
+        (document.head || document.documentElement).appendChild(estilo);
+    }
+
+    function estiloTelaCheia() {
+        injetarEstilo('gestok-loading-estilo-cheia', `
+      .gestok-loading-screen{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(248,250,252,.97);backdrop-filter:blur(5px);opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease;font-family:inherit}
+      .gestok-loading-screen.gestok-loading-hidden{opacity:0;visibility:hidden;pointer-events:none}
+      .gestok-loading-screen .gestok-loading-card{display:flex;flex-direction:column;align-items:center;gap:12px;padding:30px 36px;text-align:center}
+      .gestok-loading-screen .gestok-loading-brand{font-size:23px;font-weight:750;letter-spacing:-.5px;color:#172554}
+      .gestok-loading-screen .gestok-loading-brand span{display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;margin-right:8px;border-radius:9px;background:#2563eb;color:white;font-size:15px;vertical-align:middle}
+      .gestok-loading-screen .gestok-loading-spinner{width:34px;height:34px;border:3px solid #dbeafe;border-top-color:#2563eb;border-radius:50%;animation:gestok-spin .8s linear infinite}
+      .gestok-loading-screen .gestok-loading-title{font-size:14px;font-weight:650;color:#334155}
+      .gestok-loading-screen .gestok-loading-subtitle{font-size:12px;color:#94a3b8}
       @keyframes gestok-spin{to{transform:rotate(360deg)}}
-      @media(prefers-reduced-motion:reduce){#gestok-loading-screen .gestok-loading-spinner{animation-duration:2s}}
-    `;
-    (document.head || document.documentElement).appendChild(estilo);
+      @media(prefers-reduced-motion:reduce){.gestok-loading-screen .gestok-loading-spinner{animation-duration:2s}}
+    `);
+    }
 
-    const tela = document.createElement('div');
-    tela.id = 'gestok-loading-screen';
-    tela.setAttribute('role', 'status');
-    tela.setAttribute('aria-live', 'polite');
-    tela.innerHTML = '<div class="gestok-loading-card"><div class="gestok-loading-brand"><span>G</span>Gestok</div><div class="gestok-loading-spinner" aria-hidden="true"></div><div class="gestok-loading-title">Conectando ao sistema...</div><div class="gestok-loading-subtitle">Carregando informações e sincronizando dados.</div></div>';
-    (document.body || document.documentElement).appendChild(tela);
+    function estiloBarra() {
+        injetarEstilo('gestok-loading-estilo-barra', `
+      #gestok-loading-bar{position:fixed;top:0;left:0;right:0;height:3px;z-index:99999;overflow:hidden;pointer-events:none;opacity:1;transition:opacity .25s ease}
+      #gestok-loading-bar.gestok-loading-hidden{opacity:0}
+      #gestok-loading-bar::before{content:"";position:absolute;top:0;bottom:0;left:0;width:40%;background:linear-gradient(90deg,transparent,#2563eb,transparent);animation:gestok-barra 1s ease-in-out infinite}
+      @keyframes gestok-barra{from{transform:translateX(-100%)}to{transform:translateX(250%)}}
+      @media(prefers-reduced-motion:reduce){#gestok-loading-bar::before{animation-duration:2.4s}}
+    `);
+    }
+
+    function criarTelaCheia(titulo) {
+        estiloTelaCheia();
+        const el = document.createElement('div');
+        el.className = 'gestok-loading-screen';
+        el.setAttribute('role', 'status');
+        el.setAttribute('aria-live', 'polite');
+        el.innerHTML = '<div class="gestok-loading-card"><div class="gestok-loading-brand"><span>G</span>Gestok</div><div class="gestok-loading-spinner" aria-hidden="true"></div><div class="gestok-loading-title"></div><div class="gestok-loading-subtitle">Carregando informações e sincronizando dados.</div></div>';
+        el.querySelector('.gestok-loading-title').textContent = titulo || 'Conectando ao sistema...';
+        (document.body || document.documentElement).appendChild(el);
+        return el;
+    }
+
+    function criarBarra() {
+        estiloBarra();
+        const el = document.createElement('div');
+        el.id = 'gestok-loading-bar';
+        el.setAttribute('role', 'progressbar');
+        el.setAttribute('aria-label', 'Carregando');
+        el.classList.add('gestok-loading-hidden');
+        (document.body || document.documentElement).appendChild(el);
+        /* Só aparece se a carga passar de 0,3 s (cargas rápidas ficam invisíveis) */
+        setTimeout(function () { if (!encerrado) el.classList.remove('gestok-loading-hidden'); }, 300);
+        return el;
+    }
+
+    const tela = modoCompleto ? criarTelaCheia() : criarBarra();
 
     function atividade() {
         ultimoEvento = Date.now();
@@ -45,8 +107,8 @@
         clearTimeout(timer);
         if (encerrado) return;
         timer = setTimeout(() => {
-            const tempoMinimo = 650;
-            const ocioso = Date.now() - ultimoEvento >= 550;
+            const tempoMinimo = modoCompleto ? 450 : 0;
+            const ocioso = Date.now() - ultimoEvento >= (modoCompleto ? 350 : 250);
             if (pendentes === 0 && ocioso && Date.now() - inicio >= tempoMinimo) {
                 encerrado = true;
                 tela.classList.add('gestok-loading-hidden');
@@ -140,13 +202,23 @@
     } catch (e) { console.warn('Gestok: não foi possível acompanhar a autenticação.', e); }
 
     window.GestokLoading = {
-        hide: function () { pendentes = 0; ultimoEvento = Date.now(); agendarFechamento(); },
+        hide: function () {
+            if (telaManual) {
+                const t = telaManual;
+                telaManual = null;
+                t.classList.add('gestok-loading-hidden');
+                setTimeout(function () { t.remove(); }, 350);
+            }
+            pendentes = 0; ultimoEvento = Date.now(); agendarFechamento();
+        },
+        /* Tela cheia sob demanda, para quando realmente precisar atualizar/sincronizar */
         show: function (mensagem) {
-            if (encerrado) return;
-            tela.classList.remove('gestok-loading-hidden');
-            const titulo = tela.querySelector('.gestok-loading-title');
-            if (titulo && mensagem) titulo.textContent = mensagem;
-            atividade();
+            if (telaManual) {
+                const titulo = telaManual.querySelector('.gestok-loading-title');
+                if (titulo && mensagem) titulo.textContent = mensagem;
+                return;
+            }
+            telaManual = criarTelaCheia(mensagem || 'Atualizando...');
         }
     };
     agendarFechamento();

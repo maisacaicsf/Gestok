@@ -101,15 +101,19 @@
 
                     <div class="form-group">
                         <label for="categoria">Categoria</label>
-                        <select id="categoria" name="categoria">
-                            <option value="">Selecione uma categoria</option>
-                            <option>Eletrônicos</option>
-                            <option>Informática</option>
-                            <option>Escritório</option>
-                            <option>Ferramentas</option>
-                            <option>Materiais</option>
-                            <option>Outros</option>
-                        </select>
+                        <div class="categoria-linha">
+                            <select id="categoria" name="categoria">
+                                <option value="">Selecione uma categoria</option>
+                                <option>Eletrônicos</option>
+                                <option>Informática</option>
+                                <option>Escritório</option>
+                                <option>Ferramentas</option>
+                                <option>Materiais</option>
+                                <option>Outros</option>
+                            </select>
+                            <button type="button" class="categoria-botao-nova" id="botaoNovaCategoria" title="Criar nova categoria">+ Nova</button>
+                        </div>
+                        <small class="form-hint"><button type="button" class="categoria-gerenciar" id="botaoGerenciarCategorias" hidden>Renomear ou remover minhas categorias</button></small>
                     </div>
 
                     <div class="form-group" id="grupoFornecedor">
@@ -229,6 +233,50 @@
         </section>
 
     </main>
+
+    <div class="categoria-modal" id="modalCategoria" hidden>
+        <div class="categoria-modal-caixa" role="dialog" aria-modal="true" aria-labelledby="modalCategoriaTitulo">
+            <h3 id="modalCategoriaTitulo">Nova categoria</h3>
+            <p class="categoria-modal-sub" id="modalCategoriaSub">Crie uma categoria para organizar seus produtos.</p>
+
+            <div id="categoriaBlocoCriar">
+                <label for="novaCategoriaNome">Nome da categoria</label>
+                <input type="text" id="novaCategoriaNome" maxlength="40" placeholder="Ex.: Bebidas" autocomplete="off">
+            </div>
+            <p class="categoria-msg" id="categoriaMsg" role="alert" hidden></p>
+
+            <div class="categoria-minhas" id="categoriaMinhas" hidden>
+                <ul id="categoriaLista"></ul>
+            </div>
+
+            <div class="categoria-modal-rodape">
+                <button type="button" class="secondary-button" id="botaoFecharCategoria">Cancelar</button>
+                <button type="button" class="primary-button" id="botaoSalvarCategoria">Criar categoria</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="categoria-modal categoria-confirma" id="confirmaCategoria" hidden>
+        <div class="categoria-modal-caixa categoria-confirma-caixa" role="alertdialog" aria-modal="true" aria-labelledby="confirmaCategoriaTitulo" aria-describedby="confirmaCategoriaTexto">
+            <div class="categoria-confirma-icone" id="confirmaCategoriaIcone" aria-hidden="true">↻</div>
+            <h3 id="confirmaCategoriaTitulo"></h3>
+
+            <div class="categoria-confirma-fluxo" id="confirmaCategoriaFluxo">
+                <span class="categoria-chip" id="confirmaCategoriaDe"></span>
+                <span class="categoria-seta" id="confirmaCategoriaSeta" aria-hidden="true">→</span>
+                <span class="categoria-chip categoria-chip-novo" id="confirmaCategoriaPara"></span>
+            </div>
+
+            <div class="categoria-confirma-qtd" id="confirmaCategoriaQtd"></div>
+            <p class="categoria-confirma-texto" id="confirmaCategoriaTexto"></p>
+
+            <div class="categoria-modal-rodape">
+                <button type="button" class="secondary-button" id="confirmaCategoriaCancelar">Cancelar</button>
+                <button type="button" class="primary-button" id="confirmaCategoriaOk">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>

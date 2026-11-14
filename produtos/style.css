@@ -1293,3 +1293,194 @@ textarea::placeholder {
 }
 
 #buscaFornecedor{width:100%;min-height:44px;padding:10px 12px;border:1px solid #dbe2ec;border-radius:9px;background:#fff;color:#1e293b;font:inherit;box-sizing:border-box;outline:none}#buscaFornecedor:focus{border-color:#5790ed;box-shadow:0 0 0 3px rgba(87,144,237,.14)}#fornecedor{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+
+
+/* =========================================
+   CATEGORIAS: botão "+ Nova" e janela de criação
+========================================= */
+.categoria-linha { display: flex; gap: 8px; align-items: stretch; }
+.categoria-linha select { flex: 1; min-width: 0; }
+
+.categoria-botao-nova {
+    flex: none;
+    height: 42px;
+    padding: 0 14px;
+    border: 1px solid #bfd3f8;
+    border-radius: 9px;
+    background: #eff5ff;
+    color: #2563eb;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: .2s;
+}
+.categoria-botao-nova:hover { background: #dbe8ff; }
+
+.categoria-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(15, 23, 42, .45);
+}
+.categoria-modal[hidden] { display: none; }
+
+.categoria-modal-caixa {
+    width: 100%;
+    max-width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 22px;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, .25);
+}
+.categoria-modal-caixa h3 { margin: 0 0 4px; font-size: 17px; color: #1e293b; }
+.categoria-modal-caixa label { display: block; margin: 14px 0 6px; font-size: 12px; font-weight: 600; color: #475569; }
+.categoria-modal-sub { margin: 0; font-size: 12px; color: #7b8794; }
+
+.categoria-msg {
+    margin: 8px 0 0;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 12px;
+}
+.categoria-msg[hidden] { display: none; }
+
+.categoria-minhas { margin-top: 16px; padding-top: 14px; border-top: 1px solid #edf0f4; }
+.categoria-minhas strong { font-size: 12px; color: #475569; }
+.categoria-minhas ul { list-style: none; margin: 8px 0 0; padding: 0; max-height: 160px; overflow-y: auto; }
+.categoria-minhas li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 7px 0;
+    font-size: 13px;
+    color: #1e293b;
+    border-bottom: 1px solid #f1f4f8;
+}
+.categoria-remover {
+    border: none;
+    background: none;
+    color: #dc2626;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.categoria-remover:hover { text-decoration: underline; }
+
+.categoria-modal-rodape { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+/* Renomear categoria (edição na própria lista) */
+.categoria-acoes { display: inline-flex; align-items: center; gap: 12px; flex: none; }
+.categoria-acao {
+    border: none;
+    background: none;
+    color: #2563eb;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.categoria-acao:hover { text-decoration: underline; }
+.categoria-acao:disabled { opacity: .5; cursor: default; }
+.categoria-item-edicao { gap: 8px; }
+.categoria-edicao-input { flex: 1; min-width: 0; height: 34px; padding: 0 10px; }
+
+/* Confirmação de categoria (fica por cima da janela de categorias) */
+.categoria-confirma { z-index: 10000; }
+.categoria-confirma[hidden] { display: none; }
+.categoria-confirma-caixa { max-width: 400px; text-align: center; padding: 26px 24px 22px; }
+.categoria-confirma-caixa h3 { margin: 12px 0 14px; font-size: 18px; }
+
+.categoria-confirma-icone {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: #eff5ff;
+    color: #2563eb;
+    font-size: 22px;
+    font-weight: 700;
+}
+.categoria-confirma-icone.perigo { background: #fef2f2; color: #dc2626; }
+
+.categoria-confirma-fluxo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+.categoria-confirma-fluxo[hidden],
+.categoria-confirma-qtd[hidden],
+.categoria-confirma-texto[hidden],
+.categoria-chip[hidden],
+.categoria-seta[hidden] { display: none; }
+
+.categoria-chip {
+    max-width: 100%;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+.categoria-chip-novo { background: #eff5ff; color: #2563eb; }
+.categoria-seta { color: #94a3b8; font-weight: 700; }
+
+.categoria-confirma-qtd {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #edf0f4;
+    color: #475569;
+    font-size: 13px;
+}
+.categoria-confirma-qtd strong { font-size: 24px; line-height: 1; color: #1e293b; }
+.categoria-confirma-qtd.vazio { color: #7b8794; }
+
+.categoria-confirma-texto { margin: 0 0 4px; font-size: 12px; line-height: 1.5; color: #7b8794; }
+
+.categoria-confirma-caixa .categoria-modal-rodape { justify-content: center; margin-top: 18px; }
+.categoria-confirma-caixa .categoria-modal-rodape button { flex: 1; }
+
+.primary-button.perigo { background: #dc2626; box-shadow: 0 3px 8px rgba(220, 38, 38, .2); }
+.primary-button.perigo:hover { background: #b91c1c; }
+
+/* Atalho "Renomear ou remover minhas categorias" */
+.categoria-gerenciar {
+    border: none;
+    background: none;
+    padding: 0;
+    color: #2563eb;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.categoria-gerenciar:hover { text-decoration: underline; }
+.categoria-gerenciar[hidden] { display: none; }
+
+#categoriaBlocoCriar[hidden],
+#botaoSalvarCategoria[hidden] { display: none; }
+.categoria-minhas { margin-top: 14px; padding-top: 0; border-top: none; }
