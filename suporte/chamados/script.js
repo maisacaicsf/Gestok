@@ -2105,6 +2105,90 @@ if (formResponderChamado) {
 
 }
 
+/* =========================================
+   ENTER ENVIA A RESPOSTA (Shift+Enter = nova linha)
+========================================= */
+if (formResponderChamado && mensagemRespostaCliente) {
+    mensagemRespostaCliente.addEventListener(
+        "keydown",
+        function (event) {
+            if (
+                event.key !== "Enter" ||
+                event.shiftKey ||
+                event.ctrlKey ||
+                event.altKey ||
+                event.metaKey ||
+                event.isComposing
+            ) {
+                return;
+            }
+            /* Enter sempre é tratado aqui, para nunca quebrar a linha por engano. */
+            event.preventDefault();
+            if (
+                !mensagemRespostaCliente.value.trim() ||
+                (btnEnviarRespostaCliente && btnEnviarRespostaCliente.disabled)
+            ) {
+                return;
+            }
+            if (typeof formResponderChamado.requestSubmit === "function") {
+                formResponderChamado.requestSubmit();
+            } else if (btnEnviarRespostaCliente) {
+                btnEnviarRespostaCliente.click();
+            }
+        }
+    );
+}
+
+/* =========================================
+   DESCRIÇÃO: recolhida em 3 linhas, com "Ver mais / Ver menos"
+   (o botão só aparece quando o texto realmente não cabe)
+========================================= */
+(function descricaoExpansivelChamado() {
+    const caixa = document.querySelector("#modalDetalhes .detail-message");
+    const texto = document.getElementById("detalheMensagem");
+    const modal = document.getElementById("modalDetalhes");
+    if (!caixa || !texto || !modal || !caixa.parentNode) {
+        return;
+    }
+    const botao = document.createElement("button");
+    botao.type = "button";
+    botao.className = "detail-desc-toggle";
+    botao.hidden = true;
+    botao.textContent = "Ver mais ▾";
+    caixa.parentNode.appendChild(botao);
+    function medir() {
+        /* Só mede com o modal aberto (fechado, as alturas são 0). */
+        if (!modal.classList.contains("active")) {
+            return;
+        }
+        const estavaExpandida = caixa.classList.contains("expandida");
+        caixa.classList.remove("expandida");
+        const naoCabe = caixa.scrollHeight > caixa.clientHeight + 1;
+        botao.hidden = !naoCabe;
+        if (naoCabe && estavaExpandida) {
+            caixa.classList.add("expandida");
+        }
+        botao.textContent =
+            caixa.classList.contains("expandida") ? "Ver menos ▴" : "Ver mais ▾";
+    }
+    botao.addEventListener("click", function () {
+        caixa.classList.toggle("expandida");
+        botao.textContent =
+            caixa.classList.contains("expandida") ? "Ver menos ▴" : "Ver mais ▾";
+    });
+    new MutationObserver(function (mudancas) {
+        /* Texto novo (outro chamado): volta a recolher antes de medir. */
+        if (mudancas.some(function (m) { return m.target !== modal; })) {
+            caixa.classList.remove("expandida");
+        }
+        medir();
+    }).observe(texto, { childList: true, characterData: true, subtree: true });
+    new MutationObserver(medir).observe(modal, {
+        attributes: true,
+        attributeFilter: ["class"]
+    });
+})();
+
 (function aplicarEstilosConversaCliente() {
 
     if (document.getElementById("gestok-conversa-cliente-style")) {

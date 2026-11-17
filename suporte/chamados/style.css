@@ -2212,3 +2212,184 @@ body {
         min-height: 85px;
     }
 }
+
+/* =========================================
+   CHAT ENQUADRADO (modal de altura fixa)
+   Cabeçalho e resposta ficam sempre visíveis;
+   só a lista de mensagens rola.
+========================================= */
+#modalDetalhes {
+    padding: 14px;
+}
+
+#modalDetalhes .modal {
+    display: flex;
+    flex-direction: column;
+    width: min(660px, 100%);
+    height: min(88vh, 760px);
+    height: min(88dvh, 760px);
+    max-height: none;
+    overflow: hidden;
+}
+
+#modalDetalhes .modal-header {
+    flex: none;
+    padding: 12px 16px;
+}
+
+#modalDetalhes .ticket-details {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 16px;
+    overflow: hidden;
+}
+
+#modalDetalhes .detail-grid {
+    flex: none;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 0;
+}
+
+#modalDetalhes .detail-box {
+    padding: 6px 8px;
+}
+
+#modalDetalhes .detail-section {
+    flex: none;
+    margin-top: 8px;
+}
+
+#modalDetalhes .detail-section h4 {
+    margin-bottom: 4px;
+}
+
+#modalDetalhes .detail-message {
+    max-height: calc(1.55em * 3 + 18px);
+    padding: 9px 11px;
+    overflow: hidden;
+    font-size: 10px;
+    color: var(--text);
+    white-space: normal;
+}
+
+/* o pre-wrap fica só no texto (evita linhas em branco do HTML dentro da caixa) */
+#modalDetalhes .detail-message p {
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+#modalDetalhes .detail-message.expandida {
+    max-height: min(210px, 34vh);
+    overflow-y: auto;
+}
+
+#modalDetalhes .detail-desc-toggle {
+    align-self: flex-start;
+    margin-top: 3px;
+    padding: 2px 0;
+    border: 0;
+    background: none;
+    color: var(--blue, #2563eb);
+    font-family: inherit;
+    font-size: 9px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#modalDetalhes .detail-desc-toggle[hidden] {
+    display: none;
+}
+
+/* Conversa ocupa todo o espaço que sobrar */
+#modalDetalhes .detail-section-chat {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+#modalDetalhes .ticket-conversation {
+    flex: 1 1 auto;
+    min-height: 90px;
+    max-height: none;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #fafbfc;
+    scroll-behavior: auto;
+    overscroll-behavior: contain;
+}
+
+/* Resposta fixa embaixo: campo + botão na mesma linha */
+#modalDetalhes .detail-section-reply h4 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+}
+
+#modalDetalhes .ticket-reply-form {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 6px 8px;
+    margin-top: 0;
+}
+
+#modalDetalhes .ticket-reply-form textarea {
+    min-height: 44px;
+    height: 44px;
+    max-height: 110px;
+    resize: none;
+    field-sizing: content;
+}
+
+#modalDetalhes .ticket-reply-form .primary-button {
+    width: auto;
+    min-height: 44px;
+    padding: 0 16px;
+}
+
+#modalDetalhes .reply-status {
+    grid-column: 1 / -1;
+    min-height: 12px;
+}
+
+#modalDetalhes .modal-footer {
+    flex: none;
+    padding: 10px 16px;
+}
+
+#modalDetalhes .support-response:not([hidden]) {
+    max-height: 56px;
+    overflow-y: auto;
+}
+
+@media (max-width: 600px) {
+
+    #modalDetalhes {
+        padding: 8px;
+    }
+
+    #modalDetalhes .modal {
+        height: 94vh;
+        height: 94dvh;
+    }
+
+    #modalDetalhes .detail-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #modalDetalhes .ticket-reply-form {
+        grid-template-columns: 1fr;
+    }
+
+    #modalDetalhes .ticket-reply-form .primary-button {
+        width: 100%;
+        min-height: 40px;
+    }
+
+}
