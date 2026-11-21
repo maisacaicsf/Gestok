@@ -55,6 +55,7 @@ body {
     width: 100%;
     min-width: 0;
     min-height: 100vh;
+    min-height: 100dvh;
 
     font-family:
         Inter,
@@ -121,6 +122,7 @@ body {
     max-width: 90vw;
 
     height: 100vh;
+    height: 100dvh;
 
     background: #ffffff;
 
@@ -1262,6 +1264,7 @@ body {
     max-width: 100%;
 
     max-height: 90vh;
+    max-height: 90dvh;
 
     overflow-y: auto;
 
@@ -2037,6 +2040,7 @@ body {
         max-width: 100%;
 
         max-height: 94vh;
+        max-height: 94dvh;
 
         border-radius: 12px;
     }
@@ -2283,6 +2287,7 @@ body {
 
 #modalDetalhes .detail-message.expandida {
     max-height: min(210px, 34vh);
+    max-height: min(210px, 34dvh);
     overflow-y: auto;
 }
 

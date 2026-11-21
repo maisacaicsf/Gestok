@@ -30,6 +30,9 @@ let movimentacoesCache = [];
 let cancelarMovimentacoes = null;
 let lojaAtualMovimentacoes = null;
 let carregamentoIniciado = false;
+let movimentoExpandidoId = null;
+/* Produtos já consultados nos detalhes: reabrir um detalhe fica instantâneo. */
+const produtosDetalheCache = new Map();
 
 
 /* =========================================
@@ -451,13 +454,15 @@ function renderizarMovimentacoes() {
                         </td>
 
                         <td>
-                            <strong>
-                                ${escaparHtml(item.produto || "—")}
-                            </strong>
-
-                            <small>
-                                ${escaparHtml(item.codigo || "")}
-                            </small>
+                            <button
+                                type="button"
+                                class="produto-mov-link"
+                                data-abrir-detalhe="${escaparHtml(item.id)}"
+                                aria-expanded="${movimentoExpandidoId === item.id ? "true" : "false"}"
+                            >
+                                <strong>${escaparHtml(item.produto || "—")}</strong>
+                                <small>${escaparHtml(item.codigo || "Ver detalhes")}</small>
+                            </button>
                         </td>
 
                         <td>
@@ -478,12 +483,168 @@ function renderizarMovimentacoes() {
                         </td>
 
                     </tr>
+                    <tr class="mov-detail-row" data-linha-detalhe="${escaparHtml(item.id)}" ${movimentoExpandidoId === item.id ? "" : "hidden"}>
+                        <td colspan="6">
+                            <div class="mov-detail-card" data-conteudo-detalhe="${escaparHtml(item.id)}">
+                                ${movimentoExpandidoId === item.id ? montarConteudoDetalheMovimentacao(item, produtosDetalheCache.get(String(item.produtoId)) || null) : ""}
+                            </div>
+                        </td>
+                    </tr>
                 `;
 
             })
             .join("");
 }
 
+
+/* =========================================
+   DETALHES EXPANSÍVEIS DA MOVIMENTAÇÃO
+   (não interfere no carregamento do histórico)
+========================================= */
+
+function montarConteudoDetalheMovimentacao(movimento, produto) {
+    const camposProduto = [
+        ["Produto", produto?.nome || movimento.produto],
+        ["Código", produto?.codigo || movimento.codigo],
+        ["Categoria", produto?.categoria],
+        ["Unidade", produto?.unidade || movimento.unidade],
+        ["Preço de venda", produto?.preco !== undefined
+            ? Number(produto.preco).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+            : undefined],
+        ["Estoque atual", produto?.quantidade !== undefined
+            ? `${produto.quantidade} ${produto.unidade || movimento.unidade || "UN"}`
+            : undefined]
+    ];
+
+    const camposMovimento = [
+        ["Tipo", movimento.tipo],
+        ["Quantidade", `${movimento.quantidade ?? "—"} ${movimento.unidade || "UN"}`],
+        ["Estoque anterior", movimento.estoqueAnterior],
+        ["Estoque após movimentação", movimento.estoqueNovo],
+        ["Motivo", movimento.motivo],
+        ["Observação", movimento.observacao],
+        ["Data", formatarData(movimento.data)]
+    ];
+
+    function montarSecao(titulo, campos) {
+        const itens = campos.filter(([nome, valor]) => valor !== undefined && valor !== null && valor !== "");
+        if (!itens.length) return "";
+        return `<section class="mov-detail-section"><h4>${escaparHtml(titulo)}</h4><div class="mov-detail-grid">${itens.map(([nome, valor]) =>
+            `<div class="mov-detail-item"><span>${escaparHtml(nome)}</span><strong>${escaparHtml(valor)}</strong></div>`
+        ).join("")}</div></section>`;
+    }
+
+    return montarSecao("Produto", camposProduto) + montarSecao("Movimentação", camposMovimento);
+}
+
+function preencherDetalheExpandido(id) {
+    const movimento = movimentacoesCache.find(item => item.id === id);
+    if (!movimento) return;
+
+    const area = listaMovimentacoes.querySelector(`[data-conteudo-detalhe="${CSS.escape(id)}"]`);
+    if (!area) return;
+
+    area.innerHTML = montarConteudoDetalheMovimentacao(
+        movimento,
+        produtosDetalheCache.get(String(movimento.produtoId)) || null
+    );
+}
+
+function assinaturaProdutoDetalhe(produto) {
+    return [
+        produto.nome,
+        produto.codigo,
+        produto.categoria,
+        produto.unidade,
+        produto.preco,
+        produto.quantidade
+    ].join("|");
+}
+
+/* Complementa o detalhe com os dados do produto SEM bloquear a abertura:
+   1) tenta o cache local do Firestore (praticamente instantâneo);
+   2) confirma no servidor e só redesenha se algum dado realmente mudou. */
+async function carregarProdutoDetalhe(id) {
+    const movimento = movimentacoesCache.find(item => item.id === id);
+
+    if (
+        !movimento ||
+        !movimento.produtoId ||
+        !lojaAtualMovimentacoes ||
+        typeof referenciaProdutos !== "function"
+    ) {
+        return;
+    }
+
+    const chave = String(movimento.produtoId);
+    const referencia = referenciaProdutos(lojaAtualMovimentacoes).doc(chave);
+
+    function aplicar(snapshot) {
+        if (!snapshot || !snapshot.exists) return;
+
+        const dados = snapshot.data();
+        const anterior = produtosDetalheCache.get(chave);
+
+        produtosDetalheCache.set(chave, dados);
+
+        if (movimentoExpandidoId !== id) return;
+        if (anterior && assinaturaProdutoDetalhe(anterior) === assinaturaProdutoDetalhe(dados)) return;
+
+        preencherDetalheExpandido(id);
+    }
+
+    try {
+        if (!produtosDetalheCache.has(chave)) {
+            try {
+                aplicar(await referencia.get({ source: "cache" }));
+            } catch (erroCache) {
+                /* produto ainda não está no cache local: segue para o servidor */
+            }
+        }
+
+        aplicar(await referencia.get());
+    } catch (erro) {
+        console.warn("Consulta complementar do produto indisponível; mantendo detalhes do histórico.", erro);
+    }
+}
+
+/* Abre/fecha só a linha de detalhe, sem redesenhar a tabela inteira. */
+function alternarLinhaDetalhe(id, abrir) {
+    const seletor = CSS.escape(id);
+    const linha = listaMovimentacoes.querySelector(`[data-linha-detalhe="${seletor}"]`);
+    const botao = listaMovimentacoes.querySelector(`[data-abrir-detalhe="${seletor}"]`);
+
+    if (botao) botao.setAttribute("aria-expanded", abrir ? "true" : "false");
+    if (!linha) return;
+
+    linha.hidden = !abrir;
+
+    if (abrir) {
+        preencherDetalheExpandido(id);
+    } else {
+        const area = linha.querySelector("[data-conteudo-detalhe]");
+        if (area) area.innerHTML = "";
+    }
+}
+
+if (listaMovimentacoes) {
+    listaMovimentacoes.addEventListener("click", function (event) {
+        const botao = event.target.closest("[data-abrir-detalhe]");
+        if (!botao) return;
+
+        const id = botao.getAttribute("data-abrir-detalhe");
+        const anteriorId = movimentoExpandidoId;
+
+        movimentoExpandidoId = anteriorId === id ? null : id;
+
+        if (anteriorId) alternarLinhaDetalhe(anteriorId, false);
+
+        if (movimentoExpandidoId) {
+            alternarLinhaDetalhe(movimentoExpandidoId, true);
+            carregarProdutoDetalhe(movimentoExpandidoId);
+        }
+    });
+}
 
 /* =========================================
    SNAPSHOT EM TEMPO REAL
@@ -528,6 +689,9 @@ function iniciarMonitoramentoMovimentacoes(lojaId) {
                         );
 
                     renderizarMovimentacoes();
+                    if (movimentoExpandidoId) {
+                        carregarProdutoDetalhe(movimentoExpandidoId);
+                    }
 
                     if (statusMovimentacoes) {
 

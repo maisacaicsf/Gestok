@@ -9,6 +9,7 @@ body {
     background: #f7f9fc;
     color: #17202a;
     min-height: 100vh;
+    min-height: 100dvh;
 }
 
 .topbar {

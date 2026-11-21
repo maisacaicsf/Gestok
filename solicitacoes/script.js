@@ -2315,58 +2315,132 @@ function abrirModalSugestao() {
 
     }
 
+    const OPCOES_ITENS_SUGESTAO = [5, 10, 50, 100];
+    let itensPorPagina = 5;
+    let paginaAtual = 1;
+
+    /* Seleção e quantidades ficam guardadas aqui, para valerem em todas as páginas. */
+    const selecao = new Map();
+    sugestoes.forEach(function (p) {
+        selecao.set(String(p.id), { marcado: true, quantidade: String(quantidadeSugerida(p)) });
+    });
+
     overlay.innerHTML = `
         <div class="sol-card" role="dialog" aria-modal="true">
             <h3>Sugerir reposição</h3>
             <p class="sol-sub">Produtos abaixo do estoque mínimo. Ajuste as quantidades e desmarque o que não quiser pedir.${jaTem ? ` (${jaTem} já ${jaTem === 1 ? "tem" : "têm"} solicitação em aberto e ${jaTem === 1 ? "ficou" : "ficaram"} de fora.)` : ""}</p>
             <table class="sol-sug">
-                <thead><tr><th><input type="checkbox" id="solSugTodos" checked></th><th>Produto</th><th>Estoque / mín.</th><th>Quantidade</th></tr></thead>
-                <tbody>
-                    ${sugestoes.map(function (p) {
-                        return `<tr data-id="${escaparHtml(p.id)}">
-                            <td><input type="checkbox" class="sol-sug-ck" checked></td>
-                            <td><strong>${escaparHtml(p.nome || "-")}</strong><small>${escaparHtml(p.codigo || "sem código")}</small></td>
-                            <td>${Number(p.quantidade || 0)} / ${Number(p.estoqueMinimo || 0)} ${escaparHtml(p.unidade || "UN")}</td>
-                            <td><input type="number" class="sol-sug-qtd" min="1" step="1" value="${quantidadeSugerida(p)}"></td>
-                        </tr>`;
-                    }).join("")}
-                </tbody>
+                <thead><tr><th><input type="checkbox" id="solSugTodos" checked title="Selecionar todos (todas as páginas)"></th><th>Produto</th><th>Estoque / mín.</th><th>Quantidade</th></tr></thead>
+                <tbody id="solSugCorpo"></tbody>
             </table>
+            <div class="sol-pag" id="solSugPag">
+                <label class="sol-pag-tam">
+                    Itens por página
+                    <select id="solSugPorPagina">
+                        ${OPCOES_ITENS_SUGESTAO.map(function (n) { return `<option value="${n}">${n}</option>`; }).join("")}
+                    </select>
+                </label>
+                <span class="sol-pag-info" id="solSugPagInfo"></span>
+                <div class="sol-pag-nav" id="solSugPagNav"></div>
+            </div>
             <div class="sol-rodape">
                 <span class="sol-contagem" id="solSugContagem"></span>
                 <button type="button" class="secondary-button" id="solSugCancelar">Cancelar</button>
                 <button type="button" class="primary-button" id="solSugCriar">Criar solicitações</button>
             </div>
         </div>`;
-
     overlay.hidden = false;
-
-    const marcas = function () { return Array.from(overlay.querySelectorAll(".sol-sug-ck")); };
-
+    const card = overlay.querySelector(".sol-card");
+    const corpo = overlay.querySelector("#solSugCorpo");
+    const marcarTodos = overlay.querySelector("#solSugTodos");
+    const seletorItens = overlay.querySelector("#solSugPorPagina");
+    const paginaInfo = overlay.querySelector("#solSugPagInfo");
+    const paginaNav = overlay.querySelector("#solSugPagNav");
     const atualizarContagem = function () {
-
-        const total = marcas().filter(function (m) { return m.checked; }).length;
-
+        let total = 0;
+        selecao.forEach(function (item) { if (item.marcado) { total++; } });
         overlay.querySelector("#solSugContagem").textContent = `${total} de ${sugestoes.length} selecionado(s)`;
-
         overlay.querySelector("#solSugCriar").disabled = total === 0;
-
+        marcarTodos.checked = total === sugestoes.length;
+        marcarTodos.indeterminate = total > 0 && total < sugestoes.length;
     };
-
-    atualizarContagem();
-
-    overlay.querySelector("#solSugTodos").addEventListener("change", function (event) {
-
-        marcas().forEach(function (m) { m.checked = event.target.checked; });
-
+    const renderizarPaginacao = function (total, totalPaginas, inicio, quantidadeNaPagina) {
+        seletorItens.value = String(itensPorPagina);
+        paginaInfo.textContent = `Mostrando ${inicio + 1}–${inicio + quantidadeNaPagina} de ${total}`;
+        if (totalPaginas <= 1) {
+            paginaNav.innerHTML = "";
+            return;
+        }
+        const numeros = Array.from(new Set([1, totalPaginas, paginaAtual - 1, paginaAtual, paginaAtual + 1]))
+            .filter(function (n) { return n >= 1 && n <= totalPaginas; })
+            .sort(function (a, b) { return a - b; });
+        let html = `<button type="button" class="sol-page-btn" data-pagina="${paginaAtual - 1}" ${paginaAtual === 1 ? "disabled" : ""}>‹ Anterior</button>`;
+        let anterior = 0;
+        numeros.forEach(function (n) {
+            if (n - anterior > 1) {
+                html += `<span class="sol-page-gap">…</span>`;
+            }
+            html += `<button type="button" class="sol-page-btn ${n === paginaAtual ? "active" : ""}" data-pagina="${n}">${n}</button>`;
+            anterior = n;
+        });
+        html += `<button type="button" class="sol-page-btn" data-pagina="${paginaAtual + 1}" ${paginaAtual === totalPaginas ? "disabled" : ""}>Próxima ›</button>`;
+        paginaNav.innerHTML = html;
+    };
+    const renderizarPagina = function () {
+        const total = sugestoes.length;
+        const totalPaginas = Math.max(1, Math.ceil(total / itensPorPagina));
+        paginaAtual = Math.min(Math.max(1, paginaAtual), totalPaginas);
+        const inicio = (paginaAtual - 1) * itensPorPagina;
+        const pagina = sugestoes.slice(inicio, inicio + itensPorPagina);
+        corpo.innerHTML = pagina.map(function (p) {
+            const item = selecao.get(String(p.id));
+            return `<tr data-id="${escaparHtml(p.id)}">
+                <td><input type="checkbox" class="sol-sug-ck" ${item.marcado ? "checked" : ""}></td>
+                <td><strong>${escaparHtml(p.nome || "-")}</strong><small>${escaparHtml(p.codigo || "sem código")}</small></td>
+                <td>${Number(p.quantidade || 0)} / ${Number(p.estoqueMinimo || 0)} ${escaparHtml(p.unidade || "UN")}</td>
+                <td><input type="number" class="sol-sug-qtd" min="1" step="1" value="${escaparHtml(item.quantidade)}"></td>
+            </tr>`;
+        }).join("");
+        renderizarPaginacao(total, totalPaginas, inicio, pagina.length);
+    };
+    corpo.addEventListener("change", function (event) {
+        const caixa = event.target.closest(".sol-sug-ck");
+        const linha = caixa && caixa.closest("tr");
+        const item = linha && selecao.get(linha.dataset.id);
+        if (item) {
+            item.marcado = caixa.checked;
+            atualizarContagem();
+        }
+    });
+    corpo.addEventListener("input", function (event) {
+        const campo = event.target.closest(".sol-sug-qtd");
+        const linha = campo && campo.closest("tr");
+        const item = linha && selecao.get(linha.dataset.id);
+        if (item) {
+            item.quantidade = campo.value;
+        }
+    });
+    marcarTodos.addEventListener("change", function (event) {
+        selecao.forEach(function (item) { item.marcado = event.target.checked; });
+        corpo.querySelectorAll(".sol-sug-ck").forEach(function (m) { m.checked = event.target.checked; });
         atualizarContagem();
-
     });
-
-    overlay.querySelectorAll(".sol-sug-ck").forEach(function (m) {
-        m.addEventListener("change", atualizarContagem);
+    paginaNav.addEventListener("click", function (event) {
+        const botao = event.target.closest("button[data-pagina]");
+        if (!botao || botao.disabled) {
+            return;
+        }
+        paginaAtual = Number(botao.dataset.pagina);
+        renderizarPagina();
     });
-
+    seletorItens.addEventListener("change", function () {
+        const valor = Number(seletorItens.value);
+        itensPorPagina = OPCOES_ITENS_SUGESTAO.indexOf(valor) !== -1 ? valor : 5;
+        paginaAtual = 1;
+        renderizarPagina();
+    });
+    renderizarPagina();
+    atualizarContagem();
     overlay.querySelector("#solSugCancelar").onclick = function () { overlay.hidden = true; };
 
     const criar = overlay.querySelector("#solSugCriar");
@@ -2375,20 +2449,15 @@ function abrirModalSugestao() {
 
         const escolhidos = [];
 
-        overlay.querySelectorAll("tbody tr").forEach(function (linha) {
-
-            if (!linha.querySelector(".sol-sug-ck").checked) {
+        sugestoes.forEach(function (produto) {
+            const item = selecao.get(String(produto.id));
+            if (!item || !item.marcado) {
                 return;
             }
-
-            const produto = sugestoes.find(function (p) { return String(p.id) === linha.dataset.id; });
-
-            const quantidade = Number(linha.querySelector(".sol-sug-qtd").value);
-
-            if (produto && quantidade > 0) {
+            const quantidade = Number(item.quantidade);
+            if (quantidade > 0) {
                 escolhidos.push({ produto: produto, quantidade: Math.ceil(quantidade) });
             }
-
         });
 
         if (!escolhidos.length) {

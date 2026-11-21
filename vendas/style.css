@@ -381,6 +381,7 @@ tr.cancelada td { opacity: .55; }
 .vend-modal {
     width: min(520px, 100%);
     max-height: 90vh;
+    max-height: 90dvh;
     overflow: auto;
     padding: 26px;
     border-radius: 16px;

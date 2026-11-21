@@ -464,6 +464,7 @@ body {
     left: -290px;
     width: 290px;
     height: 100vh;
+    height: 100dvh;
 
     background: #ffffff;
 

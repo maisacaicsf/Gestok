@@ -15,6 +15,7 @@ body {
     background: #f7f9fc;
     color: #172033;
     min-height: 100vh;
+    min-height: 100dvh;
 }
 /* =========================================
    CABEÇALHO
@@ -730,6 +731,7 @@ td {
     width: min(520px, 100%);
 
     max-height: 90vh;
+    max-height: 90dvh;
 
     overflow-y: auto;
 
@@ -1000,6 +1002,7 @@ td {
 
     .modal {
         max-height: 94vh;
+        max-height: 94dvh;
     }
 
     .stock-info {
@@ -1106,6 +1109,7 @@ td {
 .sol-card {
     width: min(680px, 100%);
     max-height: 88vh;
+    max-height: 88dvh;
     overflow: auto;
     padding: 26px;
     border-radius: 16px;
@@ -1182,4 +1186,95 @@ td {
 @media (max-width: 760px) {
     .header-actions { width: 100%; }
     .sol-btn, .header-actions .primary-button { flex: 1 1 100%; }
+}
+
+/* Paginação da sugestão de reposição (mesmo visual de Produtos) */
+.sol-pag {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #edf0f4;
+    font-size: 13px;
+    color: #5b6678;
+}
+.sol-card .sol-pag-tam {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #5b6678;
+}
+.sol-pag-tam select {
+    height: 34px;
+    padding: 0 10px;
+    border: 1px solid #dbe2ec;
+    border-radius: 8px;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 13px;
+    color: #1f2937;
+    cursor: pointer;
+}
+.sol-pag-nav { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.sol-page-btn {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 11px;
+    border: 1px solid #dbe2ec;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #3155a5;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.sol-page-btn:hover:not(:disabled) { background: #f1f5ff; border-color: #b9c8ec; }
+.sol-page-btn.active { background: #3155a5; border-color: #3155a5; color: #ffffff; }
+.sol-page-btn:disabled { opacity: .45; cursor: not-allowed; }
+.sol-page-gap { padding: 0 4px; color: #9aa3b2; }
+@media (max-width: 650px) {
+    .sol-pag { justify-content: center; }
+}
+
+/* Sugerir reposição: tabela enquadrada no modal (sem rolagem lateral).
+   A regra global "table { min-width: 900px }" da página valia também aqui e estourava o modal. */
+.sol-card { overflow-x: hidden; }
+.sol-sug {
+    min-width: 0;
+    table-layout: fixed;
+}
+.sol-sug th {
+    padding: 8px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+.sol-sug td {
+    padding: 10px 8px;
+    overflow-wrap: anywhere;
+}
+.sol-sug th:nth-child(1), .sol-sug td:nth-child(1) { width: 34px; }
+.sol-sug th:nth-child(3), .sol-sug td:nth-child(3) { width: 24%; }
+.sol-sug th:nth-child(4), .sol-sug td:nth-child(4) { width: 108px; }
+.sol-sug input[type="number"] { width: 100%; max-width: 90px; }
+
+@media (max-width: 650px) {
+    .sol-overlay { padding: 10px; }
+    .sol-card { padding: 16px; }
+    .sol-sug th, .sol-sug td { padding-left: 5px; padding-right: 5px; }
+    .sol-sug th { font-size: 9px; letter-spacing: 0; }
+    .sol-sug th:nth-child(1), .sol-sug td:nth-child(1) { width: 28px; }
+    .sol-sug th:nth-child(3), .sol-sug td:nth-child(3) { width: 74px; }
+    .sol-sug th:nth-child(4), .sol-sug td:nth-child(4) { width: 84px; }
+    .sol-sug input[type="number"] { height: 34px; padding: 0 6px; }
+    .sol-sug ~ .sol-rodape { flex-wrap: wrap; }
+    .sol-sug ~ .sol-rodape .sol-contagem { flex: 1 0 100%; margin: 0 0 4px; }
+    .sol-sug ~ .sol-rodape .secondary-button,
+    .sol-sug ~ .sol-rodape .primary-button { flex: 1 1 0; width: auto; }
 }

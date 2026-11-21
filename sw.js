@@ -11,7 +11,7 @@
    Para forçar atualização geral, troque VERSAO.
 ========================================= */
 
-const VERSAO = "gestok-pwa-v2";
+const VERSAO = "gestok-pwa-v3";
 const CACHE_PAGINAS = VERSAO + "-paginas";
 const CACHE_CDN = VERSAO + "-cdn";
 const TEMPO_REDE_MS = 5000;

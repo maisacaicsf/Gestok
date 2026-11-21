@@ -1,0 +1,72 @@
+/* =========================================
+   GESTOK - AJUSTES PARA CELULAR (Android e iPhone)
+   Carregado por todas as telas, depois do CSS de cada página.
+   Só mexe no essencial: toque, zoom dos campos no iPhone,
+   área segura (notch / barra inferior) e rolagem no app instalado.
+========================================= */
+
+/* iPhone: não aumenta o texto sozinho ao girar a tela */
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+/* Toque rápido: sem atraso e sem "zoom" por toque duplo em botões e links */
+a,
+button,
+label,
+select,
+summary,
+[role="button"],
+input[type="checkbox"],
+input[type="radio"] {
+    touch-action: manipulation;
+}
+
+/* Botões não selecionam texto nem abrem menu ao segurar o dedo */
+button,
+[role="button"] {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+/* Só em telas de toque (celular/tablet) */
+@media (hover: none) and (pointer: coarse) {
+
+    * {
+        -webkit-tap-highlight-color: rgba(37, 99, 235, .14);
+    }
+
+    /* iPhone dá zoom automático em campo com fonte menor que 16px */
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]),
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+
+}
+
+/* Área segura: barra de gestos do iPhone/Android e "notch" no modo paisagem */
+body {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (orientation: landscape) {
+
+    html {
+        padding-left: env(safe-area-inset-left, 0px);
+        padding-right: env(safe-area-inset-right, 0px);
+    }
+
+}
+
+/* App instalado: puxar a tela para baixo não recarrega a página sem querer */
+@media (display-mode: standalone) {
+
+    html,
+    body {
+        overscroll-behavior-y: contain;
+    }
+
+}

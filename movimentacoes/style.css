@@ -316,3 +316,61 @@ td small {
     }
 
 }
+
+
+/* Detalhes expansíveis - estilos isolados da tabela original */
+.produto-mov-link {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+}
+/* Indicação de clique discreta: nome em cor normal + setinha cinza (sem azul/sublinhado) */
+.produto-mov-link {
+    position: relative;
+    padding-right: 22px;
+    border-radius: 6px;
+}
+.produto-mov-link strong { color: #202938; text-decoration: none; }
+.produto-mov-link::after {
+    content: "";
+    position: absolute;
+    right: 4px;
+    top: calc(50% - 5px);
+    width: 6px;
+    height: 6px;
+    border-right: 1.5px solid #b4bcc8;
+    border-bottom: 1.5px solid #b4bcc8;
+    transform: rotate(45deg);
+    transition: transform .18s ease, border-color .18s ease, top .18s ease;
+}
+.produto-mov-link:hover::after,
+.produto-mov-link:focus-visible::after { border-color: #667085; }
+.produto-mov-link[aria-expanded="true"]::after {
+    top: calc(50% - 1px);
+    transform: rotate(-135deg);
+    border-color: #667085;
+}
+.produto-mov-link:focus-visible { outline: 2px solid #d5dbe5; outline-offset: 3px; }
+/* a linha inteira ganha um fundo suave ao passar o mouse */
+#listaMovimentacoes tr:not(.mov-detail-row):hover > td { background: #fafbfd; }
+.mov-detail-row[hidden] { display: none; }
+.mov-detail-row > td { padding: 0 11px 14px; background: #fbfcfe; }
+.mov-detail-card { padding: 15px; border: 1px solid #e8edf5; border-radius: 11px; background: #fff; }
+.mov-detail-section + .mov-detail-section { margin-top: 14px; }
+.mov-detail-section h4 { margin: 0 0 9px; color: #7b8796; font-size: 9px; letter-spacing: .6px; text-transform: uppercase; }
+.mov-detail-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.mov-detail-item { min-width: 0; padding: 9px 10px; border: 1px solid #edf0f4; border-radius: 8px; background: #fafbfc; }
+.mov-detail-item span { display: block; margin-bottom: 4px; color: #98a2b3; font-size: 8px; font-weight: 700; text-transform: uppercase; }
+.mov-detail-item strong { display: block; color: #263244; font-size: 10px; overflow-wrap: anywhere; white-space: pre-wrap; }
+@media (max-width: 600px) { .mov-detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Toque responde na hora no celular (sem o atraso do duplo toque) */
+.produto-mov-link { touch-action: manipulation; }

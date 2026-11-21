@@ -16,11 +16,13 @@ body {
     color: #17202a;
 
     min-height: 100vh;
+    min-height: 100dvh;
 }
 
 
 .payment-page {
     min-height: 100vh;
+    min-height: 100dvh;
 
     display: flex;
 
