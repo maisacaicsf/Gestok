@@ -2099,3 +2099,58 @@ a {
     .mov-plot-wrap { grid-template-columns: 30px 1fr; grid-template-rows: 190px auto; column-gap: 6px; }
     .mov-bars, .mov-x { gap: 6px; padding-left: 4px; padding-right: 4px; }
 }
+
+
+/* =========================================
+   PAINEL - PRÓXIMOS DA VALIDADE
+========================================= */
+
+.validade-grid {
+    grid-template-columns: 1fr;
+}
+
+.validade-header-acoes {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.validade-header-acoes .see-all {
+    text-decoration: none;
+}
+
+.validade-products-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+    max-height: 380px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 8px;
+}
+
+.validade-products-list .alert-product-card {
+    margin-top: 0;
+}
+
+.validade-card.v-vencido .alert-product-icon {
+    background: #fde8e8;
+    color: #b42318;
+}
+
+.validade-card.v-vencido .alert-product-warning {
+    background: #fde8e8;
+    color: #b42318;
+}
+
+.validade-card.v-hoje .alert-product-icon,
+.validade-card.v-7d .alert-product-icon {
+    background: #ffe8cc;
+    color: #c2570c;
+}
+
+.validade-card.v-hoje .alert-product-warning,
+.validade-card.v-7d .alert-product-warning {
+    background: #ffe8cc;
+    color: #b45309;
+}

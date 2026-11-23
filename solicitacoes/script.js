@@ -2318,6 +2318,7 @@ function abrirModalSugestao() {
     const OPCOES_ITENS_SUGESTAO = [5, 10, 50, 100];
     let itensPorPagina = 5;
     let paginaAtual = 1;
+    let visiveis = sugestoes;
 
     /* Seleção e quantidades ficam guardadas aqui, para valerem em todas as páginas. */
     const selecao = new Map();
@@ -2329,8 +2330,12 @@ function abrirModalSugestao() {
         <div class="sol-card" role="dialog" aria-modal="true">
             <h3>Sugerir reposição</h3>
             <p class="sol-sub">Produtos abaixo do estoque mínimo. Ajuste as quantidades e desmarque o que não quiser pedir.${jaTem ? ` (${jaTem} já ${jaTem === 1 ? "tem" : "têm"} solicitação em aberto e ${jaTem === 1 ? "ficou" : "ficaram"} de fora.)` : ""}</p>
+            <div class="sol-sug-busca">
+                <span class="sol-sug-busca-icone">🔎</span>
+                <input type="text" id="solSugPesquisa" placeholder="Pesquisar por nome ou código..." autocomplete="off">
+            </div>
             <table class="sol-sug">
-                <thead><tr><th><input type="checkbox" id="solSugTodos" checked title="Selecionar todos (todas as páginas)"></th><th>Produto</th><th>Estoque / mín.</th><th>Quantidade</th></tr></thead>
+                <thead><tr><th><input type="checkbox" id="solSugTodos" checked title="Selecionar todos (resultados da pesquisa)"></th><th>Produto</th><th>Estoque / mín.</th><th>Quantidade</th></tr></thead>
                 <tbody id="solSugCorpo"></tbody>
             </table>
             <div class="sol-pag" id="solSugPag">
@@ -2356,13 +2361,20 @@ function abrirModalSugestao() {
     const seletorItens = overlay.querySelector("#solSugPorPagina");
     const paginaInfo = overlay.querySelector("#solSugPagInfo");
     const paginaNav = overlay.querySelector("#solSugPagNav");
+    const campoPesquisa = overlay.querySelector("#solSugPesquisa");
     const atualizarContagem = function () {
         let total = 0;
         selecao.forEach(function (item) { if (item.marcado) { total++; } });
         overlay.querySelector("#solSugContagem").textContent = `${total} de ${sugestoes.length} selecionado(s)`;
         overlay.querySelector("#solSugCriar").disabled = total === 0;
-        marcarTodos.checked = total === sugestoes.length;
-        marcarTodos.indeterminate = total > 0 && total < sugestoes.length;
+        let marcadosVisiveis = 0;
+        visiveis.forEach(function (p) {
+            const item = selecao.get(String(p.id));
+            if (item && item.marcado) { marcadosVisiveis++; }
+        });
+        marcarTodos.checked = visiveis.length > 0 && marcadosVisiveis === visiveis.length;
+        marcarTodos.indeterminate = marcadosVisiveis > 0 && marcadosVisiveis < visiveis.length;
+        marcarTodos.disabled = visiveis.length === 0;
     };
     const renderizarPaginacao = function (total, totalPaginas, inicio, quantidadeNaPagina) {
         seletorItens.value = String(itensPorPagina);
@@ -2387,11 +2399,17 @@ function abrirModalSugestao() {
         paginaNav.innerHTML = html;
     };
     const renderizarPagina = function () {
-        const total = sugestoes.length;
+        const total = visiveis.length;
         const totalPaginas = Math.max(1, Math.ceil(total / itensPorPagina));
         paginaAtual = Math.min(Math.max(1, paginaAtual), totalPaginas);
         const inicio = (paginaAtual - 1) * itensPorPagina;
-        const pagina = sugestoes.slice(inicio, inicio + itensPorPagina);
+        const pagina = visiveis.slice(inicio, inicio + itensPorPagina);
+        if (!total) {
+            corpo.innerHTML = `<tr><td colspan="4" class="sol-vazio">Nenhum produto encontrado para a pesquisa.</td></tr>`;
+            paginaInfo.textContent = "Mostrando 0 de 0";
+            paginaNav.innerHTML = "";
+            return;
+        }
         corpo.innerHTML = pagina.map(function (p) {
             const item = selecao.get(String(p.id));
             return `<tr data-id="${escaparHtml(p.id)}">
@@ -2421,7 +2439,10 @@ function abrirModalSugestao() {
         }
     });
     marcarTodos.addEventListener("change", function (event) {
-        selecao.forEach(function (item) { item.marcado = event.target.checked; });
+        visiveis.forEach(function (p) {
+            const item = selecao.get(String(p.id));
+            if (item) { item.marcado = event.target.checked; }
+        });
         corpo.querySelectorAll(".sol-sug-ck").forEach(function (m) { m.checked = event.target.checked; });
         atualizarContagem();
     });
@@ -2438,6 +2459,16 @@ function abrirModalSugestao() {
         itensPorPagina = OPCOES_ITENS_SUGESTAO.indexOf(valor) !== -1 ? valor : 5;
         paginaAtual = 1;
         renderizarPagina();
+    });
+    campoPesquisa.addEventListener("input", function () {
+        const termo = campoPesquisa.value.trim().toLowerCase();
+        visiveis = !termo ? sugestoes : sugestoes.filter(function (p) {
+            return String(p.nome || "").toLowerCase().includes(termo) ||
+                String(p.codigo || "").toLowerCase().includes(termo);
+        });
+        paginaAtual = 1;
+        renderizarPagina();
+        atualizarContagem();
     });
     renderizarPagina();
     atualizarContagem();

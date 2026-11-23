@@ -1196,82 +1196,129 @@ if (changePassword) {
 
     changePassword.addEventListener(
         "click",
-        function () {
+        async function () {
+
+            const atualInput =
+                document.getElementById(
+                    "currentPasswordInput"
+                );
+
+            const senhaAtual =
+                atualInput
+                    ? atualInput.value
+                    : "";
 
             const password =
                 passwordInput
                     ? passwordInput.value.trim()
                     : "";
 
+            if (!senhaAtual) {
+                alert("Digite sua senha atual.");
+                return;
+            }
 
             if (!password) {
+                alert("Digite uma nova senha.");
+                return;
+            }
 
-                alert(
-                    "Digite uma nova senha."
-                );
+            if (password.length < 6) {
+                alert("A senha precisa ter pelo menos 6 caracteres.");
+                return;
+            }
+
+            if (password === senhaAtual) {
+                alert("A nova senha precisa ser diferente da atual.");
+                return;
+            }
+
+            const usuario =
+                typeof firebase !== "undefined" &&
+                firebase.auth
+                    ? firebase.auth().currentUser
+                    : null;
+
+            if (!usuario || !usuario.email) {
+                alert("Sessão expirada. Entre novamente para alterar a senha.");
+                return;
+            }
+
+            changePassword.disabled = true;
+
+            try {
+
+                /* Confirma a senha atual e altera de verdade no Firebase */
+                const credencial =
+                    firebase.auth.EmailAuthProvider.credential(
+                        usuario.email,
+                        senhaAtual
+                    );
+
+                await usuario.reauthenticateWithCredential(credencial);
+
+                await usuario.updatePassword(password);
+
+            } catch (erro) {
+
+                const codigo = erro && erro.code ? erro.code : "";
+
+                let mensagem = "Não foi possível alterar a senha. Tente novamente.";
+
+                if (
+                    codigo === "auth/wrong-password" ||
+                    codigo === "auth/invalid-credential" ||
+                    codigo === "auth/invalid-login-credentials"
+                ) {
+                    mensagem = "Senha atual incorreta.";
+                } else if (codigo === "auth/weak-password") {
+                    mensagem = "A nova senha é muito fraca.";
+                } else if (codigo === "auth/too-many-requests") {
+                    mensagem = "Muitas tentativas. Aguarde alguns minutos e tente de novo.";
+                } else if (codigo === "auth/requires-recent-login") {
+                    mensagem = "Por segurança, saia e entre novamente antes de alterar a senha.";
+                } else if (codigo === "auth/network-request-failed") {
+                    mensagem = "Sem conexão. Verifique a internet e tente de novo.";
+                }
+
+                console.error("Erro ao alterar senha:", erro);
+
+                alert(mensagem);
+
+                changePassword.disabled = false;
 
                 return;
 
             }
 
-
-            if (
-                password.length < 6
-            ) {
-
-                alert(
-                    "A senha precisa ter pelo menos 6 caracteres."
-                );
-
-                return;
-
-            }
-
-
+            /* Só atualiza o cadastro local depois que o Firebase confirmou */
             const conta =
                 obterContaGestokPerfil();
 
+            if (conta) {
 
-            if (!conta) {
+                conta.senha = password;
 
-                alert(
-                    "Conta do usuário não encontrada."
+                localStorage.setItem(
+                    "gestok_conta",
+                    JSON.stringify(conta)
                 );
 
-                return;
-
             }
 
+            localStorage.setItem("gestok_senha", password);
 
-            conta.senha =
-                password;
-
-
-            localStorage.setItem(
-                "gestok_conta",
-                JSON.stringify(conta)
-            );
-
-
-            /* Compatibilidade */
-
-            localStorage.setItem(
-                "gestok_senha",
-                password
-            );
-
+            if (atualInput) {
+                atualInput.value = "";
+            }
 
             if (passwordInput) {
-
-                passwordInput.value =
-                    "";
-
+                passwordInput.value = "";
             }
 
+            changePassword.disabled = false;
 
-            alert(
-                "Senha alterada com sucesso!"
-            );
+            alert("Senha alterada com sucesso!");
 
         }
     );

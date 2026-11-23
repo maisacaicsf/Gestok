@@ -849,6 +849,44 @@
         </section>
 
 
+        <!-- PRODUTOS PRÓXIMOS DA VALIDADE -->
+
+        <section class="bottom-grid validade-grid">
+
+            <div class="panel alerts-panel validade-panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2>Próximos da validade</h2>
+                        <p>Produtos vencidos ou que vencem em até 30 dias.</p>
+                    </div>
+
+                    <div class="validade-header-acoes">
+                        <a class="see-all" href="../validade/index.html">Ver validade</a>
+                        <span class="alert-count" id="validadeCount">0</span>
+                    </div>
+
+                </div>
+
+                <div class="empty-state" id="validadeEmptyState">
+
+                    <div class="empty-icon">…</div>
+
+                    <strong>Verificando validades…</strong>
+
+                    <span>Aguarde um instante.</span>
+
+                </div>
+
+                <div class="alert-products-list validade-products-list" id="validadeProductsList"></div>
+
+            </div>
+
+        </section>
+
+
+
     </main>
 
 
@@ -876,6 +914,7 @@
 <!-- Aviso de lotes vencidos / perto de vencer -->
 <script src="../componentes/validade-core.js"></script>
 <script src="../componentes/aviso-validade.js"></script>
+<script src="../componentes/painel-validade.js"></script>
 </body>
 
 </html>

@@ -134,14 +134,75 @@
 
     }
 
+    /* Publicidades do próprio Gestok (uma é sorteada a cada abertura do painel). */
+    var PUBLIS = [
+        { icone: "🚀", titulo: "Gestok Premium", texto: "Mais produtos, mais operadores e relatórios completos para o seu negócio crescer.", botao: "Ver planos", link: "../planos/index.html" },
+        { icone: "📊", titulo: "Decida com dados", texto: "Veja no Gestok o que mais vende, o que está parado e o que precisa repor.", botao: "Ver relatórios", link: "../relatorios/index.html" },
+        { icone: "⏰", titulo: "Controle de validade", texto: "Evite perdas: o Gestok avisa antes dos produtos vencerem.", botao: "Ver validades", link: "../validade/index.html" }
+    ];
+
+    var AVISO_INSTALAR = { icone: "📲", titulo: "Instale o Gestok no seu aparelho", texto: "para abrir mais rápido, em tela cheia.", instalar: true };
+
+    var CHAVE_ROTACAO = "gestok_aviso_rotacao";
+
+    var contadorAviso = 0;
+
+    /* Alterna a cada abertura do painel: publi, instalar, publi, instalar...
+       O aviso de instalar só vale quando o navegador permite instalar. */
+    function escolherAviso() {
+
+        var publi = PUBLIS[Math.floor(contadorAviso / 2) % PUBLIS.length];
+
+        if (contadorAviso % 2 === 1 && eventoInstalacao && !instaladoComoApp()) {
+            return AVISO_INSTALAR;
+        }
+
+        return publi;
+
+    }
+
+    function desenharAviso() {
+
+        var caixa = document.getElementById("gestokAvisoInstalar");
+
+        if (!caixa) {
+            return;
+        }
+
+        var item = escolherAviso();
+
+        var texto = caixa.querySelector("[data-aviso-texto]");
+        var link = caixa.querySelector("[data-aviso-link]");
+        var botao = caixa.querySelector("[data-aviso-instalar]");
+
+        texto.innerHTML = "<strong>" + item.icone + " " + item.titulo + "</strong>" +
+            (item.instalar ? " " : " — ") + item.texto +
+            (item.instalar ? "" : " <span style=\"font-size:11px;opacity:.6;\">Publicidade Gestok</span>");
+
+        if (item.instalar) {
+            link.style.display = "none";
+            botao.style.display = "inline-flex";
+            botao.textContent = "Instalar";
+        } else {
+            botao.style.display = "none";
+            link.style.display = "inline-flex";
+            link.href = item.link;
+            link.textContent = item.botao;
+        }
+
+    }
+
+    /* Chamado quando o navegador libera a instalação (pode chegar depois do banner). */
+    function atualizarBotaoInstalarAviso() {
+        desenharAviso();
+    }
+
     function mostrarAvisoPainel() {
 
         try {
 
             if (window.location.pathname.toLowerCase().indexOf("/sistema/") === -1 ||
-                localStorage.getItem(CHAVE_AVISO) === "1" ||
-                instaladoComoApp() ||
-                !eventoInstalacao) {
+                localStorage.getItem(CHAVE_AVISO) === "1") {
                 return;
             }
 
@@ -162,25 +223,34 @@
         caixa.style.cssText =
             "display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;" +
             "margin:0 0 20px;padding:14px 18px;border-radius:14px;font-size:14px;line-height:1.55;" +
-            "border:1px solid #cfe0fb;background:#eef5ff;color:#1e3a6e;";
+            "border:1px solid #cfe0fb;background:linear-gradient(90deg,#eef5ff,#f5f0ff);color:#1e3a6e;";
 
         var texto = document.createElement("div");
 
-        texto.innerHTML = "<strong>📲 Instale o Gestok no seu aparelho</strong> para abrir mais rápido, em tela cheia.";
+        texto.setAttribute("data-aviso-texto", "");
 
         var acoes = document.createElement("div");
 
-        acoes.style.cssText = "display:flex;align-items:center;gap:8px;";
+        acoes.style.cssText = "display:flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0;margin-left:auto;";
+
+        var estiloBotao =
+            "height:36px;padding:0 18px;border:0;border-radius:9px;background:#2563eb;color:#fff;box-sizing:border-box;" +
+            "font-family:inherit;font-size:13px;font-weight:700;line-height:1;cursor:pointer;white-space:nowrap;" +
+            "display:inline-flex;align-items:center;justify-content:center;text-decoration:none;";
+
+        var saibaMais = document.createElement("a");
+
+        saibaMais.setAttribute("data-aviso-link", "");
+
+        saibaMais.style.cssText = estiloBotao;
 
         var instalarBtn = document.createElement("button");
 
         instalarBtn.type = "button";
 
-        instalarBtn.textContent = "Instalar";
+        instalarBtn.setAttribute("data-aviso-instalar", "");
 
-        instalarBtn.style.cssText =
-            "height:36px;padding:0 16px;border:0;border-radius:9px;background:#2563eb;color:#fff;" +
-            "font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;";
+        instalarBtn.style.cssText = estiloBotao + "display:none;";
 
         instalarBtn.addEventListener("click", instalar);
 
@@ -205,6 +275,8 @@
 
         });
 
+        acoes.appendChild(saibaMais);
+
         acoes.appendChild(instalarBtn);
 
         acoes.appendChild(fechar);
@@ -214,6 +286,15 @@
         caixa.appendChild(acoes);
 
         principal.insertBefore(caixa, principal.firstChild);
+
+        try {
+            contadorAviso = parseInt(localStorage.getItem(CHAVE_ROTACAO) || "0", 10) || 0;
+            localStorage.setItem(CHAVE_ROTACAO, String(contadorAviso + 1));
+        } catch (e) {
+            contadorAviso = 0;
+        }
+
+        desenharAviso();
 
     }
 
@@ -227,11 +308,7 @@
 
         atualizarCartao();
 
-        if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", mostrarAvisoPainel);
-        } else {
-            mostrarAvisoPainel();
-        }
+        atualizarBotaoInstalarAviso();
 
     });
 
@@ -258,6 +335,8 @@
         }
 
         atualizarCartao();
+
+        mostrarAvisoPainel();
 
     }
 

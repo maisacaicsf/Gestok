@@ -12,6 +12,20 @@
         return;
     }
 
+    function publicarErro(erro) {
+
+        try {
+
+            if (erro) {
+                console.error("Aviso de validade:", erro);
+            }
+
+            document.dispatchEvent(new CustomEvent("gestok:validade-erro"));
+
+        } catch (e) { }
+
+    }
+
     function esperarDados(usuario) {
 
         var lojaId = typeof obterLojaAtualGestok === "function"
@@ -21,6 +35,7 @@
         Promise.resolve(lojaId).then(function (id) {
 
             if (!id || typeof referenciaLotes !== "function") {
+                publicarErro();
                 return;
             }
 
@@ -37,11 +52,19 @@
                     return Object.assign({ id: d.id }, d.data());
                 });
 
-                mostrarAviso(window.GestokValidade.calcular(lotes, produtos).linhas);
+                var linhas = window.GestokValidade.calcular(lotes, produtos).linhas;
+
+                /* compartilha os dados com o painel "Próximos da validade" */
+                try {
+                    window.GestokValidadeLinhas = linhas;
+                    document.dispatchEvent(new CustomEvent("gestok:validade-calculada", { detail: { linhas: linhas } }));
+                } catch (e) { }
+
+                mostrarAviso(linhas);
 
             });
 
-        }).catch(function () { });
+        }).catch(function (erro) { publicarErro(erro); });
 
     }
 
@@ -140,7 +163,7 @@
 
         var jaFoi = false;
 
-        firebase.auth().onAuthStateChanged(function (usuario) {
+        function aoAutenticar(usuario) {
 
             if (!usuario || jaFoi) {
                 return;
@@ -150,7 +173,14 @@
 
             esperarDados(usuario);
 
-        });
+        }
+
+        /* observarAutenticacaoGestok só chama depois de carregar a loja do usuário */
+        if (typeof observarAutenticacaoGestok === "function") {
+            observarAutenticacaoGestok(aoAutenticar);
+        } else {
+            firebase.auth().onAuthStateChanged(aoAutenticar);
+        }
 
     });
 
