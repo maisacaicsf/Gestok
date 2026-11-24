@@ -66,7 +66,7 @@ body {
 
     border-radius: 12px;
 
-    background: #2563eb;
+    background: var(--gk-primaria,#2563eb);
 
     color: #fff;
 
@@ -89,7 +89,7 @@ body {
 
     font-weight: 800;
 
-    color: #2563eb;
+    color: var(--gk-primaria,#2563eb);
 }
 
 
@@ -135,7 +135,7 @@ body {
 .plan-box span {
     display: block;
 
-    color: #2563eb;
+    color: var(--gk-primaria,#2563eb);
 
     font-size: 9px;
 
@@ -224,9 +224,9 @@ body {
 .method {
     width: 100%;
 
-    border: 1px solid #2563eb;
+    border: 1px solid var(--gk-primaria,#2563eb);
 
-    background: #edf4ff;
+    background: var(--gk-primaria-clara,#edf4ff);
 
     border-radius: 12px;
 
@@ -253,7 +253,7 @@ body {
 
     border-radius: 9px;
 
-    background: #2563eb;
+    background: var(--gk-primaria,#2563eb);
 
     color: #fff;
 
@@ -375,7 +375,7 @@ body {
 
     border-radius: 11px;
 
-    background: #2563eb;
+    background: var(--gk-primaria,#2563eb);
 
     color: #fff;
 
@@ -392,7 +392,7 @@ body {
 
 
 .payment-button:hover {
-    background: #1d4ed8;
+    background: var(--gk-primaria-escura,#1d4ed8);
 }
 
 
@@ -425,7 +425,7 @@ body {
 
     margin-top: 20px;
 
-    color: #2563eb;
+    color: var(--gk-primaria,#2563eb);
 
     text-decoration: none;
 
@@ -481,7 +481,7 @@ body {
     line-height: 1.5;
 }
 
-.payment-status strong { color: #1d4ed8; }
+.payment-status strong { color: var(--gk-primaria-escura,#1d4ed8); }
 .payment-status span { color: #667085; }
 
 .pix-real-area {

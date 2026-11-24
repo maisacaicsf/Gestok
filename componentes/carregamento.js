@@ -50,8 +50,8 @@
       .gestok-loading-screen.gestok-loading-hidden{opacity:0;visibility:hidden;pointer-events:none}
       .gestok-loading-screen .gestok-loading-card{display:flex;flex-direction:column;align-items:center;gap:12px;padding:30px 36px;text-align:center}
       .gestok-loading-screen .gestok-loading-brand{font-size:23px;font-weight:750;letter-spacing:-.5px;color:#172554}
-      .gestok-loading-screen .gestok-loading-brand span{display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;margin-right:8px;border-radius:9px;background:#2563eb;color:white;font-size:15px;vertical-align:middle}
-      .gestok-loading-screen .gestok-loading-spinner{width:34px;height:34px;border:3px solid #dbeafe;border-top-color:#2563eb;border-radius:50%;animation:gestok-spin .8s linear infinite}
+      .gestok-loading-screen .gestok-loading-brand span{display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;margin-right:8px;border-radius:9px;background:var(--gk-primaria,#2563eb);color:white;font-size:15px;vertical-align:middle}
+      .gestok-loading-screen .gestok-loading-spinner{width:34px;height:34px;border:3px solid var(--gk-primaria-borda,#dbeafe);border-top-color:var(--gk-primaria,#2563eb);border-radius:50%;animation:gestok-spin .8s linear infinite}
       .gestok-loading-screen .gestok-loading-title{font-size:14px;font-weight:650;color:#334155}
       .gestok-loading-screen .gestok-loading-subtitle{font-size:12px;color:#94a3b8}
       @keyframes gestok-spin{to{transform:rotate(360deg)}}
@@ -63,7 +63,7 @@
         injetarEstilo('gestok-loading-estilo-barra', `
       #gestok-loading-bar{position:fixed;top:0;left:0;right:0;height:3px;z-index:99999;overflow:hidden;pointer-events:none;opacity:1;transition:opacity .25s ease}
       #gestok-loading-bar.gestok-loading-hidden{opacity:0}
-      #gestok-loading-bar::before{content:"";position:absolute;top:0;bottom:0;left:0;width:40%;background:linear-gradient(90deg,transparent,#2563eb,transparent);animation:gestok-barra 1s ease-in-out infinite}
+      #gestok-loading-bar::before{content:"";position:absolute;top:0;bottom:0;left:0;width:40%;background:linear-gradient(90deg,transparent,var(--gk-primaria,#2563eb),transparent);animation:gestok-barra 1s ease-in-out infinite}
       @keyframes gestok-barra{from{transform:translateX(-100%)}to{transform:translateX(250%)}}
       @media(prefers-reduced-motion:reduce){#gestok-loading-bar::before{animation-duration:2.4s}}
     `);

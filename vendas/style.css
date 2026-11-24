@@ -10,14 +10,14 @@
     border: 1px solid #dbe2ec;
     border-radius: 10px;
     background: #ffffff;
-    color: #3155a5;
+    color: var(--gk-primaria-escura2,#3155a5);
     font-family: inherit;
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
 }
 
-.vend-btn:hover { background: #f1f5ff; border-color: #b9c8ec; }
+.vend-btn:hover { background: var(--gk-primaria-clara,#f1f5ff); border-color: var(--gk-primaria-borda,#b9c8ec); }
 
 /* ----- caixa ----- */
 
@@ -67,8 +67,8 @@
 }
 
 .vend-busca input:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, .12);
+    border-color: var(--gk-primaria,#2563eb);
+    box-shadow: 0 0 0 4px rgba(var(--gk-primaria-rgb,37,99,235), .12);
 }
 
 .vend-resultados {
@@ -98,7 +98,7 @@
 }
 
 .vend-res.ativo,
-.vend-res:hover { background: #f1f5ff; }
+.vend-res:hover { background: var(--gk-primaria-clara,#f1f5ff); }
 .vend-res small { display: block; margin-top: 2px; font-size: 12px; color: #7b8794; }
 .vend-res .preco { font-weight: 700; white-space: nowrap; }
 .vend-res.sem { opacity: .5; }
@@ -155,7 +155,7 @@
     cursor: pointer;
 }
 
-.vend-qtd button:hover { background: #edf5fc; border-color: #2563eb; }
+.vend-qtd button:hover { background: #edf5fc; border-color: var(--gk-primaria,#2563eb); }
 
 .vend-qtd .valor {
     width: auto;
@@ -220,8 +220,8 @@
     transition: border-color .15s ease, background .15s ease;
 }
 
-.vend-forma:hover { border-color: #b9c8ec; }
-.vend-forma.ativo { border-color: #2563eb; background: #eef3fd; color: #1d4ed8; }
+.vend-forma:hover { border-color: var(--gk-primaria-borda,#b9c8ec); }
+.vend-forma.ativo { border-color: var(--gk-primaria,#2563eb); background: var(--gk-primaria-clara,#eef3fd); color: var(--gk-primaria-escura,#1d4ed8); }
 
 .vend-recebido,
 .vend-campo { margin-bottom: 12px; }
@@ -250,8 +250,8 @@
 
 .vend-recebido input:focus,
 .vend-campo input:focus {
-    border-color: #5790ed;
-    box-shadow: 0 0 0 3px rgba(87, 144, 237, .15);
+    border-color: var(--gk-primaria-media,#5790ed);
+    box-shadow: 0 0 0 3px rgba(var(--gk-primaria-rgb,87,144,237), .15);
 }
 
 .vend-rapidos { display: flex; gap: 6px; margin: 8px 0; }
@@ -262,14 +262,14 @@
     border: 1px solid #dbe2ec;
     border-radius: 8px;
     background: #ffffff;
-    color: #3155a5;
+    color: var(--gk-primaria-escura2,#3155a5);
     font-family: inherit;
     font-size: 12px;
     font-weight: 700;
     cursor: pointer;
 }
 
-.vend-rapidos button:hover { background: #f1f5ff; }
+.vend-rapidos button:hover { background: var(--gk-primaria-clara,#f1f5ff); }
 
 .vend-troco { display: flex; justify-content: space-between; padding: 10px 12px; border-radius: 10px; background: #f3f6fb; font-size: 13px; color: #475569; }
 .vend-troco b { font-size: 16px; color: #15803d; }
@@ -342,7 +342,7 @@
 .vend-badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
 .vend-badge.finalizada { background: #dcfce7; color: #15803d; }
 .vend-badge.cancelada { background: #fee2e2; color: #b91c1c; }
-.vend-badge.origem { background: #eef3fd; color: #274690; }
+.vend-badge.origem { background: var(--gk-primaria-clara,#eef3fd); color: var(--gk-primaria-escura2,#274690); }
 
 .vend-acoes { display: flex; gap: 6px; flex-wrap: wrap; }
 
@@ -527,15 +527,15 @@ button.secondary-button {
     border: 1px solid #dbe2ec;
     border-radius: 8px;
     background: #ffffff;
-    color: #3155a5;
+    color: var(--gk-primaria-escura2,#3155a5);
     font-family: inherit;
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
 }
 
-.page-btn:hover:not(:disabled) { background: #f1f5ff; border-color: #b9c8ec; }
-.page-btn.active { background: #3155a5; border-color: #3155a5; color: #ffffff; }
+.page-btn:hover:not(:disabled) { background: var(--gk-primaria-clara,#f1f5ff); border-color: var(--gk-primaria-borda,#b9c8ec); }
+.page-btn.active { background: var(--gk-primaria-escura2,#3155a5); border-color: var(--gk-primaria-escura2,#3155a5); color: #ffffff; }
 .page-btn:disabled { opacity: .45; cursor: not-allowed; }
 .page-gap { padding: 0 4px; color: #9aa3b2; }
 

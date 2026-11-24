@@ -2218,7 +2218,7 @@ if (formResponderChamado && mensagemRespostaCliente) {
 
         .conversation-message.cliente {
             align-self: flex-end;
-            background: #edf4ff;
+            background: var(--gk-primaria-clara,#edf4ff);
             border-color: #dceaff;
         }
 
@@ -2285,7 +2285,7 @@ if (formResponderChamado && mensagemRespostaCliente) {
         }
 
         .ticket-reply-form textarea:focus {
-            border-color: #3478e5;
+            border-color: var(--gk-primaria,#3478e5);
             box-shadow: 0 0 0 3px rgba(52,120,229,.10);
         }
 

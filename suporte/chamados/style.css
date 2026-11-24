@@ -4,9 +4,9 @@
 ========================================= */
 
 :root {
-    --blue: #2563eb;
-    --blue-dark: #1d4ed8;
-    --blue-soft: #eff6ff;
+    --blue: var(--gk-primaria,#2563eb);
+    --blue-dark: var(--gk-primaria-escura,#1d4ed8);
+    --blue-soft: var(--gk-primaria-clara,#eff6ff);
 
     --green: #16a34a;
     --green-soft: #ecfdf3;
@@ -383,7 +383,7 @@ body {
 
     box-shadow:
         0 4px 12px
-        rgba(37, 99, 235, .17);
+        rgba(var(--gk-primaria-rgb,37,99,235), .17);
 }
 
 .nav-create-product:hover {
@@ -617,7 +617,7 @@ body {
 
     box-shadow:
         0 4px 12px
-        rgba(37, 99, 235, .16);
+        rgba(var(--gk-primaria-rgb,37,99,235), .16);
 
     transition: .16s ease;
 }
@@ -858,7 +858,7 @@ body {
 
     box-shadow:
         0 0 0 3px
-        rgba(37, 99, 235, .06);
+        rgba(var(--gk-primaria-rgb,37,99,235), .06);
 }
 
 
@@ -1518,7 +1518,7 @@ body {
     align-self: flex-end;
 
     background:
-        #edf4ff;
+        var(--gk-primaria-clara,#edf4ff);
 
     border-color:
         #dceaff;
@@ -1672,7 +1672,7 @@ body {
 
 .ticket-reply-form textarea:focus {
     border-color:
-        #3478e5;
+        var(--gk-primaria,#3478e5);
 
     box-shadow:
         0 0 0 3px
@@ -2297,7 +2297,7 @@ body {
     padding: 2px 0;
     border: 0;
     background: none;
-    color: var(--blue, #2563eb);
+    color: var(--blue, var(--gk-primaria,#2563eb));
     font-family: inherit;
     font-size: 9px;
     font-weight: 700;

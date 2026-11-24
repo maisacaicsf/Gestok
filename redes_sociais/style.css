@@ -1,6 +1,6 @@
 :root {
-    --blue: #2563eb;
-    --blue-soft: #eff6ff;
+    --blue: var(--gk-primaria,#2563eb);
+    --blue-soft: var(--gk-primaria-clara,#eff6ff);
     --text: #172033;
     --muted: #667085;
     --light: #98a2b3;

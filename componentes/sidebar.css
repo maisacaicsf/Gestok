@@ -102,7 +102,7 @@
 
     border-radius: 10px;
 
-    background: #2563eb;
+    background: var(--gk-primaria,#2563eb);
 
     color: #ffffff;
 
@@ -260,9 +260,9 @@
 
 
 .sidebar-nav-item.active {
-    background: #edf4ff;
+    background: var(--gk-primaria-clara,#edf4ff);
 
-    color: #2563eb;
+    color: var(--gk-primaria,#2563eb);
 
     font-weight: 600;
 }
@@ -304,20 +304,20 @@
 
     border-radius: 11px;
 
-    background: #2563eb;
+    background: var(--gk-primaria,#2563eb);
 
     color: #ffffff;
 
     box-shadow:
         0 5px 14px
-        rgba(37, 99, 235, 0.20);
+        rgba(var(--gk-primaria-rgb,37,99,235), 0.20);
 
     gap: 11px;
 }
 
 
 .sidebar-create-product:hover {
-    background: #1d4ed8;
+    background: var(--gk-primaria-escura,#1d4ed8);
 
     color: #ffffff;
 
@@ -325,7 +325,7 @@
 
     box-shadow:
         0 7px 18px
-        rgba(37, 99, 235, 0.25);
+        rgba(var(--gk-primaria-rgb,37,99,235), 0.25);
 }
 
 

@@ -35,7 +35,7 @@ button,
 @media (hover: none) and (pointer: coarse) {
 
     * {
-        -webkit-tap-highlight-color: rgba(37, 99, 235, .14);
+        -webkit-tap-highlight-color: rgba(var(--gk-primaria-rgb,37,99,235), .14);
     }
 
     /* iPhone dá zoom automático em campo com fonte menor que 16px */

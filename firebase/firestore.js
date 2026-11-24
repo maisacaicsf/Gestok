@@ -4,6 +4,12 @@
 
 const db = firebase.firestore();
 
+/* Rede instável / bloqueio de QUIC / antivírus / proxy: se a conexão em tempo
+   real falhar, o Firestore troca sozinho para "long polling" (mais compatível). */
+try {
+    db.settings({ experimentalAutoDetectLongPolling: true, merge: true });
+} catch (erro) { }
+
 /* Cache local do Firestore: nas próximas aberturas os dados aparecem
    na hora e são atualizados em seguida com os dados do servidor. */
 try {

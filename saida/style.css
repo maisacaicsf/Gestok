@@ -50,7 +50,7 @@ body {
 }
 
 .eyebrow {
-    color: #2563eb;
+    color: var(--gk-primaria,#2563eb);
 
     font-size: 10px;
     font-weight: 700;
@@ -204,11 +204,11 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-    border-color: #5790ed;
+    border-color: var(--gk-primaria-media,#5790ed);
 
     box-shadow:
         0 0 0 3px
-        rgba(37, 99, 235, .08);
+        rgba(var(--gk-primaria-rgb,37,99,235), .08);
 }
 
 input::placeholder,
@@ -267,7 +267,7 @@ textarea::placeholder {
 
     border-color: #d9e9ff;
 
-    color: #2563eb;
+    color: var(--gk-primaria,#2563eb);
 
     font-weight: 700;
 }
@@ -330,23 +330,23 @@ textarea::placeholder {
 .primary-button {
     border: none;
 
-    background: #2563eb;
+    background: var(--gk-primaria,#2563eb);
 
     color: #fff;
 
     box-shadow:
         0 3px 8px
-        rgba(37, 99, 235, .18);
+        rgba(var(--gk-primaria-rgb,37,99,235), .18);
 }
 
 .primary-button:hover {
-    background: #1d4ed8;
+    background: var(--gk-primaria-escura,#1d4ed8);
 
     transform: translateY(-1px);
 
     box-shadow:
         0 5px 12px
-        rgba(37, 99, 235, .22);
+        rgba(var(--gk-primaria-rgb,37,99,235), .22);
 }
 
 .primary-button:active {

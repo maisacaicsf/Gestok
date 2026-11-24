@@ -31,7 +31,7 @@ main {
     width: 44px;
     height: 44px;
     border-radius: 11px;
-    background: #2563eb;
+    background: var(--gk-primaria,#2563eb);
     color: #fff;
     display: grid;
     place-items: center;
@@ -43,7 +43,7 @@ main {
 .eyebrow {
     font-size: 10px;
     letter-spacing: 1.5px;
-    color: #2563eb;
+    color: var(--gk-primaria,#2563eb);
     font-weight: 800;
 }
 
@@ -85,7 +85,7 @@ button {
     border: 0;
     border-radius: 9px;
     padding: 14px;
-    background: #2563eb;
+    background: var(--gk-primaria,#2563eb);
     color: #fff;
     font-weight: 700;
     font-size: 14px;
@@ -101,7 +101,7 @@ button {
 }
 
 .links a {
-    color: #2563eb;
+    color: var(--gk-primaria,#2563eb);
     text-decoration: none;
     font-weight: 700;
 }

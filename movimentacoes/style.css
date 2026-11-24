@@ -159,8 +159,8 @@ body {
 
 .filters input:focus,
 .filters select:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, .07);
+    border-color: var(--gk-primaria,#2563eb);
+    box-shadow: 0 0 0 3px rgba(var(--gk-primaria-rgb,37,99,235), .07);
 }
 
 .filters button {

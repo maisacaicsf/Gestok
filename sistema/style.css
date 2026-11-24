@@ -11,7 +11,7 @@
 
 :root {
 
-    --primary: #3478e5;
+    --primary: var(--gk-primaria,#3478e5);
     --primary-dark: #2563d3;
 
     --background: #f5f7fa;
@@ -286,7 +286,7 @@ a {
         linear-gradient(
             135deg,
             #438eea,
-            #2868ce
+            var(--gk-primaria-escura,#2868ce)
         );
 
     color: white;
@@ -422,7 +422,7 @@ a {
 
     border-radius: 8px;
 
-    background: #edf4ff;
+    background: var(--gk-primaria-clara,#edf4ff);
 
     color: var(--primary);
 
@@ -1466,7 +1466,7 @@ a {
 
     background: transparent;
 
-    color: #2563eb;
+    color: var(--gk-primaria,#2563eb);
 
     font-size: 11px;
 
@@ -1591,7 +1591,7 @@ a {
 
     background: #eaf2ff;
 
-    color: #2563eb;
+    color: var(--gk-primaria,#2563eb);
 
     font-size: 7px;
 
@@ -1946,8 +1946,8 @@ a {
 }
 
 .chart-period:focus {
-    border-color: #5790ed;
-    box-shadow: 0 0 0 3px rgba(87, 144, 237, .15);
+    border-color: var(--gk-primaria-media,#5790ed);
+    box-shadow: 0 0 0 3px rgba(var(--gk-primaria-rgb,87,144,237), .15);
 }
 
 .mov-chart {
@@ -2005,7 +2005,7 @@ a {
 .mov-bar {
     position: relative;
     width: min(62%, 58px);
-    background: linear-gradient(180deg, #3b8bff 0%, #2563eb 100%);
+    background: linear-gradient(180deg, #3b8bff 0%, var(--gk-primaria,#2563eb) 100%);
     border-radius: 8px 8px 0 0;
     transition: height .45s ease, filter .2s ease;
     cursor: default;

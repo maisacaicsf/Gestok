@@ -223,7 +223,7 @@
         caixa.style.cssText =
             "display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;" +
             "margin:0 0 20px;padding:14px 18px;border-radius:14px;font-size:14px;line-height:1.55;" +
-            "border:1px solid #cfe0fb;background:linear-gradient(90deg,#eef5ff,#f5f0ff);color:#1e3a6e;";
+            "border:1px solid var(--gk-primaria-borda,#cfe0fb);background:linear-gradient(90deg,var(--gk-primaria-clara,#eef5ff),#f5f0ff);color:var(--gk-primaria-escura2,#1e3a6e);";
 
         var texto = document.createElement("div");
 
@@ -234,7 +234,7 @@
         acoes.style.cssText = "display:flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0;margin-left:auto;";
 
         var estiloBotao =
-            "height:36px;padding:0 18px;border:0;border-radius:9px;background:#2563eb;color:#fff;box-sizing:border-box;" +
+            "height:36px;padding:0 18px;border:0;border-radius:9px;background:var(--gk-primaria,#2563eb);color:#fff;box-sizing:border-box;" +
             "font-family:inherit;font-size:13px;font-weight:700;line-height:1;cursor:pointer;white-space:nowrap;" +
             "display:inline-flex;align-items:center;justify-content:center;text-decoration:none;";
 

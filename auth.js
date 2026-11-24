@@ -2383,7 +2383,7 @@ function mensagemErroFirebaseGestok(
             caixa.style.cssText =
                 "display:flex;align-items:flex-start;justify-content:space-between;gap:14px;" +
                 "margin:0 0 20px;padding:14px 18px;border-radius:14px;font-size:14px;line-height:1.55;" +
-                "border:1px solid " + (urgente ? "#fcd9a8" : "#cfe0fb") + ";" +
+                "border:1px solid " + (urgente ? "#fcd9a8" : "var(--gk-primaria-borda,#cfe0fb)") + ";" +
                 "background:" + (urgente ? "#fff6e8" : "#eef5ff") + ";" +
                 "color:" + (urgente ? "#7a4a06" : "#1e3a6e") + ";";
 

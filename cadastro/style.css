@@ -12,8 +12,8 @@
 
 :root {
 
-    --primary: #2563eb;
-    --primary-dark: #1d4ed8;
+    --primary: var(--gk-primaria,#2563eb);
+    --primary-dark: var(--gk-primaria-escura,#1d4ed8);
 
     --background: #f7f9fc;
     --white: #ffffff;
@@ -330,7 +330,7 @@ input:focus {
 
     box-shadow:
         0 0 0 3px
-        rgba(37,99,235,.08);
+        rgba(var(--gk-primaria-rgb,37,99,235),.08);
 }
 
 

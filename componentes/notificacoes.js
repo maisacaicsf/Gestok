@@ -28,7 +28,7 @@
         sucesso: { icone: "✓", fundo: "#ecfdf3", cor: "#16a34a" },
         erro: { icone: "✕", fundo: "#fef2f2", cor: "#dc2626" },
         aviso: { icone: "!", fundo: "#fffbeb", cor: "#d97706" },
-        info: { icone: "i", fundo: "#eff6ff", cor: "#2563eb" }
+        info: { icone: "i", fundo: "var(--gk-primaria-clara,#eff6ff)", cor: "var(--gk-primaria,#2563eb)" }
     };
 
     var ultimaExibicao = null;
